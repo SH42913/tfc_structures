@@ -5,7 +5,8 @@
   "compatibilityLevel": "JAVA_16",
   "refmap": "tfc_structures.refmap.json",
   "mixins": [
-    "ExampleMixin"
+    "StructurePieceMixin",
+    "StructureTemplateMixin"
   ],
   "client": [
   ],

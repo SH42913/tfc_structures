@@ -4,6 +4,7 @@ import com.farco.tfc_structures.config.CommonConfig;
 import com.farco.tfc_structures.config.JsonConfigProvider;
 import com.farco.tfc_structures.config.StructureConfig;
 import com.farco.tfc_structures.data.DatapackGenerator;
+import com.farco.tfc_structures.processors.ModProcessors;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.packs.PackType;
@@ -43,6 +44,8 @@ public class TFCStructuresMod {
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::addPackFinder);
         modLoadingContext.registerConfig(ModConfig.Type.COMMON, CommonConfig.SPEC, MODID + "/structures-config.toml");
+
+        ModProcessors.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.addListener(this::onServerStarted);
     }
