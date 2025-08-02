@@ -2,9 +2,11 @@ package com.farco.tfc_structures;
 
 import com.farco.tfc_structures.config.CommonConfig;
 import com.farco.tfc_structures.config.JsonConfigProvider;
+import com.farco.tfc_structures.config.ReplacementConfig;
 import com.farco.tfc_structures.config.StructureConfig;
 import com.farco.tfc_structures.data.DatapackGenerator;
-import com.farco.tfc_structures.processors.ModProcessors;
+import com.farco.tfc_structures.processors.ModStructureProcessors;
+import com.farco.tfc_structures.processors.TFCStructureProcessor;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.packs.PackType;
@@ -30,7 +32,10 @@ public class TFCStructuresMod {
     private static final JsonConfigProvider CONFIG_PROVIDER;
     private static final DatapackGenerator DATAPACK_GENERATOR;
 
+    private static TFCStructureProcessor structureProcessor;
     private StructureConfig structureConfig;
+    @SuppressWarnings("FieldCanBeLocal")
+    private ReplacementConfig replacementConfig;
 
     static {
         LOGGER = LogUtils.getLogger();
@@ -43,9 +48,9 @@ public class TFCStructuresMod {
         IEventBus modEventBus = modLoadingContext.getModEventBus();
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::addPackFinder);
-        modLoadingContext.registerConfig(ModConfig.Type.COMMON, CommonConfig.SPEC, MODID + "/structures-config.toml");
+        modLoadingContext.registerConfig(ModConfig.Type.COMMON, CommonConfig.SPEC, MODID + "/common-config.toml");
 
-        ModProcessors.register(modEventBus);
+        ModStructureProcessors.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.addListener(this::onServerStarted);
     }
@@ -53,6 +58,8 @@ public class TFCStructuresMod {
     private void commonSetup(FMLCommonSetupEvent event) {
         LOGGER.info("Common setup of {}", MODID);
         structureConfig = CONFIG_PROVIDER.load(StructureConfig.CONFIG_NAME, StructureConfig.class, StructureConfig::getDefaultConfig);
+        replacementConfig = CONFIG_PROVIDER.load(ReplacementConfig.CONFIG_NAME, ReplacementConfig.class, ReplacementConfig::getDefaultConfig);
+        structureProcessor = new TFCStructureProcessor(replacementConfig);
     }
 
     private void addPackFinder(AddPackFindersEvent event) {
@@ -67,5 +74,9 @@ public class TFCStructuresMod {
         var registry = event.getServer().registryAccess().registryOrThrow(Registries.STRUCTURE);
         structureConfig.refreshUnused(registry);
         CONFIG_PROVIDER.save(StructureConfig.CONFIG_NAME, structureConfig);
+    }
+
+    public static TFCStructureProcessor getStructureProcessor() {
+        return structureProcessor;
     }
 }

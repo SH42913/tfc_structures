@@ -1,6 +1,6 @@
 package com.farco.tfc_structures.mixin;
 
-import com.farco.tfc_structures.processors.TestProcessor;
+import com.farco.tfc_structures.TFCStructuresMod;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,6 +18,6 @@ public abstract class StructurePieceMixin {
             index = 1
     )
     private BlockState modifyPlacedBlock(BlockState original) {
-        return TestProcessor.INSTANCE.replaceBlock(original);
+        return TFCStructuresMod.getStructureProcessor().replaceBlock(original);
     }
 }
