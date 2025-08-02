@@ -2,9 +2,11 @@ package com.farco.tfc_structures.processors;
 
 import com.farco.tfc_structures.config.ReplacementConfig;
 import com.mojang.serialization.Codec;
+import net.dries007.tfc.world.chunkdata.ChunkDataProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -16,23 +18,25 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class TFCStructureProcessor extends StructureProcessor {
     public static final Codec<TFCStructureProcessor> CODEC = Codec.unit(new TFCStructureProcessor(null));
 
     private final Map<String, String> directReplacements;
+    private final Set<String> tfcReplacements;
 
     public TFCStructureProcessor(ReplacementConfig replacementConfig) {
         if (replacementConfig == null) {
             directReplacements = new HashMap<>();
+            tfcReplacements = new HashSet<>();
         } else {
             directReplacements = Arrays
                     .stream(replacementConfig.directReplacements())
                     .collect(Collectors.toMap(ReplacementConfig.Direct::original, ReplacementConfig.Direct::replacement));
+
+            tfcReplacements = Set.of(replacementConfig.tfcReplacements());
         }
     }
 
@@ -49,7 +53,7 @@ public class TFCStructureProcessor extends StructureProcessor {
                                                                   @NotNull StructureTemplate.StructureBlockInfo current,
                                                                   @NotNull StructurePlaceSettings settings,
                                                                   @Nullable StructureTemplate template) {
-        var newBlock = replaceBlock(current.state());
+        var newBlock = replaceBlock(level, current.pos(), current.state());
         return new StructureTemplate.StructureBlockInfo(
                 current.pos(),
                 newBlock,
@@ -57,7 +61,7 @@ public class TFCStructureProcessor extends StructureProcessor {
         );
     }
 
-    public BlockState replaceBlock(BlockState original) {
+    public BlockState replaceBlock(@NotNull LevelReader level, BlockPos pos, BlockState original) {
         ResourceLocation resourceLocation = ForgeRegistries.BLOCKS.getKey(original.getBlock());
         if (resourceLocation == null) {
             return original;
@@ -69,12 +73,28 @@ public class TFCStructureProcessor extends StructureProcessor {
             return replaceDirectly(original, directReplacement);
         }
 
+        if (tfcReplacements.contains(blockId)) {
+            return replaceTfc(level, pos, original);
+        }
+
         return original;
     }
 
     private BlockState replaceDirectly(BlockState original, String directReplacement) {
         ResourceLocation location = ResourceLocation.parse(directReplacement);
         Block replacement = ForgeRegistries.BLOCKS.getValue(location);
+        return replaceBlock(original, replacement);
+    }
+
+    private BlockState replaceTfc(@NotNull LevelReader level, BlockPos pos, BlockState original) {
+        WorldGenLevel worldGenLevel = (WorldGenLevel) level;
+        ChunkDataProvider provider = ChunkDataProvider.get(worldGenLevel);
+        var chunkData = provider.get(worldGenLevel, pos);
+        var hardened = chunkData.getRockData().getSurfaceRock(pos.getX(), pos.getZ()).hardened();
+        return replaceBlock(original, hardened);
+    }
+
+    private static BlockState replaceBlock(BlockState original, Block replacement) {
         if (replacement == null) {
             return original;
         }
@@ -90,7 +110,6 @@ public class TFCStructureProcessor extends StructureProcessor {
                 newBlockState = setValueGeneric(newBlockState, property, originalValue);
             }
         }
-
 
         return newBlockState;
     }
