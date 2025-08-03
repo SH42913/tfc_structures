@@ -1,17 +1,21 @@
 package com.farco.tfc_structures.config;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.properties.WoodType;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Predicate;
 
 public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> tfcWorldReplacement) {
     public static final String CONFIG_NAME = "replacement_config.json";
     public static final String TFC_STONE_TYPE = "STONE";
     public static final String TFC_BRICK_TYPE = "BRICK";
     public static final String TFC_WOOD_TYPE = "WOOD";
+    public static final String TFC_SKIP_TYPE = "SKIP";
 
     private record Direct(String original, String replacement) {
     }
@@ -45,39 +49,50 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
     }
 
     private static @NotNull List<Direct> getDefaultDirect() {
-        return List.of();
+        return List.of(
+                new Direct("minecraft:campfire", "tfc:firepit"),
+                new Direct("minecraft:anvil", "tfc:metal/anvil/bismuth_bronze"),
+                new Direct("minecraft:chipped_anvil", "tfc:metal/anvil/bronze"),
+                new Direct("minecraft:damaged_anvil", "tfc:metal/anvil/copper")
+        );
     }
 
     private static @NotNull List<TFCWorld> getDefaultTFCWorld() {
-        return List.of(
-                new TFCWorld("minecraft:cobblestone", TFC_BRICK_TYPE),
-                new TFCWorld("minecraft:cobblestone_stairs", TFC_BRICK_TYPE),
-                new TFCWorld("minecraft:cobblestone_wall", TFC_BRICK_TYPE),
-                new TFCWorld("minecraft:cobblestone_slab", TFC_BRICK_TYPE),
-                new TFCWorld("minecraft:mossy_cobblestone", TFC_BRICK_TYPE),
-                new TFCWorld("minecraft:mossy_cobblestone_slab", TFC_BRICK_TYPE),
-                new TFCWorld("minecraft:mossy_cobblestone_stairs", TFC_BRICK_TYPE),
-                new TFCWorld("minecraft:mossy_cobblestone_wall", TFC_BRICK_TYPE),
-                new TFCWorld("minecraft:mossy_stone_brick_slab", TFC_BRICK_TYPE),
-                new TFCWorld("minecraft:mossy_stone_brick_stairs", TFC_BRICK_TYPE),
-                new TFCWorld("minecraft:mossy_stone_brick_wall", TFC_BRICK_TYPE),
-                new TFCWorld("minecraft:mossy_stone_bricks", TFC_BRICK_TYPE),
-                new TFCWorld("minecraft:chest", TFC_WOOD_TYPE),
-                new TFCWorld("minecraft:oak_log", TFC_WOOD_TYPE),
-                new TFCWorld("minecraft:oak_planks", TFC_WOOD_TYPE),
-                new TFCWorld("minecraft:oak_door", TFC_WOOD_TYPE),
-                new TFCWorld("minecraft:oak_fence", TFC_WOOD_TYPE),
-                new TFCWorld("minecraft:oak_fence_gate", TFC_WOOD_TYPE),
-                new TFCWorld("minecraft:oak_slab", TFC_WOOD_TYPE),
-                new TFCWorld("minecraft:oak_stairs", TFC_WOOD_TYPE),
-                new TFCWorld("minecraft:oak_wood", TFC_WOOD_TYPE),
-                new TFCWorld("minecraft:dark_oak_log", TFC_WOOD_TYPE),
-                new TFCWorld("minecraft:dark_oak_planks", TFC_WOOD_TYPE),
-                new TFCWorld("minecraft:dark_oak_door", TFC_WOOD_TYPE),
-                new TFCWorld("minecraft:dark_oak_fence", TFC_WOOD_TYPE),
-                new TFCWorld("minecraft:dark_oak_fence_gate", TFC_WOOD_TYPE),
-                new TFCWorld("minecraft:dark_oak_slab", TFC_WOOD_TYPE),
-                new TFCWorld("minecraft:dark_oak_stairs", TFC_WOOD_TYPE),
-                new TFCWorld("minecraft:dark_oak_wood", TFC_WOOD_TYPE));
+        var ignoreNames = List.of("nether", "prismarine", "end");
+        var stoneNames = List.of("stone");
+        var brickNames = List.of("brick");
+        var woodNames = WoodType.values().map(WoodType::name).toList();
+        var woodBlocksSet = Set.of(Blocks.CRAFTING_TABLE, Blocks.CHEST, Blocks.TRAPPED_CHEST, Blocks.LECTERN, Blocks.BOOKSHELF);
+
+        var list = new ArrayList<TFCWorld>();
+        for (var entry : ForgeRegistries.BLOCKS.getEntries()) {
+            ResourceLocation location = entry.getKey().location();
+            if (!location.getNamespace().equals("minecraft")) {
+                continue;
+            }
+
+            String name = location.getPath();
+            Predicate<String> predicate = name::contains;
+            if (ignoreNames.stream().anyMatch(predicate)) {
+                continue;
+            }
+
+            String conversionType;
+            Block block = entry.getValue();
+            if (woodBlocksSet.contains(block) || woodNames.stream().anyMatch(predicate)) {
+                conversionType = TFC_WOOD_TYPE;
+            } else if (brickNames.stream().anyMatch(predicate)) {
+                conversionType = TFC_BRICK_TYPE;
+            } else if (stoneNames.stream().anyMatch(predicate)) {
+                conversionType = TFC_STONE_TYPE;
+            } else {
+                continue;
+            }
+
+            list.add(new TFCWorld(location.toString(), conversionType));
+        }
+
+        list.sort(Comparator.comparing(o -> o.original));
+        return list;
     }
 }

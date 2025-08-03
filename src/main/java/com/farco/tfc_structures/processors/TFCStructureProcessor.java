@@ -83,7 +83,7 @@ public class TFCStructureProcessor extends StructureProcessor {
         }
 
         String tfcWorldType = tfcReplacements.get(originalLocation);
-        if (tfcWorldType == null) {
+        if (tfcWorldType == null || tfcWorldType.equals(ReplacementConfig.TFC_SKIP_TYPE)) {
             return original;
         } else if (tfcWorldType.equals(ReplacementConfig.TFC_STONE_TYPE)) {
             return replaceTFCStone(level, pos, original, original.is(TFCStructuresMod.MOSSY_TAG)

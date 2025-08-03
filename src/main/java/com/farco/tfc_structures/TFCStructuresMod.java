@@ -30,7 +30,7 @@ import java.nio.file.Path;
 public class TFCStructuresMod {
     public static final String MODID = "tfc_structures";
 
-    public static final String MOSSY_TAG_NAME = "mossy";
+    public static final String MOSSY_TAG_NAME = "mossy_stones";
     public static final TagKey<Block> MOSSY_TAG = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(MODID, MOSSY_TAG_NAME));
 
     public static final Logger LOGGER;
