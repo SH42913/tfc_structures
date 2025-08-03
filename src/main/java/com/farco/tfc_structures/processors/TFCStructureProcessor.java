@@ -16,10 +16,12 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
@@ -32,13 +34,20 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class TFCStructureProcessor extends StructureProcessor {
     public static final Codec<TFCStructureProcessor> CODEC = Codec.unit(new TFCStructureProcessor(null));
 
+    private record Pair<T1, T2>(T1 first, T2 second) {
+    }
+
     private final Map<ResourceLocation, ResourceLocation> directReplacements;
     private final Map<ResourceLocation, String> tfcReplacements;
+
+    private final Map<Block, Wood.BlockType> blockToWoodBlockTypeMap;
+    private final List<Pair<TagKey<Block>, Wood.BlockType>> tagToWoodBlockTypeMappings;
 
     public TFCStructureProcessor(ReplacementConfig replacementConfig) {
         if (replacementConfig == null) {
@@ -48,6 +57,32 @@ public class TFCStructureProcessor extends StructureProcessor {
             directReplacements = replacementConfig.getDirectReplacementMap();
             tfcReplacements = replacementConfig.getTfcWorldReplacementMap();
         }
+
+        blockToWoodBlockTypeMap = Map.of(
+                Blocks.CRAFTING_TABLE, Wood.BlockType.WORKBENCH,
+                Blocks.LECTERN, Wood.BlockType.LECTERN
+        );
+
+        tagToWoodBlockTypeMappings = List.of(
+                new Pair<>(BlockTags.LEAVES, Wood.BlockType.LEAVES),
+                new Pair<>(BlockTags.PLANKS, Wood.BlockType.PLANKS),
+                new Pair<>(BlockTags.WOODEN_DOORS, Wood.BlockType.DOOR),
+                new Pair<>(BlockTags.WOODEN_TRAPDOORS, Wood.BlockType.TRAPDOOR),
+                new Pair<>(BlockTags.WOODEN_FENCES, Wood.BlockType.FENCE),
+                new Pair<>(BlockTags.FENCE_GATES, Wood.BlockType.FENCE_GATE),
+                new Pair<>(BlockTags.WOODEN_BUTTONS, Wood.BlockType.BUTTON),
+                new Pair<>(BlockTags.WOODEN_PRESSURE_PLATES, Wood.BlockType.PRESSURE_PLATE),
+                new Pair<>(BlockTags.WOODEN_SLABS, Wood.BlockType.SLAB),
+                new Pair<>(BlockTags.WOODEN_STAIRS, Wood.BlockType.STAIRS),
+                new Pair<>(BlockTags.STANDING_SIGNS, Wood.BlockType.SIGN),
+                new Pair<>(BlockTags.WALL_SIGNS, Wood.BlockType.WALL_SIGN),
+                new Pair<>(Tags.Blocks.CHESTS_TRAPPED, Wood.BlockType.TRAPPED_CHEST),
+                new Pair<>(Tags.Blocks.CHESTS_WOODEN, Wood.BlockType.CHEST),
+                new Pair<>(Tags.Blocks.BOOKSHELVES, Wood.BlockType.BOOKSHELF),
+                new Pair<>(TFCStructuresMod.STRIPPED_LOG_TAG, Wood.BlockType.STRIPPED_LOG),
+                new Pair<>(TFCStructuresMod.STRIPPED_WOOD_TAG, Wood.BlockType.STRIPPED_WOOD),
+                new Pair<>(BlockTags.LOGS, Wood.BlockType.LOG)
+        );
     }
 
     @Override
@@ -154,23 +189,23 @@ public class TFCStructureProcessor extends StructureProcessor {
             return original;
         }
 
-        Wood.BlockType blockType = Wood.BlockType.WOOD;
-        if (original.is(BlockTags.LOGS)) {
-            blockType = Wood.BlockType.LOG;
-        } else if (original.is(BlockTags.PLANKS)) {
-            blockType = Wood.BlockType.PLANKS;
-        } else if (original.is(BlockTags.SLABS)) {
-            blockType = Wood.BlockType.SLAB;
-        } else if (original.is(BlockTags.STAIRS)) {
-            blockType = Wood.BlockType.STAIRS;
-        } else if (original.is(BlockTags.FENCES)) {
-            blockType = Wood.BlockType.FENCE;
-        } else if (original.is(BlockTags.FENCE_GATES)) {
-            blockType = Wood.BlockType.FENCE_GATE;
-        } else if (original.is(BlockTags.DOORS)) {
-            blockType = Wood.BlockType.DOOR;
-        } else if (original.is(Tags.Blocks.CHESTS)) {
-            blockType = Wood.BlockType.CHEST;
+        Wood.BlockType blockType = null;
+        Block originalBlock = original.getBlock();
+        var possibleReplacement = blockToWoodBlockTypeMap.get(originalBlock);
+        if (possibleReplacement != null) {
+            blockType = possibleReplacement;
+        } else {
+            for (var pair : tagToWoodBlockTypeMappings) {
+                if (original.is(pair.first)) {
+                    blockType = pair.second;
+                    break;
+                }
+            }
+        }
+
+        if (blockType == null) {
+            TFCStructuresMod.LOGGER.warn("Wood block type was not detected, will be used common WOOD");
+            blockType = Wood.BlockType.WOOD;
         }
 
         Block replacement = wood.getBlock(blockType).get();
