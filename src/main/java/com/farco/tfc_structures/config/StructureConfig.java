@@ -49,8 +49,8 @@ public final class StructureConfig {
         list.add(new StructureData("minecraft:buried_treasure", List.of(BiomeTag.BEACH.getTagId())));
         list.add(new StructureData("minecraft:desert_pyramid", List.of("tfc:badlands")));
         list.add(new StructureData("minecraft:jungle_temple", List.of("tfc:low_canyons")));
-        list.add(new StructureData("minecraft:mineshaft", List.of(BiomeTag.MOUNTAIN.getTagId())));
-        list.add(new StructureData("minecraft:mineshaft_mesa", List.of(BiomeTag.BADLANDS.getTagId())));
+//        list.add(new StructureData("minecraft:mineshaft", List.of(BiomeTag.MOUNTAIN.getTagId())));
+//        list.add(new StructureData("minecraft:mineshaft_mesa", List.of(BiomeTag.BADLANDS.getTagId())));
         list.add(new StructureData("minecraft:ocean_monument", List.of(BiomeTag.DEEP_OCEAN.getTagId())));
         list.add(new StructureData("minecraft:pillager_outpost", List.of(BiomeTag.PLAINS.getTagId())));
         list.add(new StructureData("minecraft:shipwreck", List.of(BiomeTag.OCEAN.getTagId())));
