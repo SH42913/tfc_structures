@@ -15,7 +15,7 @@ public class CommonConfig {
     private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> MOSSY_BLOCKS = BUILDER
-            .comment("List to separate mossy blocks from others (it will generate MossyBlock tag)")
+            .comment("List to separate mossy blocks from others (it will generate #mossy_stones tag)")
             .defineList("mossyBlocks", List.of(
                     "minecraft:mossy_cobblestone",
                     "minecraft:mossy_cobblestone_slab",
@@ -25,6 +25,32 @@ public class CommonConfig {
                     "minecraft:mossy_stone_brick_stairs",
                     "minecraft:mossy_stone_brick_wall",
                     "minecraft:mossy_stone_bricks"
+            ), CommonConfig::validateBlockIds);
+
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> STRIPPED_LOGS = BUILDER
+            .comment("List to separate stripped logs from others (it will generate #stripped_log tag)")
+            .defineList("strippedLogs", List.of(
+                    "minecraft:stripped_oak_log",
+                    "minecraft:stripped_spruce_log",
+                    "minecraft:stripped_birch_log",
+                    "minecraft:stripped_jungle_log",
+                    "minecraft:stripped_acacia_log",
+                    "minecraft:stripped_dark_oak_log",
+                    "minecraft:stripped_mangrove_log",
+                    "minecraft:stripped_cherry_log"
+            ), CommonConfig::validateBlockIds);
+
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> STRIPPED_WOOD = BUILDER
+            .comment("List to separate stripped wood from others (it will generate #stripped_wood tag)")
+            .defineList("strippedWood", List.of(
+                    "minecraft:stripped_oak_wood",
+                    "minecraft:stripped_spruce_wood",
+                    "minecraft:stripped_birch_wood",
+                    "minecraft:stripped_jungle_wood",
+                    "minecraft:stripped_acacia_wood",
+                    "minecraft:stripped_dark_oak_wood",
+                    "minecraft:stripped_mangrove_wood",
+                    "minecraft:stripped_cherry_wood"
             ), CommonConfig::validateBlockIds);
 
     public static final ForgeConfigSpec SPEC = BUILDER.build();

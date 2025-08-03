@@ -31,9 +31,11 @@ public class TFCStructuresMod {
     public static final String MODID = "tfc_structures";
 
     public static final String MOSSY_TAG_NAME = "mossy_stones";
+    public static final String STRIPPED_LOG_TAG_NAME = "stripped_log";
+    public static final String STRIPPED_WOOD_TAG_NAME = "stripped_wood";
     public static final TagKey<Block> MOSSY_TAG = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(MODID, MOSSY_TAG_NAME));
-    public static final TagKey<Block> STRIPPED_LOG_TAG = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("forge", "stripped_logs"));
-    public static final TagKey<Block> STRIPPED_WOOD_TAG = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath("forge", "stripped_wood"));
+    public static final TagKey<Block> STRIPPED_LOG_TAG = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(MODID, STRIPPED_LOG_TAG_NAME));
+    public static final TagKey<Block> STRIPPED_WOOD_TAG = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(MODID, STRIPPED_WOOD_TAG_NAME));
 
     public static final Logger LOGGER;
     private static final Path CONFIG_FOLDER_PATH;

@@ -76,7 +76,7 @@ public final class DatapackGenerator {
         PackMeta packMeta = new PackMeta(new Pack(15, TFCStructuresMod.MODID + " generated data-pack"));
         SaveJson(packMetaPath, packMeta);
 
-        generateMossyBlocksTag();
+        generateBlocksTag();
 
         Path biomeTagsFolder = buildBiomeTagsFolderPath(datapackFolderPath, "minecraft");
         Files.createDirectories(biomeTagsFolder);
@@ -86,7 +86,7 @@ public final class DatapackGenerator {
         }
     }
 
-    private void generateMossyBlocksTag() throws IOException {
+    private void generateBlocksTag() throws IOException {
         Path blockTagsFolder = datapackFolderPath
                 .resolve("data")
                 .resolve(TFCStructuresMod.MODID)
@@ -94,8 +94,15 @@ public final class DatapackGenerator {
                 .resolve("blocks");
 
         Files.createDirectories(blockTagsFolder);
+
         TagValues mossyBlocks = new TagValues(new ArrayList<>(CommonConfig.MOSSY_BLOCKS.get()), true);
         generateTag(blockTagsFolder, TFCStructuresMod.MOSSY_TAG_NAME, mossyBlocks);
+
+        TagValues strippedLogs = new TagValues(new ArrayList<>(CommonConfig.STRIPPED_LOGS.get()), true);
+        generateTag(blockTagsFolder, TFCStructuresMod.STRIPPED_LOG_TAG_NAME, strippedLogs);
+
+        TagValues strippedWoods = new TagValues(new ArrayList<>(CommonConfig.STRIPPED_WOOD.get()), true);
+        generateTag(blockTagsFolder, TFCStructuresMod.STRIPPED_WOOD_TAG_NAME, strippedWoods);
     }
 
     private void generateActiveStructures(StructureConfig structureConfig) throws IOException {
