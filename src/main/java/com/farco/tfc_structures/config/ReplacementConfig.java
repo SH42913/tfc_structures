@@ -1,12 +1,58 @@
 package com.farco.tfc_structures.config;
 
-public record ReplacementConfig(Direct[] directReplacements, String[] tfcReplacements) {
-    public static final String CONFIG_NAME = "replacement_config.json";
+import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 
-    public record Direct(String original, String replacement) {
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> tfcWorldReplacement) {
+    public static final String CONFIG_NAME = "replacement_config.json";
+    public static final String TFC_STONE_TYPE = "STONE";
+    public static final String TFC_BRICK_TYPE = "BRICK";
+    public static final String TFC_WOOD_TYPE = "WOOD";
+
+    private record Direct(String original, String replacement) {
+    }
+
+    private record TFCWorld(String original, String type) {
+    }
+
+    public Map<ResourceLocation, ResourceLocation> getDirectReplacementMap() {
+        var map = new HashMap<ResourceLocation, ResourceLocation>(directReplacements.size());
+        for (Direct entry : directReplacements) {
+            var originalLocation = ResourceLocation.parse(entry.original);
+            var replacementLocation = ResourceLocation.parse(entry.replacement);
+            map.put(originalLocation, replacementLocation);
+        }
+
+        return map;
+    }
+
+    public Map<ResourceLocation, String> getTfcWorldReplacementMap() {
+        var map = new HashMap<ResourceLocation, String>(tfcWorldReplacement.size());
+        for (TFCWorld entry : tfcWorldReplacement) {
+            var originalLocation = ResourceLocation.parse(entry.original);
+            map.put(originalLocation, entry.type);
+        }
+
+        return map;
     }
 
     public static ReplacementConfig getDefaultConfig() {
-        return new ReplacementConfig(new Direct[0], new String[]{"minecraft:cobblestone"});
+        return new ReplacementConfig(getDefaultDirect(), getDefaultTFCWorld());
+    }
+
+    private static @NotNull List<Direct> getDefaultDirect() {
+        return List.of();
+    }
+
+    private static @NotNull List<TFCWorld> getDefaultTFCWorld() {
+        return List.of(
+                new TFCWorld("minecraft:cobblestone", TFC_BRICK_TYPE),
+                new TFCWorld("minecraft:cobblestone_stairs", TFC_BRICK_TYPE),
+                new TFCWorld("minecraft:cobblestone_wall", TFC_BRICK_TYPE),
+                new TFCWorld("minecraft:cobblestone_slab", TFC_BRICK_TYPE));
     }
 }

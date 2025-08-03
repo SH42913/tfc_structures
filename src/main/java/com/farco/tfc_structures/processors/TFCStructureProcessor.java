@@ -1,10 +1,14 @@
 package com.farco.tfc_structures.processors;
 
+import com.farco.tfc_structures.TFCStructuresMod;
 import com.farco.tfc_structures.config.ReplacementConfig;
 import com.mojang.serialization.Codec;
+import net.dries007.tfc.common.blocks.rock.Rock;
+import net.dries007.tfc.util.Helpers;
 import net.dries007.tfc.world.chunkdata.ChunkDataProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
@@ -18,25 +22,22 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TFCStructureProcessor extends StructureProcessor {
     public static final Codec<TFCStructureProcessor> CODEC = Codec.unit(new TFCStructureProcessor(null));
 
-    private final Map<String, String> directReplacements;
-    private final Set<String> tfcReplacements;
+    private final Map<ResourceLocation, ResourceLocation> directReplacements;
+    private final Map<ResourceLocation, String> tfcReplacements;
 
     public TFCStructureProcessor(ReplacementConfig replacementConfig) {
         if (replacementConfig == null) {
             directReplacements = new HashMap<>();
-            tfcReplacements = new HashSet<>();
+            tfcReplacements = new HashMap<>();
         } else {
-            directReplacements = Arrays
-                    .stream(replacementConfig.directReplacements())
-                    .collect(Collectors.toMap(ReplacementConfig.Direct::original, ReplacementConfig.Direct::replacement));
-
-            tfcReplacements = Set.of(replacementConfig.tfcReplacements());
+            directReplacements = replacementConfig.getDirectReplacementMap();
+            tfcReplacements = replacementConfig.getTfcWorldReplacementMap();
         }
     }
 
@@ -62,60 +63,83 @@ public class TFCStructureProcessor extends StructureProcessor {
     }
 
     public BlockState replaceBlock(@NotNull LevelReader level, BlockPos pos, BlockState original) {
-        ResourceLocation resourceLocation = ForgeRegistries.BLOCKS.getKey(original.getBlock());
-        if (resourceLocation == null) {
+        ResourceLocation originalLocation = ForgeRegistries.BLOCKS.getKey(original.getBlock());
+        if (originalLocation == null) {
             return original;
         }
 
-        String blockId = resourceLocation.toString();
-        String directReplacement = directReplacements.get(blockId);
-        if (directReplacement != null) {
-            return replaceDirectly(original, directReplacement);
+        ResourceLocation replacementLocation = directReplacements.get(originalLocation);
+        if (replacementLocation != null) {
+            return replaceDirectly(original, replacementLocation);
         }
 
-        if (tfcReplacements.contains(blockId)) {
-            return replaceTfc(level, pos, original);
+        String tfcWorldType = tfcReplacements.get(originalLocation);
+        if (tfcWorldType == null) {
+            return original;
+        } else if (tfcWorldType.equals(ReplacementConfig.TFC_STONE_TYPE)) {
+            return replaceTFCStone(level, pos, original, Rock.BlockType.HARDENED);
+        } else if (tfcWorldType.equals(ReplacementConfig.TFC_BRICK_TYPE)) {
+            return replaceTFCStone(level, pos, original, Rock.BlockType.BRICKS);
         }
 
-        return original;
+        throw new RuntimeException("Type " + tfcWorldType + " is not supported");
     }
 
-    private BlockState replaceDirectly(BlockState original, String directReplacement) {
-        ResourceLocation location = ResourceLocation.parse(directReplacement);
-        Block replacement = ForgeRegistries.BLOCKS.getValue(location);
+    private BlockState replaceDirectly(BlockState original, ResourceLocation replacementLocation) {
+        Block replacement = ForgeRegistries.BLOCKS.getValue(replacementLocation);
         return replaceBlock(original, replacement);
     }
 
-    private BlockState replaceTfc(@NotNull LevelReader level, BlockPos pos, BlockState original) {
+    private BlockState replaceTFCStone(@NotNull LevelReader level, BlockPos pos, BlockState original, Rock.BlockType blockType) {
+        Block hardenedStone = getHardenedStone(level, pos);
+        var rock = getRockFromHardened(hardenedStone);
+        if (rock == null) {
+            TFCStructuresMod.LOGGER.warn("Rock was not detected, so it will be hardened one");
+            return replaceBlock(original, hardenedStone);
+        }
+
+        Block replacement;
+        if (original.is(BlockTags.STAIRS)) {
+            replacement = rock.getStair(blockType).get();
+        } else if (original.is(BlockTags.SLABS)) {
+            replacement = rock.getSlab(blockType).get();
+        } else if (original.is(BlockTags.WALLS)) {
+            replacement = rock.getWall(blockType).get();
+        } else {
+            replacement = rock.getBlock(blockType).get();
+        }
+
+        return replaceBlock(original, replacement);
+    }
+
+    private static Block getHardenedStone(LevelReader level, BlockPos pos) {
         WorldGenLevel worldGenLevel = (WorldGenLevel) level;
         ChunkDataProvider provider = ChunkDataProvider.get(worldGenLevel);
         var chunkData = provider.get(worldGenLevel, pos);
-        var hardened = chunkData.getRockData().getSurfaceRock(pos.getX(), pos.getZ()).hardened();
-        return replaceBlock(original, hardened);
+        return chunkData.getRockData().getSurfaceRock(pos.getX(), pos.getZ()).hardened();
     }
 
-    private static BlockState replaceBlock(BlockState original, Block replacement) {
+    private static BlockState replaceBlock(BlockState originalBlockState, Block replacement) {
         if (replacement == null) {
-            return original;
+            return originalBlockState;
         }
 
         BlockState newBlockState = replacement.defaultBlockState();
         if (newBlockState.isAir()) {
-            return original;
+            return originalBlockState;
         }
 
-        for (Property<?> property : original.getProperties()) {
-            if (newBlockState.hasProperty(property)) {
-                Comparable<?> originalValue = original.getValue(property);
-                newBlockState = setValueGeneric(newBlockState, property, originalValue);
+        return Helpers.copyProperties(newBlockState, originalBlockState);
+    }
+
+    private static Rock getRockFromHardened(Block block) {
+        for (Rock rock : Rock.VALUES) {
+            Block rockBlock = rock.getBlock(Rock.BlockType.HARDENED).get();
+            if (block.equals(rockBlock)) {
+                return rock;
             }
         }
 
-        return newBlockState;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T extends Comparable<T>> BlockState setValueGeneric(BlockState state, Property<T> property, Comparable<?> value) {
-        return state.setValue(property, (T) value);
+        return null;
     }
 }
