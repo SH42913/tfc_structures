@@ -13,7 +13,6 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
@@ -77,9 +76,13 @@ public class TFCStructureProcessor extends StructureProcessor {
         if (tfcWorldType == null) {
             return original;
         } else if (tfcWorldType.equals(ReplacementConfig.TFC_STONE_TYPE)) {
-            return replaceTFCStone(level, pos, original, Rock.BlockType.HARDENED);
+            return replaceTFCStone(level, pos, original, original.is(TFCStructuresMod.MOSSY_TAG)
+                    ? Rock.BlockType.MOSSY_COBBLE
+                    : Rock.BlockType.HARDENED);
         } else if (tfcWorldType.equals(ReplacementConfig.TFC_BRICK_TYPE)) {
-            return replaceTFCStone(level, pos, original, Rock.BlockType.BRICKS);
+            return replaceTFCStone(level, pos, original, original.is(TFCStructuresMod.MOSSY_TAG)
+                    ? Rock.BlockType.MOSSY_BRICKS
+                    : Rock.BlockType.BRICKS);
         }
 
         throw new RuntimeException("Type " + tfcWorldType + " is not supported");

@@ -53,6 +53,14 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
                 new TFCWorld("minecraft:cobblestone", TFC_BRICK_TYPE),
                 new TFCWorld("minecraft:cobblestone_stairs", TFC_BRICK_TYPE),
                 new TFCWorld("minecraft:cobblestone_wall", TFC_BRICK_TYPE),
-                new TFCWorld("minecraft:cobblestone_slab", TFC_BRICK_TYPE));
+                new TFCWorld("minecraft:cobblestone_slab", TFC_BRICK_TYPE),
+                new TFCWorld("minecraft:mossy_cobblestone", TFC_BRICK_TYPE),
+                new TFCWorld("minecraft:mossy_cobblestone_slab", TFC_BRICK_TYPE),
+                new TFCWorld("minecraft:mossy_cobblestone_stairs", TFC_BRICK_TYPE),
+                new TFCWorld("minecraft:mossy_cobblestone_wall", TFC_BRICK_TYPE),
+                new TFCWorld("minecraft:mossy_stone_brick_slab", TFC_BRICK_TYPE),
+                new TFCWorld("minecraft:mossy_stone_brick_stairs", TFC_BRICK_TYPE),
+                new TFCWorld("minecraft:mossy_stone_brick_wall", TFC_BRICK_TYPE),
+                new TFCWorld("minecraft:mossy_stone_bricks", TFC_BRICK_TYPE));
     }
 }

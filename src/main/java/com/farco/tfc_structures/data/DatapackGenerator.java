@@ -1,6 +1,7 @@
 package com.farco.tfc_structures.data;
 
 import com.farco.tfc_structures.TFCStructuresMod;
+import com.farco.tfc_structures.config.CommonConfig;
 import com.farco.tfc_structures.config.StructureConfig;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -75,12 +76,26 @@ public final class DatapackGenerator {
         PackMeta packMeta = new PackMeta(new Pack(15, TFCStructuresMod.MODID + " generated data-pack"));
         SaveJson(packMetaPath, packMeta);
 
+        generateMossyBlocksTag();
+
         Path biomeTagsFolder = buildBiomeTagsFolderPath(datapackFolderPath, "minecraft");
         Files.createDirectories(biomeTagsFolder);
         for (BiomeTag tag : BiomeTag.getAllVanillaBiomeTags()) {
             var location = ResourceLocation.parse(tag.id());
             generateTag(biomeTagsFolder, location.getPath(), tag.tagValues());
         }
+    }
+
+    private void generateMossyBlocksTag() throws IOException {
+        Path blockTagsFolder = datapackFolderPath
+                .resolve("data")
+                .resolve(TFCStructuresMod.MODID)
+                .resolve("tags")
+                .resolve("blocks");
+
+        Files.createDirectories(blockTagsFolder);
+        TagValues mossyBlocks = new TagValues(new ArrayList<>(CommonConfig.MOSSY_BLOCKS.get()), true);
+        generateTag(blockTagsFolder, TFCStructuresMod.MOSSY_TAG_NAME, mossyBlocks);
     }
 
     private void generateActiveStructures(StructureConfig structureConfig) throws IOException {

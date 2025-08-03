@@ -9,7 +9,10 @@ import com.farco.tfc_structures.processors.ModStructureProcessors;
 import com.farco.tfc_structures.processors.TFCStructureProcessor;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
@@ -26,6 +29,9 @@ import java.nio.file.Path;
 @Mod(TFCStructuresMod.MODID)
 public class TFCStructuresMod {
     public static final String MODID = "tfc_structures";
+
+    public static final String MOSSY_TAG_NAME = "mossy";
+    public static final TagKey<Block> MOSSY_TAG = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(MODID, MOSSY_TAG_NAME));
 
     public static final Logger LOGGER;
     private static final Path CONFIG_FOLDER_PATH;
