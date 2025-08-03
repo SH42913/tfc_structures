@@ -61,6 +61,23 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
                 new TFCWorld("minecraft:mossy_stone_brick_slab", TFC_BRICK_TYPE),
                 new TFCWorld("minecraft:mossy_stone_brick_stairs", TFC_BRICK_TYPE),
                 new TFCWorld("minecraft:mossy_stone_brick_wall", TFC_BRICK_TYPE),
-                new TFCWorld("minecraft:mossy_stone_bricks", TFC_BRICK_TYPE));
+                new TFCWorld("minecraft:mossy_stone_bricks", TFC_BRICK_TYPE),
+                new TFCWorld("minecraft:chest", TFC_WOOD_TYPE),
+                new TFCWorld("minecraft:oak_log", TFC_WOOD_TYPE),
+                new TFCWorld("minecraft:oak_planks", TFC_WOOD_TYPE),
+                new TFCWorld("minecraft:oak_door", TFC_WOOD_TYPE),
+                new TFCWorld("minecraft:oak_fence", TFC_WOOD_TYPE),
+                new TFCWorld("minecraft:oak_fence_gate", TFC_WOOD_TYPE),
+                new TFCWorld("minecraft:oak_slab", TFC_WOOD_TYPE),
+                new TFCWorld("minecraft:oak_stairs", TFC_WOOD_TYPE),
+                new TFCWorld("minecraft:oak_wood", TFC_WOOD_TYPE),
+                new TFCWorld("minecraft:dark_oak_log", TFC_WOOD_TYPE),
+                new TFCWorld("minecraft:dark_oak_planks", TFC_WOOD_TYPE),
+                new TFCWorld("minecraft:dark_oak_door", TFC_WOOD_TYPE),
+                new TFCWorld("minecraft:dark_oak_fence", TFC_WOOD_TYPE),
+                new TFCWorld("minecraft:dark_oak_fence_gate", TFC_WOOD_TYPE),
+                new TFCWorld("minecraft:dark_oak_slab", TFC_WOOD_TYPE),
+                new TFCWorld("minecraft:dark_oak_stairs", TFC_WOOD_TYPE),
+                new TFCWorld("minecraft:dark_oak_wood", TFC_WOOD_TYPE));
     }
 }
