@@ -2,17 +2,26 @@ package com.farco.tfc_structures.config;
 
 import com.farco.tfc_structures.TFCStructuresMod;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.WorldGenLevel;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Mod.EventBusSubscriber(modid = TFCStructuresMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class CommonConfig {
     private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
+
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ALLOWED_DIMENSIONS = BUILDER
+            .comment("Dimensions where structure blocks will be replaced")
+            .defineList("allowedDimensions", List.of(Level.OVERWORLD.location().toString()), str -> str instanceof String);
 
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> MOSSY_BLOCKS = BUILDER
             .comment("List to separate mossy blocks from others (it will generate #mossy_stones tag)")
@@ -55,11 +64,18 @@ public class CommonConfig {
 
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 
+    public static Set<ResourceLocation> allowedDimensionsSet;
+
     private static boolean validateBlockIds(Object blockId) {
         return blockId instanceof String && ForgeRegistries.BLOCKS.containsKey(ResourceLocation.parse((String) blockId));
     }
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {
+        allowedDimensionsSet = ALLOWED_DIMENSIONS.get().stream().map(ResourceLocation::parse).collect(Collectors.toSet());
+    }
+
+    public static boolean isAvailableToReplace(@NotNull WorldGenLevel worldGenLevel) {
+        return allowedDimensionsSet.contains(worldGenLevel.getLevel().dimension().location());
     }
 }

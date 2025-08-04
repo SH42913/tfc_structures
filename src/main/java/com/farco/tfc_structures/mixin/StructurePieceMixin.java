@@ -1,6 +1,7 @@
 package com.farco.tfc_structures.mixin;
 
 import com.farco.tfc_structures.TFCStructuresMod;
+import com.farco.tfc_structures.config.CommonConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.state.BlockState;
@@ -20,12 +21,16 @@ public abstract class StructurePieceMixin {
             )
     )
     private boolean redirectSetBlock(
-            WorldGenLevel level,
+            WorldGenLevel worldGenLevel,
             BlockPos pos,
             BlockState state,
             int flags
     ) {
-        BlockState replacedBlock = TFCStructuresMod.getStructureProcessor().replaceBlock(level, pos, state);
-        return level.setBlock(pos, replacedBlock, flags);
+        if (CommonConfig.isAvailableToReplace(worldGenLevel)) {
+            BlockState replacedState = TFCStructuresMod.getStructureProcessor().replaceBlock(worldGenLevel, pos, state);
+            return worldGenLevel.setBlock(pos, replacedState, flags);
+        } else {
+            return worldGenLevel.setBlock(pos, state, flags);
+        }
     }
 }

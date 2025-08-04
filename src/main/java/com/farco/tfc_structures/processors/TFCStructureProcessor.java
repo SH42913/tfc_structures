@@ -106,7 +106,7 @@ public class TFCStructureProcessor extends StructureProcessor {
         );
     }
 
-    public BlockState replaceBlock(@NotNull LevelReader level, BlockPos pos, BlockState original) {
+    public BlockState replaceBlock(@NotNull LevelReader levelReader, BlockPos pos, BlockState original) {
         ResourceLocation originalLocation = ForgeRegistries.BLOCKS.getKey(original.getBlock());
         if (originalLocation == null) {
             return original;
@@ -121,15 +121,15 @@ public class TFCStructureProcessor extends StructureProcessor {
         if (tfcWorldType == null || tfcWorldType.equals(ReplacementConfig.TFC_SKIP_TYPE)) {
             return original;
         } else if (tfcWorldType.equals(ReplacementConfig.TFC_STONE_TYPE)) {
-            return replaceTFCStone(level, pos, original, original.is(TFCStructuresMod.MOSSY_TAG)
+            return replaceTFCStone(levelReader, pos, original, original.is(TFCStructuresMod.MOSSY_TAG)
                     ? Rock.BlockType.MOSSY_COBBLE
                     : Rock.BlockType.SMOOTH);
         } else if (tfcWorldType.equals(ReplacementConfig.TFC_BRICK_TYPE)) {
-            return replaceTFCStone(level, pos, original, original.is(TFCStructuresMod.MOSSY_TAG)
+            return replaceTFCStone(levelReader, pos, original, original.is(TFCStructuresMod.MOSSY_TAG)
                     ? Rock.BlockType.MOSSY_BRICKS
                     : Rock.BlockType.BRICKS);
         } else if (tfcWorldType.equals(ReplacementConfig.TFC_WOOD_TYPE)) {
-            return replaceTFCWood(level, pos, original);
+            return replaceTFCWood(levelReader, pos, original);
         }
 
         throw new RuntimeException("Type " + tfcWorldType + " is not supported");
