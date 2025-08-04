@@ -123,7 +123,7 @@ public class TFCStructureProcessor extends StructureProcessor {
         } else if (tfcWorldType.equals(ReplacementConfig.TFC_STONE_TYPE)) {
             return replaceTFCStone(level, pos, original, original.is(TFCStructuresMod.MOSSY_TAG)
                     ? Rock.BlockType.MOSSY_COBBLE
-                    : Rock.BlockType.HARDENED);
+                    : Rock.BlockType.SMOOTH);
         } else if (tfcWorldType.equals(ReplacementConfig.TFC_BRICK_TYPE)) {
             return replaceTFCStone(level, pos, original, original.is(TFCStructuresMod.MOSSY_TAG)
                     ? Rock.BlockType.MOSSY_BRICKS

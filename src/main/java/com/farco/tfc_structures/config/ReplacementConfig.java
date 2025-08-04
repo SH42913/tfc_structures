@@ -58,7 +58,7 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
     }
 
     private static @NotNull List<TFCWorld> getDefaultTFCWorld() {
-        var ignoreNames = List.of("nether", "prismarine", "end");
+        var ignoreNames = List.of("nether", "prismarine", "end", "infested");
         var stoneNames = List.of("stone");
         var brickNames = List.of("brick");
         var woodNames = WoodType.values().map(WoodType::name).toList();
