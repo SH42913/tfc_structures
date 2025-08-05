@@ -15,6 +15,7 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
     public static final String TFC_STONE_TYPE = "STONE";
     public static final String TFC_BRICK_TYPE = "BRICK";
     public static final String TFC_WOOD_TYPE = "WOOD";
+    public static final String TFC_SOIL_TYPE = "SOIL";
     public static final String TFC_SKIP_TYPE = "SKIP";
 
     private record Direct(String original, String replacement) {
@@ -63,6 +64,7 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
         var brickNames = List.of("brick");
         var woodNames = WoodType.values().map(WoodType::name).toList();
         var woodBlocksSet = Set.of(Blocks.CRAFTING_TABLE, Blocks.CHEST, Blocks.TRAPPED_CHEST, Blocks.LECTERN, Blocks.BOOKSHELF);
+        var dirtBlocksSet = Set.of(Blocks.GRASS_BLOCK, Blocks.DIRT_PATH, Blocks.DIRT, Blocks.FARMLAND);
 
         var list = new ArrayList<TFCWorld>();
         for (var entry : ForgeRegistries.BLOCKS.getEntries()) {
@@ -81,6 +83,8 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
             Block block = entry.getValue();
             if (woodBlocksSet.contains(block) || woodNames.stream().anyMatch(predicate)) {
                 conversionType = TFC_WOOD_TYPE;
+            } else if (dirtBlocksSet.contains(block)) {
+                conversionType = TFC_SOIL_TYPE;
             } else if (brickNames.stream().anyMatch(predicate)) {
                 conversionType = TFC_BRICK_TYPE;
             } else if (stoneNames.stream().anyMatch(predicate)) {

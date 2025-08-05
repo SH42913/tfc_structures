@@ -4,13 +4,18 @@ import com.farco.tfc_structures.TFCStructuresMod;
 import com.farco.tfc_structures.config.ReplacementConfig;
 import com.mojang.serialization.Codec;
 import net.dries007.tfc.common.blocks.rock.Rock;
+import net.dries007.tfc.common.blocks.soil.SoilBlockType;
 import net.dries007.tfc.common.blocks.wood.Wood;
 import net.dries007.tfc.util.Helpers;
 import net.dries007.tfc.util.climate.OverworldClimateModel;
+import net.dries007.tfc.world.TFCChunkGenerator;
 import net.dries007.tfc.world.chunkdata.ChunkData;
 import net.dries007.tfc.world.chunkdata.ChunkDataProvider;
 import net.dries007.tfc.world.feature.tree.ForestConfig;
 import net.dries007.tfc.world.feature.tree.RandomTreeConfig;
+import net.dries007.tfc.world.surface.SoilSurfaceState;
+import net.dries007.tfc.world.surface.SurfaceBuilderContext;
+import net.dries007.tfc.world.surface.SurfaceState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
@@ -48,6 +53,9 @@ public class TFCStructureProcessor extends StructureProcessor {
 
     private final Map<Block, Wood.BlockType> blockToWoodBlockTypeMap;
     private final List<Pair<TagKey<Block>, Wood.BlockType>> tagToWoodBlockTypeMappings;
+    private final List<Pair<Block, SoilBlockType>> blockToSoilBlockTypeMappings;
+
+    private DummySurfaceBuilderContext surfaceBuilderContext;
 
     public TFCStructureProcessor(ReplacementConfig replacementConfig) {
         if (replacementConfig == null) {
@@ -82,6 +90,17 @@ public class TFCStructureProcessor extends StructureProcessor {
                 new Pair<>(TFCStructuresMod.STRIPPED_LOG_TAG, Wood.BlockType.STRIPPED_LOG),
                 new Pair<>(TFCStructuresMod.STRIPPED_WOOD_TAG, Wood.BlockType.STRIPPED_WOOD),
                 new Pair<>(BlockTags.LOGS, Wood.BlockType.LOG)
+        );
+
+        blockToSoilBlockTypeMappings = List.of(
+                new Pair<>(Blocks.DIRT, SoilBlockType.DIRT),
+                new Pair<>(Blocks.GRASS_BLOCK, SoilBlockType.GRASS),
+                new Pair<>(Blocks.DIRT_PATH, SoilBlockType.GRASS_PATH),
+                new Pair<>(Blocks.FARMLAND, SoilBlockType.FARMLAND),
+                new Pair<>(Blocks.ROOTED_DIRT, SoilBlockType.ROOTED_DIRT),
+                new Pair<>(Blocks.MUD, SoilBlockType.MUD),
+                new Pair<>(Blocks.MUD_BRICKS, SoilBlockType.MUD_BRICKS),
+                new Pair<>(Blocks.MUDDY_MANGROVE_ROOTS, SoilBlockType.MUDDY_ROOTS)
         );
     }
 
@@ -130,6 +149,8 @@ public class TFCStructureProcessor extends StructureProcessor {
                     : Rock.BlockType.BRICKS);
         } else if (tfcWorldType.equals(ReplacementConfig.TFC_WOOD_TYPE)) {
             return replaceTFCWood(levelReader, pos, original);
+        } else if (tfcWorldType.equals(ReplacementConfig.TFC_SOIL_TYPE)) {
+            return replaceTFCSoil(levelReader, pos, original);
         }
 
         throw new RuntimeException("Type " + tfcWorldType + " is not supported");
@@ -252,6 +273,42 @@ public class TFCStructureProcessor extends StructureProcessor {
         }
 
         return null;
+    }
+
+    private BlockState replaceTFCSoil(@NotNull LevelReader levelReader, BlockPos pos, BlockState original) {
+        SoilBlockType blockType = null;
+        for (var mapping : blockToSoilBlockTypeMappings) {
+            if (original.is(mapping.first)) {
+                blockType = mapping.second;
+                break;
+            }
+        }
+
+        if (blockType == null) {
+            TFCStructuresMod.LOGGER.warn("Soil block type was not detected, will be used common DIRT");
+            blockType = SoilBlockType.DIRT;
+        }
+
+        SurfaceState surfaceState = SoilSurfaceState.buildType(blockType);
+        SurfaceBuilderContext context = buildTempContext(levelReader, pos);
+        return surfaceState.getState(context);
+    }
+
+    private SurfaceBuilderContext buildTempContext(LevelReader levelReader, BlockPos pos) {
+        WorldGenLevel worldGenLevel = (WorldGenLevel) levelReader;
+        ChunkData chunkData = ChunkDataProvider.get(worldGenLevel).get(worldGenLevel, pos);
+        if (surfaceBuilderContext == null) {
+            var chunkGenerator = (TFCChunkGenerator) worldGenLevel.getLevel().getChunkSource().getGenerator();
+            var rockLayerSettings = chunkGenerator.rockLayerSettings();
+            surfaceBuilderContext = new DummySurfaceBuilderContext(chunkData, rockLayerSettings);
+        }
+
+        var accessor = surfaceBuilderContext.getAccessor();
+        accessor.setRockData(chunkData.getRockData());
+        accessor.setRainfall(chunkData.getRainfall(pos));
+        accessor.setCursor(pos.mutable());
+
+        return surfaceBuilderContext;
     }
 
     private static BlockState replaceBlock(BlockState originalBlockState, Block replacement) {

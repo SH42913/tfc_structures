@@ -5,6 +5,7 @@ import com.farco.tfc_structures.config.JsonConfigProvider;
 import com.farco.tfc_structures.config.ReplacementConfig;
 import com.farco.tfc_structures.config.StructureConfig;
 import com.farco.tfc_structures.data.DatapackGenerator;
+import com.farco.tfc_structures.mixin.SurfaceBuilderContextAccessorMixin;
 import com.farco.tfc_structures.processors.ModStructureProcessors;
 import com.farco.tfc_structures.processors.TFCStructureProcessor;
 import com.mojang.logging.LogUtils;
@@ -52,6 +53,8 @@ public class TFCStructuresMod {
         CONFIG_FOLDER_PATH = FMLPaths.CONFIGDIR.get().resolve(TFCStructuresMod.MODID);
         CONFIG_PROVIDER = new JsonConfigProvider(CONFIG_FOLDER_PATH);
         DATAPACK_GENERATOR = new DatapackGenerator(CONFIG_FOLDER_PATH);
+
+        @SuppressWarnings("unused") Class<?> unused = SurfaceBuilderContextAccessorMixin.class;
     }
 
     public TFCStructuresMod(FMLJavaModLoadingContext modLoadingContext) {

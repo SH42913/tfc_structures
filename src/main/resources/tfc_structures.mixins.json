@@ -6,7 +6,8 @@
   "refmap": "tfc_structures.refmap.json",
   "mixins": [
     "StructurePieceMixin",
-    "StructureTemplateMixin"
+    "StructureTemplateMixin",
+    "SurfaceBuilderContextAccessorMixin"
   ],
   "client": [
   ],
