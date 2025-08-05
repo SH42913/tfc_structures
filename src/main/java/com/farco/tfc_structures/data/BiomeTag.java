@@ -107,6 +107,11 @@ public record BiomeTag(String id, DatapackGenerator.TagValues tagValues) {
             RIVER.getTagLink(false)
     ));
 
+    public static final BiomeTag OLD_MOUNTAINS = new BiomeTag("minecraft:old_mountains", List.of(
+            new DatapackGenerator.TagLink("tfc:old_mountains", false),
+            new DatapackGenerator.TagLink("tfc:volcanic_mountains", false)
+    ));
+
     public static final BiomeTag MOUNTAIN = new BiomeTag("minecraft:is_mountain", List.of(
             new DatapackGenerator.TagLink("minecraft:meadow", true),
             new DatapackGenerator.TagLink("minecraft:frozen_peaks", true),
@@ -116,8 +121,7 @@ public record BiomeTag(String id, DatapackGenerator.TagValues tagValues) {
             new DatapackGenerator.TagLink("minecraft:cherry_grove", true),
             new DatapackGenerator.TagLink("tfc:highlands", false),
             new DatapackGenerator.TagLink("tfc:mountains", false),
-            new DatapackGenerator.TagLink("tfc:old_mountains", false),
-            new DatapackGenerator.TagLink("tfc:volcanic_mountains", false)
+            OLD_MOUNTAINS.getTagLink(false)
     ));
 
     public static final BiomeTag SAVANNA = new BiomeTag("minecraft:is_savanna", List.of(

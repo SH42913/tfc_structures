@@ -47,32 +47,32 @@ public final class StructureConfig {
     private static List<StructureData> getVanillaStructures() {
         List<StructureData> list = new ArrayList<>();
         list.add(new StructureData("minecraft:buried_treasure", List.of(BiomeTag.BEACH.getTagId())));
-        list.add(new StructureData("minecraft:desert_pyramid", List.of("tfc:badlands")));
-        list.add(new StructureData("minecraft:jungle_temple", List.of("tfc:low_canyons")));
+        list.add(new StructureData("minecraft:desert_pyramid", List.of(BiomeTag.BADLANDS.getTagId())));
 //        list.add(new StructureData("minecraft:mineshaft", List.of(BiomeTag.MOUNTAIN.getTagId())));
 //        list.add(new StructureData("minecraft:mineshaft_mesa", List.of(BiomeTag.BADLANDS.getTagId())));
-        list.add(new StructureData("minecraft:ocean_monument", List.of(BiomeTag.DEEP_OCEAN.getTagId())));
         list.add(new StructureData("minecraft:pillager_outpost", List.of(BiomeTag.PLAINS.getTagId())));
         list.add(new StructureData("minecraft:shipwreck", List.of(BiomeTag.OCEAN.getTagId())));
         list.add(new StructureData("minecraft:shipwreck_beached", List.of(BiomeTag.BEACH.getTagId())));
-        list.add(new StructureData("minecraft:stronghold", List.of("tfc:volcanic_mountains", "tfc:old_mountains")));
+        list.add(new StructureData("minecraft:stronghold", List.of(BiomeTag.OLD_MOUNTAINS.getTagId())));
         list.add(new StructureData("minecraft:swamp_hut", List.of(BiomeTag.SWAMP.getTagId())));
         list.add(new StructureData("minecraft:trail_ruins", List.of(BiomeTag.TAIGA.getTagId())));
         list.add(new StructureData("minecraft:village_desert", List.of(BiomeTag.BEACH.getTagId())));
         list.add(new StructureData("minecraft:village_plains", List.of(BiomeTag.PLAINS.getTagId())));
         list.add(new StructureData("minecraft:village_savanna", List.of(BiomeTag.SAVANNA.getTagId())));
-        list.add(new StructureData("minecraft:village_snowy", List.of("minecraft:snowy_plains")));
-        list.add(new StructureData("minecraft:mansion", List.of("minecraft:dark_forest")));
+        list.add(new StructureData("minecraft:village_snowy", List.of(BiomeTag.SNOWY.getTagId())));
+        list.add(new StructureData("minecraft:village_taiga", List.of(BiomeTag.TAIGA.getTagId())));
+        list.add(new StructureData("minecraft:mansion", List.of(BiomeTag.FOREST.getTagId())));
         list.add(new StructureData("minecraft:jungle_pyramid", List.of(BiomeTag.JUNGLE.getTagId())));
         list.add(new StructureData("minecraft:ocean_ruin_cold", List.of(BiomeTag.COLD_OCEAN.getTagId())));
         list.add(new StructureData("minecraft:ocean_ruin_warm", List.of(BiomeTag.WARM_OCEAN.getTagId())));
         list.add(new StructureData("minecraft:monument", List.of(BiomeTag.DEEP_OCEAN.getTagId())));
         list.add(new StructureData("minecraft:igloo", List.of(BiomeTag.SNOWY.getTagId())));
-        list.add(new StructureData("minecraft:ruined_portal_standard", List.of("tfc:highlands")));
+        list.add(new StructureData("minecraft:ruined_portal", List.of("tfc:highlands")));
         list.add(new StructureData("minecraft:ruined_portal_swamp", List.of(BiomeTag.SWAMP.getTagId())));
         list.add(new StructureData("minecraft:ruined_portal_jungle", List.of(BiomeTag.JUNGLE.getTagId())));
         list.add(new StructureData("minecraft:ruined_portal_mountain", List.of(BiomeTag.MOUNTAIN.getTagId())));
         list.add(new StructureData("minecraft:ruined_portal_ocean", List.of(BiomeTag.OCEAN.getTagId())));
+        list.add(new StructureData("minecraft:ruined_portal_desert", List.of(BiomeTag.BADLANDS.getTagId())));
         return list;
     }
 }
