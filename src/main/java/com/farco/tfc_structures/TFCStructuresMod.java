@@ -9,11 +9,15 @@ import com.farco.tfc_structures.mixin.SurfaceBuilderContextAccessorMixin;
 import com.farco.tfc_structures.processors.ModStructureProcessors;
 import com.farco.tfc_structures.processors.TFCStructureProcessor;
 import com.mojang.logging.LogUtils;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
@@ -84,9 +88,21 @@ public class TFCStructuresMod {
     }
 
     private void onServerStarted(ServerStartedEvent event) {
-        var registry = event.getServer().registryAccess().registryOrThrow(Registries.STRUCTURE);
-        structureConfig.refreshUnused(registry);
+        RegistryAccess.Frozen registryAccess = event.getServer().registryAccess();
+        Registry<Structure> structureRegistry = registryAccess.registryOrThrow(Registries.STRUCTURE);
+        structureConfig.refreshUnused(structureRegistry);
         CONFIG_PROVIDER.save(StructureConfig.CONFIG_NAME, structureConfig);
+
+        if (CommonConfig.OUTPUT_STRUCTURES_AND_BIOMES.get()) {
+            Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registries.BIOME);
+            for (ResourceLocation location : biomeRegistry.keySet()) {
+                TFCStructuresMod.LOGGER.info("[BIOME] {}", location.toString());
+            }
+
+            for (ResourceLocation location : structureRegistry.keySet()) {
+                TFCStructuresMod.LOGGER.info("[STRUCTURE] {}", location.toString());
+            }
+        }
     }
 
     public static TFCStructureProcessor getStructureProcessor() {

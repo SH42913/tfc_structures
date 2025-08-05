@@ -19,6 +19,11 @@ import java.util.stream.Collectors;
 public class CommonConfig {
     private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 
+    public static final ForgeConfigSpec.BooleanValue OUTPUT_STRUCTURES_AND_BIOMES = BUILDER
+            .comment("Print all structures and biomes to logs upon world loading")
+            .comment("You'll able to find it with [STRUCTURE] and [BIOME] tags")
+            .define("outputStructuresAndBiomes", false);
+
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ALLOWED_DIMENSIONS = BUILDER
             .comment("Dimensions where structure blocks will be replaced")
             .defineList("allowedDimensions", List.of(Level.OVERWORLD.location().toString()), str -> str instanceof String);
