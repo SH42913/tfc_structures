@@ -55,11 +55,14 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
                 new Direct("minecraft:anvil", "tfc:metal/anvil/bismuth_bronze"),
                 new Direct("minecraft:chipped_anvil", "tfc:metal/anvil/bronze"),
                 new Direct("minecraft:damaged_anvil", "tfc:metal/anvil/copper"),
+                new Direct("minecraft:chain", "tfc:metal/chain/wrought_iron"),
+                new Direct("minecraft:iron_bars", "tfc:metal/bars/wrought_iron"),
                 new Direct("minecraft:pumpkin", "tfc:pumpkin"),
                 new Direct("minecraft:pumpkin_stem", "tfc:crop/pumpkin"),
                 new Direct("minecraft:melon", "tfc:melon"),
                 new Direct("minecraft:melon_stem", "tfc:crop/melon"),
                 new Direct("minecraft:wheat", "tfc:crop/wheat"),
+                new Direct("minecraft:hay_block", "tfc:thatch"),
                 new Direct("minecraft:beetroots", "tfc:crop/beet")
         );
     }
