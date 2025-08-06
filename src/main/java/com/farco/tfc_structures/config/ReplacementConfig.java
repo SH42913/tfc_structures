@@ -16,6 +16,7 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
     public static final String TFC_BRICK_TYPE = "BRICK";
     public static final String TFC_WOOD_TYPE = "WOOD";
     public static final String TFC_SOIL_TYPE = "SOIL";
+    public static final String TFC_SAND_TYPE = "SAND";
     public static final String TFC_SKIP_TYPE = "SKIP";
 
     private record Direct(String original, String replacement) {
@@ -68,13 +69,14 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
     }
 
     private static @NotNull List<TFCWorld> getDefaultTFCWorld() {
-        var ignoreNames = List.of("nether", "prismarine", "end", "infested", "redstone", "blackstone", "dripstone");
+        var ignoreNames = List.of("nether", "prismarine", "end", "infested", "redstone", "blackstone", "dripstone", "soul");
         var stoneNames = List.of("stone");
         var stoneFunctional = Set.of(Blocks.STONECUTTER, Blocks.GRINDSTONE, Blocks.LODESTONE, Blocks.GLOWSTONE);
         var brickNames = List.of("brick");
+        var sandNames = List.of("sand");
         var woodNames = WoodType.values().map(WoodType::name).toList();
         var woodBlocksSet = Set.of(Blocks.CRAFTING_TABLE, Blocks.CHEST, Blocks.TRAPPED_CHEST, Blocks.LECTERN, Blocks.BOOKSHELF);
-        var dirtBlocksSet = Set.of(Blocks.GRASS_BLOCK, Blocks.DIRT_PATH, Blocks.DIRT, Blocks.FARMLAND);
+        var soilBlockSet = Set.of(Blocks.GRASS_BLOCK, Blocks.DIRT_PATH, Blocks.DIRT, Blocks.FARMLAND);
 
         var list = new ArrayList<TFCWorld>();
         for (var entry : ForgeRegistries.BLOCKS.getEntries()) {
@@ -93,10 +95,12 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
             Block block = entry.getValue();
             if (woodBlocksSet.contains(block) || woodNames.stream().anyMatch(predicate)) {
                 conversionType = TFC_WOOD_TYPE;
-            } else if (dirtBlocksSet.contains(block)) {
+            } else if (soilBlockSet.contains(block)) {
                 conversionType = TFC_SOIL_TYPE;
             } else if (brickNames.stream().anyMatch(predicate)) {
                 conversionType = TFC_BRICK_TYPE;
+            } else if (sandNames.stream().anyMatch(predicate)) {
+                conversionType = TFC_SAND_TYPE;
             } else if (!stoneFunctional.contains(block) && stoneNames.stream().anyMatch(predicate)) {
                 conversionType = TFC_STONE_TYPE;
             } else {

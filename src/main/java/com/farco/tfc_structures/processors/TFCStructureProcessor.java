@@ -4,7 +4,10 @@ import com.farco.tfc_structures.TFCStructuresMod;
 import com.farco.tfc_structures.config.ReplacementConfig;
 import com.mojang.serialization.Codec;
 import net.dries007.tfc.common.blockentities.DecayingBlockEntity;
+import net.dries007.tfc.common.blocks.SandstoneBlockType;
+import net.dries007.tfc.common.blocks.TFCBlocks;
 import net.dries007.tfc.common.blocks.rock.Rock;
+import net.dries007.tfc.common.blocks.soil.SandBlockType;
 import net.dries007.tfc.common.blocks.soil.SoilBlockType;
 import net.dries007.tfc.common.blocks.wood.Wood;
 import net.dries007.tfc.common.capabilities.food.FoodCapability;
@@ -16,6 +19,7 @@ import net.dries007.tfc.world.chunkdata.ChunkData;
 import net.dries007.tfc.world.chunkdata.ChunkDataProvider;
 import net.dries007.tfc.world.feature.tree.ForestConfig;
 import net.dries007.tfc.world.feature.tree.RandomTreeConfig;
+import net.dries007.tfc.world.settings.RockSettings;
 import net.dries007.tfc.world.surface.SoilSurfaceState;
 import net.dries007.tfc.world.surface.SurfaceBuilderContext;
 import net.dries007.tfc.world.surface.SurfaceState;
@@ -156,6 +160,8 @@ public class TFCStructureProcessor extends StructureProcessor {
             replacedBlockState = replaceTFCWood(levelReader, pos, original);
         } else if (tfcWorldType.equals(ReplacementConfig.TFC_SOIL_TYPE)) {
             replacedBlockState = replaceTFCSoil(levelReader, pos, original);
+        } else if (tfcWorldType.equals(ReplacementConfig.TFC_SAND_TYPE)) {
+            replacedBlockState = replaceTFCSand(levelReader, pos, original);
         }
 
         if (replacedBlockState == null) {
@@ -172,8 +178,8 @@ public class TFCStructureProcessor extends StructureProcessor {
     }
 
     private BlockState replaceTFCStone(@NotNull LevelReader level, BlockPos pos, BlockState original, Rock.BlockType blockType) {
-        Block hardenedStone = getHardenedStone(level, pos);
-        var rock = getRockFromHardened(hardenedStone);
+        Block hardenedStone = getRockSettings(level, pos).hardened();
+        var rock = getRockByHardenedBlock(hardenedStone);
         if (rock == null) {
             TFCStructuresMod.LOGGER.warn("Rock was not detected, so it will be hardened one");
             return replaceBlock(original, hardenedStone);
@@ -193,11 +199,11 @@ public class TFCStructureProcessor extends StructureProcessor {
         return replaceBlock(original, replacement);
     }
 
-    private static Block getHardenedStone(LevelReader level, BlockPos pos) {
+    private static RockSettings getRockSettings(LevelReader level, BlockPos pos) {
         WorldGenLevel worldGenLevel = (WorldGenLevel) level;
         ChunkDataProvider provider = ChunkDataProvider.get(worldGenLevel);
         var chunkData = provider.get(worldGenLevel, pos);
-        return chunkData.getRockData().getSurfaceRock(pos.getX(), pos.getZ()).hardened();
+        return chunkData.getRockData().getSurfaceRock(pos.getX(), pos.getZ());
     }
 
     private BlockState replaceTFCWood(@NotNull LevelReader level, BlockPos pos, BlockState original) {
@@ -321,6 +327,76 @@ public class TFCStructureProcessor extends StructureProcessor {
         return surfaceBuilderContext;
     }
 
+    private BlockState replaceTFCSand(@NotNull LevelReader levelReader, BlockPos pos, BlockState original) {
+        boolean isSandstoneBlock = original.is(Tags.Blocks.SANDSTONE);
+        boolean isStair = original.is(BlockTags.STAIRS);
+        boolean isSlab = original.is(BlockTags.SLABS);
+        boolean isWall = original.is(BlockTags.WALLS);
+        boolean isCommonSandstone = isSandstoneBlock || isStair || isSlab || isWall;
+
+        RockSettings rockSettings = getRockSettings(levelReader, pos);
+        if (!isCommonSandstone) {
+            if (original.is(Tags.Blocks.GRAVEL)) {
+                return replaceBlock(original, rockSettings.gravel());
+            } else {
+                return replaceBlock(original, rockSettings.sand());
+            }
+        }
+
+        var sandBlockType = genSandBlockType(rockSettings.sand());
+        if (sandBlockType == null) {
+            TFCStructuresMod.LOGGER.warn("SandBlockType was not detected, can't replace block");
+            return original;
+        }
+
+        Block originalBlock = original.getBlock();
+        var sandstoneBlockType = getSandstoneBlockType(originalBlock);
+        if (sandstoneBlockType == null) {
+            TFCStructuresMod.LOGGER.warn("SandStoneBlockType was not detected, can't replace block");
+            return original;
+        }
+
+        Block replacement;
+        var decorations = TFCBlocks.SANDSTONE_DECORATIONS;
+        if (isStair) {
+            replacement = decorations.get(sandBlockType).get(sandstoneBlockType).stair().get();
+        } else if (isSlab) {
+            replacement = decorations.get(sandBlockType).get(sandstoneBlockType).slab().get();
+        } else if (isWall) {
+            replacement = decorations.get(sandBlockType).get(sandstoneBlockType).wall().get();
+        } else {
+            replacement = TFCBlocks.SANDSTONE.get(sandBlockType).get(sandstoneBlockType).get();
+        }
+
+        return replaceBlock(original, replacement);
+    }
+
+    private static SandBlockType genSandBlockType(Block originalBlock) {
+        for (var entry : TFCBlocks.SAND.entrySet()) {
+            if (originalBlock == entry.getValue().get()) {
+                return entry.getKey();
+            }
+        }
+
+        return null;
+    }
+
+    private static SandstoneBlockType getSandstoneBlockType(Block originalBlock) {
+        var resourceLocation = ForgeRegistries.BLOCKS.getKey(originalBlock);
+        if (resourceLocation == null) {
+            return null;
+        }
+
+        String path = resourceLocation.getPath();
+        if (path.startsWith(SandstoneBlockType.CUT.name().toLowerCase()) || path.startsWith("chiseled")) {
+            return SandstoneBlockType.CUT;
+        } else if (path.startsWith(SandstoneBlockType.SMOOTH.name().toLowerCase())) {
+            return SandstoneBlockType.SMOOTH;
+        } else {
+            return SandstoneBlockType.RAW;
+        }
+    }
+
     private static BlockState replaceBlock(BlockState originalBlockState, Block replacement) {
         if (replacement == null) {
             return originalBlockState;
@@ -350,7 +426,7 @@ public class TFCStructureProcessor extends StructureProcessor {
         }
     }
 
-    private static Rock getRockFromHardened(Block block) {
+    private static Rock getRockByHardenedBlock(Block block) {
         for (Rock rock : Rock.VALUES) {
             Block rockBlock = rock.getBlock(Rock.BlockType.HARDENED).get();
             if (block.equals(rockBlock)) {
