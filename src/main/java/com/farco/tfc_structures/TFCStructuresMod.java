@@ -9,6 +9,7 @@ import com.farco.tfc_structures.mixin.SurfaceBuilderContextAccessorMixin;
 import com.farco.tfc_structures.processors.ModStructureProcessors;
 import com.farco.tfc_structures.processors.TFCStructureProcessor;
 import com.mojang.logging.LogUtils;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
@@ -93,14 +94,23 @@ public class TFCStructuresMod {
         structureConfig.refreshUnused(structureRegistry);
         CONFIG_PROVIDER.save(StructureConfig.CONFIG_NAME, structureConfig);
 
-        if (CommonConfig.OUTPUT_STRUCTURES_AND_BIOMES.get()) {
+        if (CommonConfig.BIOMES_TAGS_STRUCTURES_TO_LOGS.get()) {
             Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registries.BIOME);
             for (ResourceLocation location : biomeRegistry.keySet()) {
-                TFCStructuresMod.LOGGER.info("[BIOME] {}", location.toString());
+                LOGGER.info("[BIOME] {}", location.toString());
+            }
+
+            for (var pair : biomeRegistry.getTags().toList()) {
+                var tagLocation = pair.getFirst().location();
+                var biomes = pair.getSecond().stream()
+                        .map(Holder::unwrapKey)
+                        .map(optional -> optional.map(key -> key.location().toString()).orElse("INVALID_BIOME"))
+                        .toList();
+                LOGGER.info("[BIOME_TAG] {} contains {}", tagLocation, String.join(", ", biomes));
             }
 
             for (ResourceLocation location : structureRegistry.keySet()) {
-                TFCStructuresMod.LOGGER.info("[STRUCTURE] {}", location.toString());
+                LOGGER.info("[STRUCTURE] {}", location.toString());
             }
         }
     }
