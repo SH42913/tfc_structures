@@ -65,8 +65,9 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
     }
 
     private static @NotNull List<TFCWorld> getDefaultTFCWorld() {
-        var ignoreNames = List.of("nether", "prismarine", "end", "infested");
+        var ignoreNames = List.of("nether", "prismarine", "end", "infested", "redstone", "blackstone", "dripstone");
         var stoneNames = List.of("stone");
+        var stoneFunctional = Set.of(Blocks.STONECUTTER, Blocks.GRINDSTONE, Blocks.LODESTONE, Blocks.GLOWSTONE);
         var brickNames = List.of("brick");
         var woodNames = WoodType.values().map(WoodType::name).toList();
         var woodBlocksSet = Set.of(Blocks.CRAFTING_TABLE, Blocks.CHEST, Blocks.TRAPPED_CHEST, Blocks.LECTERN, Blocks.BOOKSHELF);
@@ -93,7 +94,7 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
                 conversionType = TFC_SOIL_TYPE;
             } else if (brickNames.stream().anyMatch(predicate)) {
                 conversionType = TFC_BRICK_TYPE;
-            } else if (stoneNames.stream().anyMatch(predicate)) {
+            } else if (!stoneFunctional.contains(block) && stoneNames.stream().anyMatch(predicate)) {
                 conversionType = TFC_STONE_TYPE;
             } else {
                 continue;
