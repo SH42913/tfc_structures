@@ -16,7 +16,6 @@ public record BiomeTag(String id, DatapackGenerator.TagValues tagValues) {
 
     public static final BiomeTag BEACH = new BiomeTag(TFCStructuresMod.MODID + ":is_beach", List.of(
             "tfc:tidal_flats",
-            "tfc:salt_marsh",
             "tfc:shore"
     ));
 
@@ -81,13 +80,13 @@ public record BiomeTag(String id, DatapackGenerator.TagValues tagValues) {
     ));
 
     public static final BiomeTag DEEP_OCEAN = new BiomeTag(TFCStructuresMod.MODID + ":is_deep_ocean", List.of(
-            MOUNTAINS.getTagId(),
-            VOLCANIC_MOUNTAINS.getTagId()
+            "tfc:deep_ocean",
+            "tfc:deep_ocean_trench"
     ));
 
     public static final BiomeTag COMMON_OCEAN = new BiomeTag(TFCStructuresMod.MODID + ":is_common_ocean", List.of(
-            MOUNTAINS.getTagId(),
-            VOLCANIC_MOUNTAINS.getTagId()
+            "tfc:ocean",
+            "tfc:ocean_reef"
     ));
 
     public static final BiomeTag ANY_OCEAN = new BiomeTag(TFCStructuresMod.MODID + ":is_any_ocean", List.of(

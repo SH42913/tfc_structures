@@ -46,6 +46,8 @@ public final class DatapackGenerator {
     public void refreshDatapack(StructureConfig structureConfig) {
         try {
             initDatapackIfNeeded();
+            generateBlocksTag();
+            generateBiomeTags(structureConfig);
             generateActiveStructures(structureConfig);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -67,10 +69,10 @@ public final class DatapackGenerator {
 
         PackMeta packMeta = new PackMeta(new Pack(15, TFCStructuresMod.MODID + " generated data-pack"));
         SaveJson(packMetaPath, packMeta);
+    }
 
-        generateBlocksTag();
-
-        for (BiomeTag tag : BiomeTag.getDefaultBiomeTags()) {
+    private void generateBiomeTags(StructureConfig structureConfig) throws IOException {
+        for (BiomeTag tag : structureConfig.biomeTags) {
             var location = ResourceLocation.parse(tag.id());
 
             Path biomeTagsFolder = buildBiomeTagsFolderPath(datapackFolderPath, location.getNamespace());

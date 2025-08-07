@@ -15,6 +15,8 @@ import java.util.Set;
 public final class StructureConfig {
     public static final String CONFIG_NAME = "structure_config.json";
 
+    public List<BiomeTag> biomeTags;
+
     //  Add desired structures from unregistered_structures here
     //  You can find available biome tags(or add new one) in tfc_structures_datapack\data\minecraft\tags\worldgen\biome
     public List<StructureData> activeStructures;
@@ -47,6 +49,7 @@ public final class StructureConfig {
 
     public static StructureConfig getDefaultConfig() {
         var config = new StructureConfig();
+        config.biomeTags = BiomeTag.getDefaultBiomeTags();
         config.activeStructures = getVanillaStructures();
         config.disabledStructures = getDisabledVanillaStructures();
         config.unregisteredStructures = new HashSet<>();
@@ -58,8 +61,8 @@ public final class StructureConfig {
         list.add(new StructureData("minecraft:buried_treasure", List.of(BiomeTag.BEACH.getTagId(), BiomeTag.OCEANIC_MOUNTAIN_LAKE.getTagId())));
         list.add(new StructureData("minecraft:desert_pyramid", List.of(BiomeTag.BADLANDS.getTagId(), BiomeTag.HILL.getTagId(), "tfc:shore", "tfc:plateau")));
         list.add(new StructureData("minecraft:pillager_outpost", List.of(BiomeTag.CANYONS.getTagId(), BiomeTag.BADLANDS.getTagId(), BiomeTag.ANY_MOUNTAINS.getTagId(), "tfc:rolling_hills", "tfc:highlands")));
-        list.add(new StructureData("minecraft:shipwreck", List.of(BiomeTag.ANY_OCEAN.getTagId(), BiomeTag.SWAMP.getTagId())));
-        list.add(new StructureData("minecraft:shipwreck_beached", List.of(BiomeTag.BEACH.getTagId())));
+        list.add(new StructureData("minecraft:shipwreck", List.of(BiomeTag.ANY_OCEAN.getTagId())));
+        list.add(new StructureData("minecraft:shipwreck_beached", List.of(BiomeTag.BEACH.getTagId(), BiomeTag.SWAMP.getTagId())));
         list.add(new StructureData("minecraft:stronghold", List.of(BiomeTag.ANY_MOUNTAINS.getTagId())));
         list.add(new StructureData("minecraft:swamp_hut", List.of(BiomeTag.SWAMP.getTagId(), BiomeTag.COMMON_LAKE.getTagId(), "tfc:tidal_flats")));
         list.add(new StructureData("minecraft:trail_ruins", List.of(BiomeTag.HIGHLANDS.getTagId(), "tfc:old_mountains", "tfc:low_canyons", "tfc:hills", "tfc:plateau")));
