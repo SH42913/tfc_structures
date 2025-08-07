@@ -57,7 +57,7 @@ public class TFCStructuresMod {
         LOGGER = LogUtils.getLogger();
         CONFIG_FOLDER_PATH = FMLPaths.CONFIGDIR.get().resolve(TFCStructuresMod.MODID);
         CONFIG_PROVIDER = new JsonConfigProvider(CONFIG_FOLDER_PATH);
-        DATAPACK_GENERATOR = new DatapackGenerator(CONFIG_FOLDER_PATH);
+        DATAPACK_GENERATOR = new DatapackGenerator(FMLPaths.GAMEDIR.get().resolve(MODID + "_datapacks"));
 
         @SuppressWarnings("unused") Class<?> unused = SurfaceBuilderContextAccessorMixin.class;
     }

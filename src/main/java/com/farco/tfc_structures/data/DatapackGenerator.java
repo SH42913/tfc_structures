@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public final class DatapackGenerator {
-    public static final String DATA_PACK_FOLDER_NAME = TFCStructuresMod.MODID + "_datapack";
+    public static final String DATA_PACK_FOLDER_NAME = TFCStructuresMod.MODID + "_main";
     public static final String PACK_MCMETA_NAME = "pack.mcmeta";
 
     public record TagLink(String id, boolean required) {
@@ -40,13 +40,13 @@ public final class DatapackGenerator {
     private record PackMeta(Pack pack) {
     }
 
-    private final Path configFolderPath;
+    private final Path datapacksFolderPath;
     private final Path datapackFolderPath;
     private final Gson GSON;
 
-    public DatapackGenerator(Path configFolderPath) {
-        this.configFolderPath = configFolderPath;
-        this.datapackFolderPath = this.configFolderPath.resolve(DATA_PACK_FOLDER_NAME);
+    public DatapackGenerator(Path datapacksFolderPath) {
+        this.datapacksFolderPath = datapacksFolderPath;
+        this.datapackFolderPath = this.datapacksFolderPath.resolve(DATA_PACK_FOLDER_NAME);
 
         GSON = new GsonBuilder().setPrettyPrinting().create();
     }
@@ -62,7 +62,7 @@ public final class DatapackGenerator {
 
     public RepositorySource getDatapackSource() {
         PackSource packSource = PackSource.SERVER;
-        return new FolderRepositorySource(configFolderPath, PackType.SERVER_DATA, packSource);
+        return new FolderRepositorySource(datapacksFolderPath, PackType.SERVER_DATA, packSource);
     }
 
     private void initDatapackIfNeeded() throws IOException {
