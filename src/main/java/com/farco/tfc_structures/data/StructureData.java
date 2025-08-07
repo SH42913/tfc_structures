@@ -10,6 +10,6 @@ public record StructureData(String id, List<String> allowedBiomes) {
     }
 
     public DatapackGenerator.TagValues getAllowedBiomesAsTagValues() {
-        return new DatapackGenerator.TagValues(allowedBiomes, true);
+        return new DatapackGenerator.TagValues(allowedBiomes);
     }
 }

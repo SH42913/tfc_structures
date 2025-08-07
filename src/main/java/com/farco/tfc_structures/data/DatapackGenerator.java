@@ -17,22 +17,13 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public final class DatapackGenerator {
     public static final String DATA_PACK_FOLDER_NAME = TFCStructuresMod.MODID + "_main";
     public static final String PACK_MCMETA_NAME = "pack.mcmeta";
 
-    public record TagLink(String id, boolean required) {
-    }
-
-    public record TagValues(List<TagLink> values) {
-        public TagValues(List<String> values, boolean required) {
-            this(values.stream().map(id -> new TagLink(id, required)).toList());
-        }
+    public record TagValues(Collection<String> values) {
     }
 
     private record Pack(int pack_format, String description) {
@@ -98,13 +89,13 @@ public final class DatapackGenerator {
 
         Files.createDirectories(blockTagsFolder);
 
-        TagValues mossyBlocks = new TagValues(new ArrayList<>(CommonConfig.MOSSY_BLOCKS.get()), true);
+        TagValues mossyBlocks = new TagValues(new ArrayList<>(CommonConfig.MOSSY_BLOCKS.get()));
         generateTag(blockTagsFolder, TFCStructuresMod.MOSSY_TAG_NAME, mossyBlocks);
 
-        TagValues strippedLogs = new TagValues(new ArrayList<>(CommonConfig.STRIPPED_LOGS.get()), true);
+        TagValues strippedLogs = new TagValues(new ArrayList<>(CommonConfig.STRIPPED_LOGS.get()));
         generateTag(blockTagsFolder, TFCStructuresMod.STRIPPED_LOG_TAG_NAME, strippedLogs);
 
-        TagValues strippedWoods = new TagValues(new ArrayList<>(CommonConfig.STRIPPED_WOOD.get()), true);
+        TagValues strippedWoods = new TagValues(new ArrayList<>(CommonConfig.STRIPPED_WOOD.get()));
         generateTag(blockTagsFolder, TFCStructuresMod.STRIPPED_WOOD_TAG_NAME, strippedWoods);
     }
 
