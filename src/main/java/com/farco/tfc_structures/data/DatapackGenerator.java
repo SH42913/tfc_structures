@@ -70,7 +70,7 @@ public final class DatapackGenerator {
 
         generateBlocksTag();
 
-        for (BiomeTag tag : BiomeTag.getAllVanillaBiomeTags()) {
+        for (BiomeTag tag : BiomeTag.getDefaultBiomeTags()) {
             var location = ResourceLocation.parse(tag.id());
 
             Path biomeTagsFolder = buildBiomeTagsFolderPath(datapackFolderPath, location.getNamespace());
