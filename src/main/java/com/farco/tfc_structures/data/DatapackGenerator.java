@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -110,14 +111,11 @@ public final class DatapackGenerator {
     private void generateActiveStructures(StructureConfig structureConfig) throws IOException {
         var modIdToStructuresMap = new HashMap<String, List<StructureData>>();
         for (StructureData structure : structureConfig.activeStructures) {
-            var modId = structure.getResourceLocation().getNamespace();
-            var locations = modIdToStructuresMap.getOrDefault(modId, null);
-            if (locations == null) {
-                locations = new ArrayList<>();
-            }
+            addStructureToMap(structure, modIdToStructuresMap);
+        }
 
-            locations.add(structure);
-            modIdToStructuresMap.put(modId, locations);
+        for (String structureId : structureConfig.disabledStructures) {
+            addStructureToMap(new StructureData(structureId, Collections.emptyList()), modIdToStructuresMap);
         }
 
         for (var entry : modIdToStructuresMap.entrySet()) {
@@ -133,6 +131,17 @@ public final class DatapackGenerator {
                 generateTag(hasStructureFolder, shortName, structure.getAllowedBiomesAsTagValues());
             }
         }
+    }
+
+    private static void addStructureToMap(StructureData structure, HashMap<String, List<StructureData>> map) {
+        var modId = structure.getResourceLocation().getNamespace();
+        var locations = map.getOrDefault(modId, null);
+        if (locations == null) {
+            locations = new ArrayList<>();
+        }
+
+        locations.add(structure);
+        map.put(modId, locations);
     }
 
     private static @NotNull Path buildBiomeTagsFolderPath(Path datapackFolder, String modId) {

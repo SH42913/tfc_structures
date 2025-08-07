@@ -19,6 +19,8 @@ public final class StructureConfig {
     //  You can find available biome tags(or add new one) in tfc_structures_datapack\data\minecraft\tags\worldgen\biome
     public List<StructureData> activeStructures;
 
+    public Set<String> disabledStructures;
+
     //  A list of structures that exists in Minecraft, but is not registered in that config
     //  This list will be updated when server is started
     public Set<String> unregisteredStructures;
@@ -35,11 +37,18 @@ public final class StructureConfig {
                 unregisteredStructures.remove(structure.id());
             }
         }
+
+        for (String structure : disabledStructures) {
+            if (structureRegistry.containsKey(ResourceLocation.parse(structure))) {
+                unregisteredStructures.remove(structure);
+            }
+        }
     }
 
     public static StructureConfig getDefaultConfig() {
         var config = new StructureConfig();
         config.activeStructures = getVanillaStructures();
+        config.disabledStructures = getDisabledVanillaStructures();
         config.unregisteredStructures = new HashSet<>();
         return config;
     }
@@ -48,8 +57,6 @@ public final class StructureConfig {
         List<StructureData> list = new ArrayList<>();
         list.add(new StructureData("minecraft:buried_treasure", List.of(BiomeTag.BEACH.getTagId())));
         list.add(new StructureData("minecraft:desert_pyramid", List.of(BiomeTag.BADLANDS.getTagId())));
-//        list.add(new StructureData("minecraft:mineshaft", List.of(BiomeTag.MOUNTAIN.getTagId())));
-//        list.add(new StructureData("minecraft:mineshaft_mesa", List.of(BiomeTag.BADLANDS.getTagId())));
         list.add(new StructureData("minecraft:pillager_outpost", List.of(BiomeTag.PLAINS.getTagId())));
         list.add(new StructureData("minecraft:shipwreck", List.of(BiomeTag.OCEAN.getTagId())));
         list.add(new StructureData("minecraft:shipwreck_beached", List.of(BiomeTag.BEACH.getTagId())));
@@ -59,20 +66,27 @@ public final class StructureConfig {
         list.add(new StructureData("minecraft:village_desert", List.of(BiomeTag.BEACH.getTagId())));
         list.add(new StructureData("minecraft:village_plains", List.of(BiomeTag.PLAINS.getTagId())));
         list.add(new StructureData("minecraft:village_savanna", List.of(BiomeTag.SAVANNA.getTagId())));
-        list.add(new StructureData("minecraft:village_snowy", List.of(BiomeTag.SNOWY.getTagId())));
         list.add(new StructureData("minecraft:village_taiga", List.of(BiomeTag.TAIGA.getTagId())));
         list.add(new StructureData("minecraft:mansion", List.of(BiomeTag.FOREST.getTagId())));
         list.add(new StructureData("minecraft:jungle_pyramid", List.of(BiomeTag.JUNGLE.getTagId())));
         list.add(new StructureData("minecraft:ocean_ruin_cold", List.of(BiomeTag.COLD_OCEAN.getTagId())));
         list.add(new StructureData("minecraft:ocean_ruin_warm", List.of(BiomeTag.WARM_OCEAN.getTagId())));
         list.add(new StructureData("minecraft:monument", List.of(BiomeTag.DEEP_OCEAN.getTagId())));
-        list.add(new StructureData("minecraft:igloo", List.of(BiomeTag.SNOWY.getTagId())));
         list.add(new StructureData("minecraft:ruined_portal", List.of("tfc:highlands")));
         list.add(new StructureData("minecraft:ruined_portal_swamp", List.of(BiomeTag.SWAMP.getTagId())));
-        list.add(new StructureData("minecraft:ruined_portal_jungle", List.of(BiomeTag.JUNGLE.getTagId())));
         list.add(new StructureData("minecraft:ruined_portal_mountain", List.of(BiomeTag.MOUNTAIN.getTagId())));
         list.add(new StructureData("minecraft:ruined_portal_ocean", List.of(BiomeTag.OCEAN.getTagId())));
         list.add(new StructureData("minecraft:ruined_portal_desert", List.of(BiomeTag.BADLANDS.getTagId())));
         return list;
+    }
+
+    private static Set<String> getDisabledVanillaStructures() {
+        return Set.of(
+                "minecraft:mineshaft",
+                "minecraft:mineshaft_mesa",
+                "minecraft:igloo",
+                "minecraft:village_snowy",
+                "minecraft:ruined_portal_jungle"
+        );
     }
 }
