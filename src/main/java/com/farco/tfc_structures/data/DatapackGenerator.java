@@ -78,10 +78,12 @@ public final class DatapackGenerator {
 
         generateBlocksTag();
 
-        Path biomeTagsFolder = buildBiomeTagsFolderPath(datapackFolderPath, "minecraft");
-        Files.createDirectories(biomeTagsFolder);
         for (BiomeTag tag : BiomeTag.getAllVanillaBiomeTags()) {
             var location = ResourceLocation.parse(tag.id());
+
+            Path biomeTagsFolder = buildBiomeTagsFolderPath(datapackFolderPath, location.getNamespace());
+            Files.createDirectories(biomeTagsFolder);
+
             generateTag(biomeTagsFolder, location.getPath(), tag.tagValues());
         }
     }
