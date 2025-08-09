@@ -3,15 +3,12 @@ package com.farco.tfc_structures.processors;
 import com.farco.tfc_structures.TFCStructuresMod;
 import com.farco.tfc_structures.config.ReplacementConfig;
 import com.mojang.serialization.Codec;
-import net.dries007.tfc.common.blockentities.DecayingBlockEntity;
 import net.dries007.tfc.common.blocks.SandstoneBlockType;
 import net.dries007.tfc.common.blocks.TFCBlocks;
 import net.dries007.tfc.common.blocks.rock.Rock;
 import net.dries007.tfc.common.blocks.soil.SandBlockType;
 import net.dries007.tfc.common.blocks.soil.SoilBlockType;
 import net.dries007.tfc.common.blocks.wood.Wood;
-import net.dries007.tfc.common.capabilities.food.FoodCapability;
-import net.dries007.tfc.common.capabilities.food.IFood;
 import net.dries007.tfc.util.Helpers;
 import net.dries007.tfc.util.climate.OverworldClimateModel;
 import net.dries007.tfc.world.TFCChunkGenerator;
@@ -29,7 +26,6 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
@@ -415,20 +411,20 @@ public class TFCStructureProcessor extends StructureProcessor {
         return newBlockState;
     }
 
-    private void postProcessNewBlock(@NotNull LevelReader levelReader, BlockPos pos) {
-        var worldGenLevel = (WorldGenLevel) levelReader;
-        var level = worldGenLevel.getLevel();
-        var blockEntity = level.getBlockEntity(pos);
-        if (blockEntity instanceof DecayingBlockEntity decaying) {
-            ItemStack stack = decaying.getStack();
-            IFood food = FoodCapability.get(stack);
-            if (food != null) {
-                food.setCreationDate(FoodCapability.getRoundedCreationDate());
-                decaying.setStack(stack);
-                blockEntity.setChanged();
-            }
-        }
-    }
+//    private void postProcessNewBlock(@NotNull LevelReader levelReader, BlockPos pos) {
+//        var worldGenLevel = (WorldGenLevel) levelReader;
+//        var level = worldGenLevel.getLevel();
+//        var blockEntity = level.getBlockEntity(pos);
+//        if (blockEntity instanceof DecayingBlockEntity decaying) {
+//            ItemStack stack = decaying.getStack();
+//            IFood food = FoodCapability.get(stack);
+//            if (food != null) {
+//                food.setCreationDate(FoodCapability.getRoundedCreationDate());
+//                decaying.setStack(stack);
+//                blockEntity.setChanged();
+//            }
+//        }
+//    }
 
     private static Rock getRockByHardenedBlock(Block block) {
         for (Rock rock : Rock.VALUES) {

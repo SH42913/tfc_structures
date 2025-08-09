@@ -1,10 +1,12 @@
 package com.farco.tfc_structures.config;
 
+import com.farco.tfc_structures.TFCStructuresMod;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.IForgeRegistry;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -26,10 +28,21 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
     }
 
     public Map<ResourceLocation, ResourceLocation> getDirectReplacementMap() {
+        IForgeRegistry<Block> blocks = ForgeRegistries.BLOCKS;
         var map = new HashMap<ResourceLocation, ResourceLocation>(directReplacements.size());
         for (Direct entry : directReplacements) {
             var originalLocation = ResourceLocation.parse(entry.original);
+            if (!blocks.containsKey(originalLocation)) {
+                TFCStructuresMod.LOGGER.error("Original with ID {} not found", entry.original);
+                continue;
+            }
+
             var replacementLocation = ResourceLocation.parse(entry.replacement);
+            if (!blocks.containsKey(replacementLocation)) {
+                TFCStructuresMod.LOGGER.error("Replacement with ID {} not found", entry.replacement);
+                continue;
+            }
+
             map.put(originalLocation, replacementLocation);
         }
 
@@ -37,10 +50,15 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
     }
 
     public Map<ResourceLocation, String> getTfcWorldReplacementMap() {
+        IForgeRegistry<Block> blocks = ForgeRegistries.BLOCKS;
         var map = new HashMap<ResourceLocation, String>(tfcWorldReplacement.size());
         for (TFCWorld entry : tfcWorldReplacement) {
             var originalLocation = ResourceLocation.parse(entry.original);
-            map.put(originalLocation, entry.type);
+            if (blocks.containsKey(originalLocation)) {
+                map.put(originalLocation, entry.type);
+            } else {
+                TFCStructuresMod.LOGGER.error("Original for TFC replacement with ID {} not found", entry.original);
+            }
         }
 
         return map;
@@ -51,25 +69,46 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
     }
 
     private static @NotNull List<Direct> getDefaultDirect() {
-        return List.of(
-                new Direct("minecraft:campfire", "tfc:firepit"),
-                new Direct("minecraft:anvil", "tfc:metal/anvil/bismuth_bronze"),
-                new Direct("minecraft:chipped_anvil", "tfc:metal/anvil/bronze"),
-                new Direct("minecraft:damaged_anvil", "tfc:metal/anvil/copper"),
-                new Direct("minecraft:chain", "tfc:metal/chain/wrought_iron"),
-                new Direct("minecraft:iron_bars", "tfc:metal/bars/wrought_iron"),
-                new Direct("minecraft:iron_block", "tfc:metal/block/wrought_iron"),
-                new Direct("minecraft:iron_trapdoor", "tfc:metal/trapdoor/wrought_iron"),
-                new Direct("minecraft:gold_block", "tfc:metal/block/gold"),
-                new Direct("minecraft:cake", "tfc:cake"),
-                new Direct("minecraft:pumpkin", "tfc:pumpkin"),
-                new Direct("minecraft:pumpkin_stem", "tfc:crop/pumpkin"),
-                new Direct("minecraft:melon", "tfc:melon"),
-                new Direct("minecraft:melon_stem", "tfc:crop/melon"),
-                new Direct("minecraft:wheat", "tfc:crop/wheat"),
-                new Direct("minecraft:hay_block", "tfc:thatch"),
-                new Direct("minecraft:beetroots", "tfc:crop/beet")
-        );
+        List<Direct> list = new ArrayList<>();
+        list.add(new Direct("minecraft:campfire", "tfc:firepit"));
+        list.add(new Direct("minecraft:anvil", "tfc:metal/anvil/bismuth_bronze"));
+        list.add(new Direct("minecraft:chipped_anvil", "tfc:metal/anvil/bronze"));
+        list.add(new Direct("minecraft:damaged_anvil", "tfc:metal/anvil/copper"));
+        list.add(new Direct("minecraft:chain", "tfc:metal/chain/wrought_iron"));
+        list.add(new Direct("minecraft:iron_bars", "tfc:metal/bars/wrought_iron"));
+        list.add(new Direct("minecraft:iron_block", "tfc:metal/block/wrought_iron"));
+        list.add(new Direct("minecraft:iron_trapdoor", "tfc:metal/trapdoor/wrought_iron"));
+        list.add(new Direct("minecraft:gold_block", "tfc:metal/block/gold"));
+        list.add(new Direct("minecraft:cake", "tfc:cake"));
+        list.add(new Direct("minecraft:pumpkin", "tfc:pumpkin"));
+        list.add(new Direct("minecraft:pumpkin_stem", "tfc:crop/pumpkin"));
+        list.add(new Direct("minecraft:melon", "tfc:melon"));
+        list.add(new Direct("minecraft:melon_stem", "tfc:crop/melon"));
+        list.add(new Direct("minecraft:wheat", "tfc:crop/wheat"));
+        list.add(new Direct("minecraft:hay_block", "tfc:thatch"));
+        list.add(new Direct("minecraft:beetroots", "tfc:crop/beet"));
+        list.add(new Direct("minecraft:granite", "tfc:rock/hardened/granite"));
+        list.add(new Direct("minecraft:granite_stairs", "tfc:rock/raw/granite_stairs"));
+        list.add(new Direct("minecraft:granite_slab", "tfc:rock/raw/granite_slab"));
+        list.add(new Direct("minecraft:granite_wall", "tfc:rock/raw/granite_wall"));
+        list.add(new Direct("minecraft:polished_granite", "tfc:rock/smooth/granite"));
+        list.add(new Direct("minecraft:polished_granite_stairs", "tfc:rock/smooth/granite_stairs"));
+        list.add(new Direct("minecraft:polished_granite_slab", "tfc:rock/smooth/granite_slab"));
+        list.add(new Direct("minecraft:diorite", "tfc:rock/hardened/diorite"));
+        list.add(new Direct("minecraft:diorite_stairs", "tfc:rock/raw/diorite_stairs"));
+        list.add(new Direct("minecraft:diorite_slab", "tfc:rock/raw/diorite_slab"));
+        list.add(new Direct("minecraft:diorite_wall", "tfc:rock/raw/diorite_wall"));
+        list.add(new Direct("minecraft:polished_diorite", "tfc:rock/smooth/diorite"));
+        list.add(new Direct("minecraft:polished_diorite_stairs", "tfc:rock/smooth/diorite_stairs"));
+        list.add(new Direct("minecraft:polished_diorite_slab", "tfc:rock/smooth/diorite_slab"));
+        list.add(new Direct("minecraft:andesite", "tfc:rock/hardened/andesite"));
+        list.add(new Direct("minecraft:andesite_stairs", "tfc:rock/raw/andesite_stairs"));
+        list.add(new Direct("minecraft:andesite_slab", "tfc:rock/raw/andesite_slab"));
+        list.add(new Direct("minecraft:andesite_wall", "tfc:rock/raw/andesite_wall"));
+        list.add(new Direct("minecraft:polished_andesite", "tfc:rock/smooth/andesite"));
+        list.add(new Direct("minecraft:polished_andesite_stairs", "tfc:rock/smooth/andesite_stairs"));
+        list.add(new Direct("minecraft:polished_andesite_slab", "tfc:rock/smooth/andesite_slab"));
+        return list;
     }
 
     private static @NotNull List<TFCWorld> getDefaultTFCWorld() {
