@@ -186,7 +186,11 @@ public class TFCStructureProcessor extends StructureProcessor {
         }
 
         Block replacement;
-        if (original.is(BlockTags.STAIRS)) {
+        if (original.is(BlockTags.STONE_BUTTONS)) {
+            replacement = rock.getBlock(Rock.BlockType.BUTTON).get();
+        } else if (original.is(BlockTags.STONE_PRESSURE_PLATES)) {
+            replacement = rock.getBlock(Rock.BlockType.PRESSURE_PLATE).get();
+        } else if (original.is(BlockTags.STAIRS)) {
             replacement = rock.getStair(blockType).get();
         } else if (original.is(BlockTags.SLABS)) {
             replacement = rock.getSlab(blockType).get();
