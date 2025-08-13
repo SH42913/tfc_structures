@@ -112,7 +112,7 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
     }
 
     private static @NotNull List<TFCWorld> getDefaultTFCWorld() {
-        var ignoreNames = List.of("nether", "prismarine", "end", "infested", "redstone", "blackstone", "dripstone", "soul");
+        var ignoreNames = List.of("nether", "prismarine", "end", "infested", "redstone", "blackstone", "dripstone", "soul", "suspicious");
         var stoneNames = List.of("stone");
         var stoneFunctional = Set.of(Blocks.STONECUTTER, Blocks.GRINDSTONE, Blocks.LODESTONE, Blocks.GLOWSTONE);
         var brickNames = List.of("brick");
