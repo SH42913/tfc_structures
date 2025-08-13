@@ -6,7 +6,6 @@ import com.farco.tfc_structures.config.ReplacementConfig;
 import com.farco.tfc_structures.config.StructureConfig;
 import com.farco.tfc_structures.data.DatapackGenerator;
 import com.farco.tfc_structures.mixin.SurfaceBuilderContextAccessorMixin;
-import com.farco.tfc_structures.processors.TFCStructureProcessor;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -47,10 +46,8 @@ public class TFCStructuresMod {
     private static final JsonConfigProvider CONFIG_PROVIDER;
     private static final DatapackGenerator DATAPACK_GENERATOR;
 
-    private static TFCStructureProcessor structureProcessor;
+    public static ReplacementConfig replacementConfig;
     private StructureConfig structureConfig;
-    @SuppressWarnings("FieldCanBeLocal")
-    private ReplacementConfig replacementConfig;
 
     static {
         LOGGER = LogUtils.getLogger();
@@ -74,7 +71,6 @@ public class TFCStructuresMod {
         LOGGER.info("Common setup of {}", MODID);
         structureConfig = CONFIG_PROVIDER.load(StructureConfig.CONFIG_NAME, StructureConfig.class, StructureConfig::getDefaultConfig);
         replacementConfig = CONFIG_PROVIDER.load(ReplacementConfig.CONFIG_NAME, ReplacementConfig.class, ReplacementConfig::getDefaultConfig);
-        structureProcessor = new TFCStructureProcessor(replacementConfig);
     }
 
     private void addPackFinder(AddPackFindersEvent event) {
@@ -110,9 +106,5 @@ public class TFCStructuresMod {
                 LOGGER.info("[STRUCTURE] {}", location.toString());
             }
         }
-    }
-
-    public static TFCStructureProcessor getStructureProcessor() {
-        return structureProcessor;
     }
 }

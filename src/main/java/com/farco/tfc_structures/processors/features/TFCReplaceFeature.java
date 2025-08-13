@@ -93,7 +93,7 @@ public class TFCReplaceFeature implements ReplaceFeature {
     }
 
     @Override
-    public @Nullable Block replaceBlock(LevelReader levelReader, BlockPos pos, BlockState originalState, ResourceLocation originalLocation) {
+    public @Nullable Block replaceBlock(WorldGenLevel level, BlockPos pos, BlockState originalState, ResourceLocation originalLocation) {
         String replacementType = replacementMap.get(originalLocation);
         if (replacementType == null) {
             return null;
@@ -102,16 +102,16 @@ public class TFCReplaceFeature implements ReplaceFeature {
         return switch (replacementType) {
             case ReplacementConfig.TFC_SKIP_TYPE -> null;
             case ReplacementConfig.TFC_STONE_TYPE ->
-                    replaceTFCStone(levelReader, pos, originalState, originalState.is(TFCStructuresMod.MOSSY_TAG)
+                    replaceTFCStone(level, pos, originalState, originalState.is(TFCStructuresMod.MOSSY_TAG)
                             ? Rock.BlockType.MOSSY_COBBLE
                             : Rock.BlockType.SMOOTH);
             case ReplacementConfig.TFC_BRICK_TYPE ->
-                    replaceTFCStone(levelReader, pos, originalState, originalState.is(TFCStructuresMod.MOSSY_TAG)
+                    replaceTFCStone(level, pos, originalState, originalState.is(TFCStructuresMod.MOSSY_TAG)
                             ? Rock.BlockType.MOSSY_BRICKS
                             : Rock.BlockType.BRICKS);
-            case ReplacementConfig.TFC_WOOD_TYPE -> replaceTFCWood(levelReader, pos, originalState);
-            case ReplacementConfig.TFC_SOIL_TYPE -> replaceTFCSoil(levelReader, pos, originalState);
-            case ReplacementConfig.TFC_SAND_TYPE -> replaceTFCSand(levelReader, pos, originalState);
+            case ReplacementConfig.TFC_WOOD_TYPE -> replaceTFCWood(level, pos, originalState);
+            case ReplacementConfig.TFC_SOIL_TYPE -> replaceTFCSoil(level, pos, originalState);
+            case ReplacementConfig.TFC_SAND_TYPE -> replaceTFCSand(level, pos, originalState);
             default -> throw new RuntimeException("Type " + replacementType + " is not supported");
         };
     }
