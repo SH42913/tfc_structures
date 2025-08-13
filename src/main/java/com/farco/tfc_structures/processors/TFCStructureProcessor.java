@@ -2,7 +2,6 @@ package com.farco.tfc_structures.processors;
 
 import com.farco.tfc_structures.TFCStructuresMod;
 import com.farco.tfc_structures.config.ReplacementConfig;
-import com.mojang.serialization.Codec;
 import net.dries007.tfc.common.blocks.SandstoneBlockType;
 import net.dries007.tfc.common.blocks.TFCBlocks;
 import net.dries007.tfc.common.blocks.rock.Rock;
@@ -33,22 +32,15 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TFCStructureProcessor extends StructureProcessor {
-    public static final Codec<TFCStructureProcessor> CODEC = Codec.unit(new TFCStructureProcessor(null));
-
+public class TFCStructureProcessor {
     private record Pair<T1, T2>(T1 first, T2 second) {
     }
 
@@ -105,27 +97,6 @@ public class TFCStructureProcessor extends StructureProcessor {
                 new Pair<>(Blocks.MUD, SoilBlockType.MUD),
                 new Pair<>(Blocks.MUD_BRICKS, SoilBlockType.MUD_BRICKS),
                 new Pair<>(Blocks.MUDDY_MANGROVE_ROOTS, SoilBlockType.MUDDY_ROOTS)
-        );
-    }
-
-    @Override
-    protected @NotNull StructureProcessorType<?> getType() {
-        return ModStructureProcessors.TFC_PROCESSOR.get();
-    }
-
-    @Override
-    public @Nullable StructureTemplate.StructureBlockInfo process(@NotNull LevelReader level,
-                                                                  @NotNull BlockPos pos,
-                                                                  @NotNull BlockPos pivot,
-                                                                  @NotNull StructureTemplate.StructureBlockInfo original,
-                                                                  @NotNull StructureTemplate.StructureBlockInfo current,
-                                                                  @NotNull StructurePlaceSettings settings,
-                                                                  @Nullable StructureTemplate template) {
-        var newBlock = replaceBlock(level, current.pos(), current.state());
-        return new StructureTemplate.StructureBlockInfo(
-                current.pos(),
-                newBlock,
-                current.nbt()
         );
     }
 
