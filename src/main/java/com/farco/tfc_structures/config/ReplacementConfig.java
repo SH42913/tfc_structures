@@ -116,10 +116,10 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
         var stoneNames = List.of("stone");
         var stoneFunctional = Set.of(Blocks.STONECUTTER, Blocks.GRINDSTONE, Blocks.LODESTONE, Blocks.GLOWSTONE);
         var brickNames = List.of("brick");
-        var sandNames = List.of("sand");
+        var sandNames = List.of("sand", "gravel");
         var woodNames = WoodType.values().map(WoodType::name).toList();
         var woodBlocksSet = Set.of(Blocks.CRAFTING_TABLE, Blocks.CHEST, Blocks.TRAPPED_CHEST, Blocks.LECTERN, Blocks.BOOKSHELF);
-        var soilBlockSet = Set.of(Blocks.GRASS_BLOCK, Blocks.DIRT_PATH, Blocks.DIRT, Blocks.FARMLAND);
+        var soilBlockSet = Set.of(Blocks.GRASS_BLOCK, Blocks.DIRT_PATH, Blocks.DIRT, Blocks.FARMLAND, Blocks.COARSE_DIRT);
 
         var list = new ArrayList<TFCWorld>();
         for (var entry : ForgeRegistries.BLOCKS.getEntries()) {
