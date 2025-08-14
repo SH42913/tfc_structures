@@ -16,7 +16,7 @@ public class ProtoChunkMixin {
         var blockState = cir.getReturnValue();
         var processor = StructureReplacementProcessor.THREAD_LOCAL.get();
         if (blockState != null && processor != null) {
-            processor.registerBlock(pos);
+            processor.registerBlock(new BlockPos(pos));
         }
     }
 }

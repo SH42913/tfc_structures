@@ -48,7 +48,7 @@ public abstract class StructureStartMixin {
 
         StructureReplacementProcessor processor = new StructureReplacementProcessor(TFCStructuresMod.replacementConfig);
         StructureReplacementProcessor.THREAD_LOCAL.set(processor);
-//        TFCStructuresMod.LOGGER.info("Start structure replacement for {} at {}", location, getChunkPos());
+        TFCStructuresMod.LOGGER.debug("Start structure replacement for {} at {}", location, getChunkPos());
     }
 
     @Inject(method = "placeInChunk", at = @At("TAIL"))

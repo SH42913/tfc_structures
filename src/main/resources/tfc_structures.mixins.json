@@ -5,7 +5,6 @@
   "compatibilityLevel": "JAVA_16",
   "refmap": "tfc_structures.refmap.json",
   "mixins": [
-    "LevelChunkMixin",
     "ProtoChunkMixin",
     "StructureStartMixin",
     "SurfaceBuilderContextAccessorMixin"
