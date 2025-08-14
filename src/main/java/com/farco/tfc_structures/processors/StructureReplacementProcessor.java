@@ -46,9 +46,9 @@ public class StructureReplacementProcessor {
         registeredBlocks.add(blockPos);
     }
 
-    public void applyReplacements(WorldGenLevel level, RandomSource random, BoundingBox box, ChunkPos chunkPos) {
+    public void applyReplacements(WorldGenLevel level, RandomSource random, ChunkPos rootChunkPos, BoundingBox box, ChunkPos chunkPos) {
         for (ReplaceFeature feature : replaceFeatures) {
-            feature.prepareData(level, random, box, chunkPos);
+            feature.prepareData(level, random, rootChunkPos, box, chunkPos);
         }
 
         var chunkAccess = level.getChunk(chunkPos.x, chunkPos.z);

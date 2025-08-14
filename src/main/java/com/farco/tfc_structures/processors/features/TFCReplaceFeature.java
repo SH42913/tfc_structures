@@ -38,6 +38,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
@@ -109,27 +110,30 @@ public class TFCReplaceFeature implements ReplaceFeature {
     }
 
     @Override
-    public void prepareData(WorldGenLevel level, RandomSource random, BoundingBox boundingBox, ChunkPos chunkPos) {
-        BlockPos center = boundingBox.getCenter();
+    public void prepareData(WorldGenLevel level, RandomSource random, ChunkPos rootChunkPos, BoundingBox box, ChunkPos chunkPos) {
+        int x = chunkPos.getMiddleBlockX();
+        int z = chunkPos.getMiddleBlockZ();
+        int y = level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, x, z);
+        BlockPos rootChunkSurface = new BlockPos(x, y, z);
 
         ChunkDataProvider provider = ChunkDataProvider.get(level);
-        ChunkData chunkData = provider.get(level, chunkPos);
+        ChunkData chunkData = provider.get(level, rootChunkPos);
         RockData rockData = chunkData.getRockData();
-        cachedRockSettings = rockData.getRock(center);
+        cachedRockSettings = rockData.getSurfaceRock(x, z);
 
         Wood wood = null;
-        ForestConfig.Entry forestEntry = getForestEntry(level, chunkData, center);
-        if (forestEntry != null) {
-            wood = getWoodFromConfigEntry(forestEntry);
-        } else {
+        int woodIndex = random.nextInt(Integer.MAX_VALUE);
+        var forestEntries = getForestEntry(level, chunkData, rootChunkSurface);
+        if (forestEntries == null || forestEntries.isEmpty()) {
             TFCStructuresMod.LOGGER.warn("Can't detect ForestEntry");
+        } else {
+            var forestEntry = forestEntries.get(woodIndex % forestEntries.size());
+            wood = getWoodFromConfigEntry(forestEntry);
         }
 
         if (wood == null) {
             TFCStructuresMod.LOGGER.warn("Wood was not detected, will be used random wood");
-            Wood[] woodVariants = Wood.VALUES;
-            int randomIndex = random.nextInt(woodVariants.length);
-            wood = woodVariants[randomIndex];
+            wood = Wood.VALUES[woodIndex % Wood.VALUES.length];
         }
 
         cachedWood = wood;
@@ -281,7 +285,7 @@ public class TFCReplaceFeature implements ReplaceFeature {
         return null;
     }
 
-    private static ForestConfig.Entry getForestEntry(WorldGenLevel level, ChunkData chunkData, BlockPos pos) {
+    private static List<ForestConfig.Entry> getForestEntry(WorldGenLevel level, ChunkData chunkData, BlockPos pos) {
         Biome biome = level.getBiome(pos).get();
         BiomeExtension biomeExtension = TFCBiomes.getExtensionOrThrow(level, biome);
         Set<PlacedFeature> featureSet = biomeExtension.getFlattenedFeatureSet(biome);
@@ -327,11 +331,7 @@ public class TFCReplaceFeature implements ReplaceFeature {
             }
         }
 
-        if (entries.isEmpty()) {
-            return null;
-        } else {
-            return entries.get(0);
-        }
+        return entries;
     }
 
     private static Wood getWoodFromConfigEntry(ForestConfig.Entry forestEntry) {
