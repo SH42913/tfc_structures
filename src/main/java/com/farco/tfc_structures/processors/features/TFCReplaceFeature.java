@@ -14,6 +14,7 @@ import net.dries007.tfc.util.climate.OverworldClimateModel;
 import net.dries007.tfc.world.TFCChunkGenerator;
 import net.dries007.tfc.world.chunkdata.ChunkData;
 import net.dries007.tfc.world.chunkdata.ChunkDataProvider;
+import net.dries007.tfc.world.chunkdata.RockData;
 import net.dries007.tfc.world.feature.tree.ForestConfig;
 import net.dries007.tfc.world.feature.tree.RandomTreeConfig;
 import net.dries007.tfc.world.settings.RockSettings;
@@ -26,16 +27,17 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.level.LevelReader;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -50,6 +52,8 @@ public class TFCReplaceFeature implements ReplaceFeature {
     private final List<Pair<Block, SoilBlockType>> blockToSoilBlockTypeMappings;
 
     private DummySurfaceBuilderContext surfaceBuilderContext;
+    private RockSettings cachedRockSettings;
+    private Wood cachedWood;
 
     public TFCReplaceFeature(Map<ResourceLocation, String> replacementMap) {
         this.replacementMap = replacementMap;
@@ -93,6 +97,35 @@ public class TFCReplaceFeature implements ReplaceFeature {
     }
 
     @Override
+    public void prepareData(WorldGenLevel level, RandomSource random, BoundingBox boundingBox, ChunkPos chunkPos) {
+        BlockPos center = boundingBox.getCenter();
+
+        ChunkDataProvider provider = ChunkDataProvider.get(level);
+        ChunkData chunkData = provider.get(level, chunkPos);
+        RockData cachedRockData = chunkData.getRockData();
+        cachedRockSettings = cachedRockData.getRock(center);
+
+        Wood wood = null;
+        BiomeGenerationSettings generationSettings = level.getBiome(center).get().getGenerationSettings();
+        ForestConfig forestConfig = getForestConfig(generationSettings);
+        if (forestConfig != null) {
+            ForestConfig.Entry forestEntry = getForestEntry(chunkData, center, forestConfig);
+            if (forestEntry != null) {
+                wood = getWood(forestEntry);
+            }
+        }
+
+        if (wood == null) {
+            TFCStructuresMod.LOGGER.warn("Wood was not detected, will be used random wood");
+            Wood[] woodVariants = Wood.VALUES;
+            int randomIndex = random.nextInt(woodVariants.length);
+            wood = woodVariants[randomIndex];
+        }
+
+        cachedWood = wood;
+    }
+
+    @Override
     public @Nullable Block replaceBlock(WorldGenLevel level, BlockPos pos, BlockState originalState, ResourceLocation originalLocation) {
         String replacementType = replacementMap.get(originalLocation);
         if (replacementType == null) {
@@ -102,26 +135,26 @@ public class TFCReplaceFeature implements ReplaceFeature {
         return switch (replacementType) {
             case ReplacementConfig.TFC_SKIP_TYPE -> null;
             case ReplacementConfig.TFC_STONE_TYPE ->
-                    replaceTFCStone(level, pos, originalState, originalState.is(TFCStructuresMod.MOSSY_TAG)
+                    replaceTFCStone(originalState, originalState.is(TFCStructuresMod.MOSSY_TAG)
                             ? Rock.BlockType.MOSSY_COBBLE
                             : Rock.BlockType.SMOOTH);
             case ReplacementConfig.TFC_BRICK_TYPE ->
-                    replaceTFCStone(level, pos, originalState, originalState.is(TFCStructuresMod.MOSSY_TAG)
+                    replaceTFCStone(originalState, originalState.is(TFCStructuresMod.MOSSY_TAG)
                             ? Rock.BlockType.MOSSY_BRICKS
                             : Rock.BlockType.BRICKS);
-            case ReplacementConfig.TFC_WOOD_TYPE -> replaceTFCWood(level, pos, originalState);
+            case ReplacementConfig.TFC_WOOD_TYPE -> replaceTFCWood(originalState);
             case ReplacementConfig.TFC_SOIL_TYPE -> replaceTFCSoil(level, pos, originalState);
-            case ReplacementConfig.TFC_SAND_TYPE -> replaceTFCSand(level, pos, originalState);
+            case ReplacementConfig.TFC_SAND_TYPE -> replaceTFCSand(originalState);
             default -> throw new RuntimeException("Type " + replacementType + " is not supported");
         };
     }
 
-    private Block replaceTFCStone(@NotNull LevelReader level, BlockPos pos, BlockState original, Rock.BlockType blockType) {
-        Block hardenedStone = getRockSettings(level, pos).hardened();
+    private Block replaceTFCStone(BlockState original, Rock.BlockType blockType) {
+        Block hardenedStone = cachedRockSettings.hardened();
         var rock = getRockByHardenedBlock(hardenedStone);
         if (rock == null) {
             TFCStructuresMod.LOGGER.warn("Rock was not detected, so it will be hardened one");
-            return null;
+            return hardenedStone;
         }
 
         Block replacement;
@@ -142,26 +175,7 @@ public class TFCReplaceFeature implements ReplaceFeature {
         return replacement;
     }
 
-    private Block replaceTFCWood(@NotNull LevelReader level, BlockPos pos, BlockState original) {
-        BiomeGenerationSettings generationSettings = level.getBiome(pos).get().getGenerationSettings();
-        ForestConfig forestConfig = getForestConfig(generationSettings);
-        if (forestConfig == null) {
-            TFCStructuresMod.LOGGER.warn("Forest config was not detected, can't replace block");
-            return null;
-        }
-
-        ForestConfig.Entry forestEntry = getForestEntry((WorldGenLevel) level, pos, forestConfig);
-        if (forestEntry == null) {
-            TFCStructuresMod.LOGGER.warn("Forest entry was not detected, can't replace block");
-            return null;
-        }
-
-        Wood wood = getWood(forestEntry);
-        if (wood == null) {
-            TFCStructuresMod.LOGGER.warn("Wood was not detected, can't replace block");
-            return null;
-        }
-
+    private Block replaceTFCWood(BlockState original) {
         Wood.BlockType blockType = null;
         Block originalBlock = original.getBlock();
         var possibleReplacement = blockToWoodBlockTypeMap.get(originalBlock);
@@ -181,10 +195,10 @@ public class TFCReplaceFeature implements ReplaceFeature {
             blockType = Wood.BlockType.WOOD;
         }
 
-        return wood.getBlock(blockType).get();
+        return cachedWood.getBlock(blockType).get();
     }
 
-    private Block replaceTFCSoil(@NotNull LevelReader levelReader, BlockPos pos, BlockState original) {
+    private Block replaceTFCSoil(WorldGenLevel level, BlockPos pos, BlockState original) {
         SoilBlockType blockType = null;
         for (var mapping : blockToSoilBlockTypeMappings) {
             if (original.is(mapping.first())) {
@@ -199,27 +213,26 @@ public class TFCReplaceFeature implements ReplaceFeature {
         }
 
         SurfaceState surfaceState = SoilSurfaceState.buildType(blockType);
-        SurfaceBuilderContext context = buildSoilContext(levelReader, pos);
+        SurfaceBuilderContext context = buildSoilContext(level, pos);
         return surfaceState.getState(context).getBlock();
     }
 
-    private Block replaceTFCSand(@NotNull LevelReader levelReader, BlockPos pos, BlockState original) {
+    private Block replaceTFCSand(BlockState original) {
         boolean isSandstoneBlock = original.is(Tags.Blocks.SANDSTONE);
         boolean isStair = original.is(BlockTags.STAIRS);
         boolean isSlab = original.is(BlockTags.SLABS);
         boolean isWall = original.is(BlockTags.WALLS);
         boolean isCommonSandstone = isSandstoneBlock || isStair || isSlab || isWall;
 
-        RockSettings rockSettings = getRockSettings(levelReader, pos);
         if (!isCommonSandstone) {
             if (original.is(Tags.Blocks.GRAVEL)) {
-                return rockSettings.gravel();
+                return cachedRockSettings.gravel();
             } else {
-                return rockSettings.sand();
+                return cachedRockSettings.sand();
             }
         }
 
-        var sandBlockType = genSandBlockType(rockSettings.sand());
+        var sandBlockType = genSandBlockType(cachedRockSettings.sand());
         if (sandBlockType == null) {
             TFCStructuresMod.LOGGER.warn("SandBlockType was not detected, can't replace block");
             return null;
@@ -247,13 +260,6 @@ public class TFCReplaceFeature implements ReplaceFeature {
         return replacement;
     }
 
-    private static RockSettings getRockSettings(LevelReader level, BlockPos pos) {
-        WorldGenLevel worldGenLevel = (WorldGenLevel) level;
-        ChunkDataProvider provider = ChunkDataProvider.get(worldGenLevel);
-        var chunkData = provider.get(worldGenLevel, pos);
-        return chunkData.getRockData().getSurfaceRock(pos.getX(), pos.getZ());
-    }
-
     private static Rock getRockByHardenedBlock(Block block) {
         for (Rock rock : Rock.VALUES) {
             Block rockBlock = rock.getBlock(Rock.BlockType.HARDENED).get();
@@ -279,8 +285,7 @@ public class TFCReplaceFeature implements ReplaceFeature {
         return null;
     }
 
-    private static ForestConfig.Entry getForestEntry(WorldGenLevel level, BlockPos pos, ForestConfig forestConfig) {
-        ChunkData chunkData = ChunkDataProvider.get(level).get(level, pos);
+    private static ForestConfig.Entry getForestEntry(ChunkData chunkData, BlockPos pos, ForestConfig forestConfig) {
         float rainfall = chunkData.getRainfall(pos);
         float averageTemperature = OverworldClimateModel.getAdjustedAverageTempByElevation(pos, chunkData);
         for (var entryHolder : forestConfig.entries()) {
@@ -307,11 +312,10 @@ public class TFCReplaceFeature implements ReplaceFeature {
         return null;
     }
 
-    private SurfaceBuilderContext buildSoilContext(LevelReader levelReader, BlockPos pos) {
-        WorldGenLevel worldGenLevel = (WorldGenLevel) levelReader;
-        ChunkData chunkData = ChunkDataProvider.get(worldGenLevel).get(worldGenLevel, pos);
+    private SurfaceBuilderContext buildSoilContext(WorldGenLevel level, BlockPos pos) {
+        ChunkData chunkData = ChunkDataProvider.get(level).get(level, pos);
         if (surfaceBuilderContext == null) {
-            var chunkGenerator = (TFCChunkGenerator) worldGenLevel.getLevel().getChunkSource().getGenerator();
+            var chunkGenerator = (TFCChunkGenerator) level.getLevel().getChunkSource().getGenerator();
             var rockLayerSettings = chunkGenerator.rockLayerSettings();
             surfaceBuilderContext = new DummySurfaceBuilderContext(chunkData, rockLayerSettings);
         }

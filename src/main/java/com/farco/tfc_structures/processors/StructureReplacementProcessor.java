@@ -12,6 +12,7 @@ import net.dries007.tfc.util.Helpers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.WorldGenLevel;
@@ -20,6 +21,7 @@ import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.HashSet;
@@ -44,7 +46,11 @@ public class StructureReplacementProcessor {
         registeredBlocks.add(blockPos);
     }
 
-    public void applyReplacements(WorldGenLevel level, ChunkPos chunkPos) {
+    public void applyReplacements(WorldGenLevel level, RandomSource random, BoundingBox box, ChunkPos chunkPos) {
+        for (ReplaceFeature feature : replaceFeatures) {
+            feature.prepareData(level, random, box, chunkPos);
+        }
+
         var chunkAccess = level.getChunk(chunkPos.x, chunkPos.z);
         for (BlockPos pos : registeredBlocks) {
             BlockState originalState = chunkAccess.getBlockState(pos);

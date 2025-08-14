@@ -53,7 +53,7 @@ public class StructureStartMixin {
         var processor = StructureReplacementProcessor.THREAD_LOCAL.get();
         if (processor != null) {
             StructureReplacementProcessor.THREAD_LOCAL.remove();
-            processor.applyReplacements(level, chunkPos);
+            processor.applyReplacements(level, random, box, chunkPos);
         }
     }
 }
