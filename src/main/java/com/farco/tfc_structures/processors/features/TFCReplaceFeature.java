@@ -100,6 +100,7 @@ public class TFCReplaceFeature implements ReplaceFeature {
 
         blockToSoilBlockTypeMappings = List.of(
                 new Pair<>(Blocks.DIRT, SoilBlockType.DIRT),
+                new Pair<>(Blocks.COARSE_DIRT, SoilBlockType.MUD),
                 new Pair<>(Blocks.GRASS_BLOCK, SoilBlockType.GRASS),
                 new Pair<>(Blocks.DIRT_PATH, SoilBlockType.GRASS_PATH),
                 new Pair<>(Blocks.FARMLAND, SoilBlockType.FARMLAND),
@@ -223,7 +224,9 @@ public class TFCReplaceFeature implements ReplaceFeature {
         }
 
         if (blockType == null) {
-            TFCStructuresMod.LOGGER.warn("Soil block type was not detected, will be used common DIRT");
+            var blockRegistry = level.registryAccess().registryOrThrow(Registries.BLOCK);
+            var location = blockRegistry.getKey(original.getBlock());
+            TFCStructuresMod.LOGGER.warn("Soil block type was not detected, will be used common DIRT (original={})", location);
             blockType = SoilBlockType.DIRT;
         }
 
