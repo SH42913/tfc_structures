@@ -2,6 +2,7 @@ package com.farco.tfc_structures.processors.features;
 
 import com.farco.tfc_structures.TFCStructuresMod;
 import com.farco.tfc_structures.config.ReplacementConfig;
+import com.farco.tfc_structures.mixin.ForestFeatureAccessorMixin;
 import com.farco.tfc_structures.processors.DummySurfaceBuilderContext;
 import com.farco.tfc_structures.utils.Pair;
 import net.dries007.tfc.common.blocks.SandstoneBlockType;
@@ -17,10 +18,7 @@ import net.dries007.tfc.world.biome.TFCBiomes;
 import net.dries007.tfc.world.chunkdata.ChunkData;
 import net.dries007.tfc.world.chunkdata.ChunkDataProvider;
 import net.dries007.tfc.world.chunkdata.RockData;
-import net.dries007.tfc.world.feature.tree.ForestConfig;
-import net.dries007.tfc.world.feature.tree.OverlayTreeConfig;
-import net.dries007.tfc.world.feature.tree.RandomTreeConfig;
-import net.dries007.tfc.world.feature.tree.StackedTreeConfig;
+import net.dries007.tfc.world.feature.tree.*;
 import net.dries007.tfc.world.settings.RockSettings;
 import net.dries007.tfc.world.surface.SoilSurfaceState;
 import net.dries007.tfc.world.surface.SurfaceBuilderContext;
@@ -125,7 +123,7 @@ public class TFCReplaceFeature implements ReplaceFeature {
 
         Wood wood = null;
         int woodIndex = random.nextInt(Integer.MAX_VALUE);
-        var forestEntries = getForestEntry(level, chunkData, rootChunkSurface);
+        var forestEntries = getForestEntry(level, chunkData, rootChunkSurface, random);
         if (forestEntries == null || forestEntries.isEmpty()) {
             TFCStructuresMod.LOGGER.warn("Can't detect ForestEntry");
         } else {
@@ -291,28 +289,27 @@ public class TFCReplaceFeature implements ReplaceFeature {
         return null;
     }
 
-    private static List<ForestConfig.Entry> getForestEntry(WorldGenLevel level, ChunkData chunkData, BlockPos pos) {
+    private static List<ForestConfig.Entry> getForestEntry(WorldGenLevel level, ChunkData chunkData, BlockPos pos, RandomSource random) {
         Biome biome = level.getBiome(pos).get();
         BiomeExtension biomeExtension = TFCBiomes.getExtensionOrThrow(level, biome);
         Set<PlacedFeature> featureSet = biomeExtension.getFlattenedFeatureSet(biome);
-        ForestConfig config = null;
+
         for (PlacedFeature placedFeature : featureSet) {
-            var feature = placedFeature.feature().value();
-            if (feature.config() instanceof ForestConfig forestConfig) {
-                config = forestConfig;
-                break;
+            var configuredFeature = placedFeature.feature().value();
+            if (configuredFeature.feature() instanceof ForestFeature forestFeature) {
+                var accessor = (ForestFeatureAccessorMixin) forestFeature;
+                var config = (ForestConfig) configuredFeature.config();
+                var tree = accessor.invokeGetTree(chunkData, random.fork(), config, pos);
+                if (tree != null) {
+                    return List.of(tree);
+                }
             }
         }
 
-        List<Holder<ConfiguredFeature<?, ?>>> features;
-        if (config != null) {
-            features = config.entries().stream().toList();
-        } else {
-            features = new ArrayList<>();
-            var featureRegistry = level.registryAccess().registryOrThrow(Registries.CONFIGURED_FEATURE);
-            for (Holder<ConfiguredFeature<?, ?>> holder : featureRegistry.getTagOrEmpty(FOREST_TREES_TAG)) {
-                features.add(holder);
-            }
+        List<Holder<ConfiguredFeature<?, ?>>> features = new ArrayList<>();
+        var featureRegistry = level.registryAccess().registryOrThrow(Registries.CONFIGURED_FEATURE);
+        for (Holder<ConfiguredFeature<?, ?>> holder : featureRegistry.getTagOrEmpty(FOREST_TREES_TAG)) {
+            features.add(holder);
         }
 
         if (features.isEmpty()) {
@@ -322,18 +319,11 @@ public class TFCReplaceFeature implements ReplaceFeature {
         float rainfall = chunkData.getRainfall(pos);
         float averageTemperature = OverworldClimateModel.getAdjustedAverageTempByElevation(pos, chunkData);
 
-        var entries = new ArrayList<ForestConfig.Entry>(4);
+        var entries = new ArrayList<ForestConfig.Entry>();
         for (var entryHolder : features) {
             var entry = (ForestConfig.Entry) entryHolder.value().config();
-            // copy-paste from ForestFeature
-            float lastRain = entry.getAverageRain();
-            float lastTemp = entry.getAverageTemp();
             if (entry.isValid(averageTemperature, rainfall)) {
-                if (entry.distanceFromMean(lastTemp, lastRain) < entry.distanceFromMean(averageTemperature, rainfall)) {
-                    entries.add(entry);
-                } else {
-                    entries.add(0, entry);
-                }
+                entries.add(entry);
             }
         }
 
