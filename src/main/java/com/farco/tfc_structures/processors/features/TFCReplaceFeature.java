@@ -12,38 +12,50 @@ import net.dries007.tfc.common.blocks.soil.SoilBlockType;
 import net.dries007.tfc.common.blocks.wood.Wood;
 import net.dries007.tfc.util.climate.OverworldClimateModel;
 import net.dries007.tfc.world.TFCChunkGenerator;
+import net.dries007.tfc.world.biome.BiomeExtension;
+import net.dries007.tfc.world.biome.TFCBiomes;
 import net.dries007.tfc.world.chunkdata.ChunkData;
 import net.dries007.tfc.world.chunkdata.ChunkDataProvider;
 import net.dries007.tfc.world.chunkdata.RockData;
 import net.dries007.tfc.world.feature.tree.ForestConfig;
+import net.dries007.tfc.world.feature.tree.OverlayTreeConfig;
 import net.dries007.tfc.world.feature.tree.RandomTreeConfig;
+import net.dries007.tfc.world.feature.tree.StackedTreeConfig;
 import net.dries007.tfc.world.settings.RockSettings;
 import net.dries007.tfc.world.surface.SoilSurfaceState;
 import net.dries007.tfc.world.surface.SurfaceBuilderContext;
 import net.dries007.tfc.world.surface.SurfaceState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.core.HolderSet;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.WorldGenLevel;
-import net.minecraft.world.level.biome.BiomeGenerationSettings;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class TFCReplaceFeature implements ReplaceFeature {
+    private static final TagKey<ConfiguredFeature<?, ?>> FOREST_TREES_TAG = TagKey.create(
+            Registries.CONFIGURED_FEATURE,
+            ResourceLocation.fromNamespaceAndPath("tfc", "forest_trees")
+    );
 
     private final Map<ResourceLocation, String> replacementMap;
 
@@ -102,17 +114,15 @@ public class TFCReplaceFeature implements ReplaceFeature {
 
         ChunkDataProvider provider = ChunkDataProvider.get(level);
         ChunkData chunkData = provider.get(level, chunkPos);
-        RockData cachedRockData = chunkData.getRockData();
-        cachedRockSettings = cachedRockData.getRock(center);
+        RockData rockData = chunkData.getRockData();
+        cachedRockSettings = rockData.getRock(center);
 
         Wood wood = null;
-        BiomeGenerationSettings generationSettings = level.getBiome(center).get().getGenerationSettings();
-        ForestConfig forestConfig = getForestConfig(generationSettings);
-        if (forestConfig != null) {
-            ForestConfig.Entry forestEntry = getForestEntry(chunkData, center, forestConfig);
-            if (forestEntry != null) {
-                wood = getWood(forestEntry);
-            }
+        ForestConfig.Entry forestEntry = getForestEntry(level, chunkData, center);
+        if (forestEntry != null) {
+            wood = getWoodFromConfigEntry(forestEntry);
+        } else {
+            TFCStructuresMod.LOGGER.warn("Can't detect ForestEntry");
         }
 
         if (wood == null) {
@@ -271,41 +281,77 @@ public class TFCReplaceFeature implements ReplaceFeature {
         return null;
     }
 
-    private static ForestConfig getForestConfig(BiomeGenerationSettings generationSettings) {
-        for (HolderSet<PlacedFeature> placedHolderSet : generationSettings.features()) {
-            for (Holder<PlacedFeature> placedHolder : placedHolderSet) {
-                PlacedFeature placedFeature = placedHolder.value();
-                var feature = placedFeature.feature().value();
-                if (feature.config() instanceof ForestConfig forestConfig) {
-                    return forestConfig;
-                }
+    private static ForestConfig.Entry getForestEntry(WorldGenLevel level, ChunkData chunkData, BlockPos pos) {
+        Biome biome = level.getBiome(pos).get();
+        BiomeExtension biomeExtension = TFCBiomes.getExtensionOrThrow(level, biome);
+        Set<PlacedFeature> featureSet = biomeExtension.getFlattenedFeatureSet(biome);
+        ForestConfig config = null;
+        for (PlacedFeature placedFeature : featureSet) {
+            var feature = placedFeature.feature().value();
+            if (feature.config() instanceof ForestConfig forestConfig) {
+                config = forestConfig;
+                break;
             }
         }
 
-        return null;
-    }
+        List<Holder<ConfiguredFeature<?, ?>>> features;
+        if (config != null) {
+            features = config.entries().stream().toList();
+        } else {
+            features = new ArrayList<>();
+            var featureRegistry = level.registryAccess().registryOrThrow(Registries.CONFIGURED_FEATURE);
+            for (Holder<ConfiguredFeature<?, ?>> holder : featureRegistry.getTagOrEmpty(FOREST_TREES_TAG)) {
+                features.add(holder);
+            }
+        }
 
-    private static ForestConfig.Entry getForestEntry(ChunkData chunkData, BlockPos pos, ForestConfig forestConfig) {
+        if (features.isEmpty()) {
+            return null;
+        }
+
         float rainfall = chunkData.getRainfall(pos);
         float averageTemperature = OverworldClimateModel.getAdjustedAverageTempByElevation(pos, chunkData);
-        for (var entryHolder : forestConfig.entries()) {
-            var forestEntry = (ForestConfig.Entry) entryHolder.value().config();
-            if (forestEntry.isValid(averageTemperature, rainfall)) {
-                return forestEntry;
+
+        var entries = new ArrayList<ForestConfig.Entry>(4);
+        for (var entryHolder : features) {
+            var entry = (ForestConfig.Entry) entryHolder.value().config();
+            // copy-paste from ForestFeature
+            float lastRain = entry.getAverageRain();
+            float lastTemp = entry.getAverageTemp();
+            if (entry.isValid(averageTemperature, rainfall)) {
+                if (entry.distanceFromMean(lastTemp, lastRain) < entry.distanceFromMean(averageTemperature, rainfall)) {
+                    entries.add(entry);
+                } else {
+                    entries.add(0, entry);
+                }
             }
         }
 
-        return null;
+        if (entries.isEmpty()) {
+            return null;
+        } else {
+            return entries.get(0);
+        }
     }
 
-    private static Wood getWood(ForestConfig.Entry forestEntry) {
+    private static Wood getWoodFromConfigEntry(ForestConfig.Entry forestEntry) {
         var configuredFeature = forestEntry.treeFeature().get();
-        if (configuredFeature.config() instanceof RandomTreeConfig treeConfig) {
-            ResourceLocation first = treeConfig.structureNames().get(0);
-            for (Wood wood : Wood.VALUES) {
-                if (first.getPath().startsWith(wood.getSerializedName())) {
-                    return wood;
-                }
+        FeatureConfiguration config = configuredFeature.config();
+
+        String path;
+        if (config instanceof RandomTreeConfig treeConfig) {
+            path = treeConfig.structureNames().get(0).getPath();
+        } else if (config instanceof OverlayTreeConfig treeConfig) {
+            path = treeConfig.base().getPath();
+        } else if (config instanceof StackedTreeConfig treeConfig) {
+            path = treeConfig.layers().get(0).templates().get(0).getPath();
+        } else {
+            return null;
+        }
+
+        for (Wood wood : Wood.VALUES) {
+            if (path.startsWith(wood.getSerializedName())) {
+                return wood;
             }
         }
 
