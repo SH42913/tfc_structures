@@ -25,6 +25,7 @@ import net.dries007.tfc.world.settings.RockSettings;
 import net.dries007.tfc.world.surface.SoilSurfaceState;
 import net.dries007.tfc.world.surface.SurfaceBuilderContext;
 import net.dries007.tfc.world.surface.SurfaceState;
+import net.dries007.tfc.world.surface.SurfaceStates;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
@@ -65,7 +66,7 @@ public class TFCReplaceFeature implements ReplaceFeature {
     private final List<Pair<Block, SoilBlockType>> blockToSoilBlockTypeMappings;
 
     private DummySurfaceBuilderContext surfaceBuilderContext;
-    private RockSettings cachedRockSettings;
+    private RockSettings cachedSurfaceRock;
     private Wood cachedWood;
 
     public TFCReplaceFeature(Map<ResourceLocation, String> replacementMap) {
@@ -118,8 +119,8 @@ public class TFCReplaceFeature implements ReplaceFeature {
 
         ChunkDataProvider provider = ChunkDataProvider.get(level);
         ChunkData chunkData = provider.get(level, rootChunkPos);
-        RockData rockData = chunkData.getRockData();
-        cachedRockSettings = rockData.getSurfaceRock(x, z);
+        RockData cachedRockData = chunkData.getRockData();
+        cachedSurfaceRock = cachedRockData.getSurfaceRock(x, z);
 
         Wood wood = null;
         int woodIndex = random.nextInt(Integer.MAX_VALUE);
@@ -158,13 +159,13 @@ public class TFCReplaceFeature implements ReplaceFeature {
                             : Rock.BlockType.BRICKS);
             case ReplacementConfig.TFC_WOOD_TYPE -> replaceTFCWood(originalState);
             case ReplacementConfig.TFC_SOIL_TYPE -> replaceTFCSoil(level, pos, originalState);
-            case ReplacementConfig.TFC_SAND_TYPE -> replaceTFCSand(originalState);
+            case ReplacementConfig.TFC_SAND_TYPE -> replaceTFCSand(level, pos, originalState);
             default -> throw new RuntimeException("Type " + replacementType + " is not supported");
         };
     }
 
     private Block replaceTFCStone(BlockState original, Rock.BlockType blockType) {
-        Block hardenedStone = cachedRockSettings.hardened();
+        Block hardenedStone = cachedSurfaceRock.hardened();
         var rock = getRockByHardenedBlock(hardenedStone);
         if (rock == null) {
             TFCStructuresMod.LOGGER.warn("Rock was not detected, so it will be hardened one");
@@ -231,22 +232,24 @@ public class TFCReplaceFeature implements ReplaceFeature {
         return surfaceState.getState(context).getBlock();
     }
 
-    private Block replaceTFCSand(BlockState original) {
+    private Block replaceTFCSand(WorldGenLevel level, BlockPos pos, BlockState original) {
         boolean isSandstoneBlock = original.is(Tags.Blocks.SANDSTONE);
         boolean isStair = original.is(BlockTags.STAIRS);
         boolean isSlab = original.is(BlockTags.SLABS);
         boolean isWall = original.is(BlockTags.WALLS);
         boolean isCommonSandstone = isSandstoneBlock || isStair || isSlab || isWall;
 
+        var context = buildSoilContext(level, pos);
+        Block sandBlock = SurfaceStates.SHORE_SAND.getState(context).getBlock();
         if (!isCommonSandstone) {
             if (original.is(Tags.Blocks.GRAVEL)) {
-                return cachedRockSettings.gravel();
+                return SurfaceStates.GRAVEL.getState(context).getBlock();
             } else {
-                return cachedRockSettings.sand();
+                return sandBlock;
             }
         }
 
-        var sandBlockType = genSandBlockType(cachedRockSettings.sand());
+        var sandBlockType = genSandBlockType(sandBlock);
         if (sandBlockType == null) {
             TFCStructuresMod.LOGGER.warn("SandBlockType was not detected, can't replace block");
             return null;
