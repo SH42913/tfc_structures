@@ -87,6 +87,8 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
         list.add(new Direct("minecraft:wheat", "tfc:crop/wheat"));
         list.add(new Direct("minecraft:hay_block", "tfc:thatch"));
         list.add(new Direct("minecraft:beetroots", "tfc:crop/beet"));
+        list.add(new Direct("minecraft:potatoes", "tfc:crop/potato"));
+        list.add(new Direct("minecraft:carrots", "tfc:crop/carrot"));
         list.add(new Direct("minecraft:granite", "tfc:rock/hardened/granite"));
         list.add(new Direct("minecraft:granite_stairs", "tfc:rock/raw/granite_stairs"));
         list.add(new Direct("minecraft:granite_slab", "tfc:rock/raw/granite_slab"));
