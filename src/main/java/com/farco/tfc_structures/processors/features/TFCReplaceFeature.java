@@ -111,8 +111,8 @@ public class TFCReplaceFeature implements ReplaceFeature {
 
     @Override
     public void prepareData(WorldGenLevel level, RandomSource random, ChunkPos rootChunkPos, BoundingBox box, ChunkPos chunkPos) {
-        int x = chunkPos.getMiddleBlockX();
-        int z = chunkPos.getMiddleBlockZ();
+        int x = rootChunkPos.getMiddleBlockX();
+        int z = rootChunkPos.getMiddleBlockZ();
         int y = level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, x, z);
         BlockPos rootChunkSurface = new BlockPos(x, y, z);
 
