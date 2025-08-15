@@ -54,6 +54,11 @@ public class StructureReplacementProcessor {
         var chunkAccess = level.getChunk(chunkPos.x, chunkPos.z);
         for (BlockPos pos : registeredBlocks) {
             BlockState originalState = chunkAccess.getBlockState(pos);
+            if (originalState.isAir()) {
+                TFCStructuresMod.LOGGER.warn("Registered block at {} was moved or removed", pos);
+                continue;
+            }
+
             BlockEntity originalEntity = chunkAccess.getBlockEntity(pos);
 
             Block newBlock = getReplacementBlock(level, pos, originalState);

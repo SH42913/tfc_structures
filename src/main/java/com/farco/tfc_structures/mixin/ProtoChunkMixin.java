@@ -15,7 +15,7 @@ public class ProtoChunkMixin {
     private void onSetBlockState(BlockPos pos, BlockState state, boolean isMoving, CallbackInfoReturnable<BlockState> cir) {
         var blockState = cir.getReturnValue();
         var processor = StructureReplacementProcessor.THREAD_LOCAL.get();
-        if (blockState != null && processor != null) {
+        if (blockState != null && processor != null && !blockState.isAir()) {
             processor.registerBlock(new BlockPos(pos));
         }
     }
