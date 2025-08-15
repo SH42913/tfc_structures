@@ -10,9 +10,9 @@ import net.dries007.tfc.common.capabilities.food.FoodCapability;
 import net.dries007.tfc.common.capabilities.food.IFood;
 import net.dries007.tfc.util.Helpers;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.WorldGenLevel;
@@ -23,6 +23,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.List;
@@ -66,12 +67,16 @@ public class StructureReplacementProcessor {
                 continue;
             }
 
-            BlockState newState = newBlock.defaultBlockState();
-            newState = Helpers.copyProperties(newState, originalState);
+            BlockState newState = replaceBlock(newBlock, originalState);
             chunkAccess.setBlockState(pos, newState, false);
 
-            ReplaceBlockEntity(level, pos, originalState, originalEntity, newState, chunkAccess);
-            postProcessNewBlock(level, pos);
+            if (originalEntity != null) {
+                replaceBlockEntity(pos, originalState, originalEntity, newState, chunkAccess);
+            } else {
+                createBlockEntity(pos, newState, chunkAccess);
+            }
+
+            postProcessNewBlock(pos, newBlock, newState, chunkAccess);
         }
     }
 
@@ -91,20 +96,21 @@ public class StructureReplacementProcessor {
         return null;
     }
 
-    private static void ReplaceBlockEntity(WorldGenLevel level, BlockPos pos, BlockState originalState, BlockEntity originalEntity, BlockState newState, ChunkAccess chunkAccess) {
-        if (originalEntity == null) {
-            return;
-        }
+    private static @NotNull BlockState replaceBlock(Block newBlock, BlockState originalState) {
+        BlockState newState = newBlock.defaultBlockState();
+        newState = Helpers.copyProperties(newState, originalState);
+        return newState;
+    }
 
+    private static void replaceBlockEntity(BlockPos pos, BlockState originalState, BlockEntity originalEntity, BlockState newState, ChunkAccess chunkAccess) {
         BlockEntity newEntity = null;
         if (newState.getBlock() instanceof EntityBlock entityBlock) {
             newEntity = entityBlock.newBlockEntity(pos, newState);
         }
 
         if (newEntity == null) {
-            var blockRegistry = level.registryAccess().registryOrThrow(Registries.BLOCK);
-            var originalLocation = blockRegistry.getKey(originalState.getBlock());
-            var newLocation = blockRegistry.getKey(newState.getBlock());
+            var originalLocation = ForgeRegistries.BLOCKS.getKey(originalState.getBlock());
+            var newLocation = ForgeRegistries.BLOCKS.getKey(newState.getBlock());
             TFCStructuresMod.LOGGER.error("Replacement block {} can't fully replace {} due first one is not EntityBlock", newLocation, originalLocation);
             return;
         }
@@ -114,19 +120,30 @@ public class StructureReplacementProcessor {
         chunkAccess.setBlockEntity(newEntity);
     }
 
-    private void postProcessNewBlock(WorldGenLevel worldGenLevel, BlockPos pos) {
-        var level = worldGenLevel.getLevel();
-        var blockEntity = level.getBlockEntity(pos);
-        if (blockEntity instanceof DecayingBlockEntity decaying) {
-            ItemStack stack = decaying.getStack();
-            if (stack.getCount() < 1) {
-                stack.setCount(1);
-            }
+    private void createBlockEntity(BlockPos pos, BlockState newState, ChunkAccess chunkAccess) {
+        BlockEntity newEntity = null;
+        if (newState.getBlock() instanceof EntityBlock entityBlock) {
+            newEntity = entityBlock.newBlockEntity(pos, newState);
 
-            IFood food = FoodCapability.get(stack);
+        }
+
+        if (newEntity != null) {
+            chunkAccess.setBlockEntity(newEntity);
+            TFCStructuresMod.LOGGER.info("new block entity created at {}(class={})", pos, newEntity.getClass());
+        }
+    }
+
+    private void postProcessNewBlock(BlockPos pos, Block newBlock, BlockState newState, ChunkAccess chunkAccess) {
+        var blockEntity = chunkAccess.getBlockEntity(pos);
+        if (blockEntity instanceof DecayingBlockEntity decaying) {
+            Item item = newBlock.asItem();
+            ItemStack itemStack = new ItemStack(item, 1);
+            FoodCapability.get(itemStack);
+
+            IFood food = FoodCapability.get(itemStack);
             if (food != null) {
                 food.setCreationDate(FoodCapability.getRoundedCreationDate());
-                decaying.setStack(stack);
+                decaying.setStack(itemStack);
                 blockEntity.setChanged();
             }
         }
