@@ -43,8 +43,12 @@ public class StructureReplacementProcessor {
         registeredBlocks = new HashSet<>();
     }
 
-    public void registerBlock(BlockPos blockPos) {
-        registeredBlocks.add(blockPos);
+    public void registerBlock(BlockState state, BlockPos blockPos) {
+        if (state.isAir()) {
+            registeredBlocks.remove(blockPos);
+        } else {
+            registeredBlocks.add(blockPos);
+        }
     }
 
     public void applyReplacements(WorldGenLevel level, RandomSource random, ChunkPos rootChunkPos, BoundingBox box, ChunkPos chunkPos) {
@@ -129,7 +133,6 @@ public class StructureReplacementProcessor {
 
         if (newEntity != null) {
             chunkAccess.setBlockEntity(newEntity);
-            TFCStructuresMod.LOGGER.info("new block entity created at {}(class={})", pos, newEntity.getClass());
         }
     }
 

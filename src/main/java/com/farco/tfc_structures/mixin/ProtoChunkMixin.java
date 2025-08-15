@@ -13,10 +13,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class ProtoChunkMixin {
     @Inject(method = "setBlockState", at = @At("RETURN"))
     private void onSetBlockState(BlockPos pos, BlockState state, boolean isMoving, CallbackInfoReturnable<BlockState> cir) {
-        var blockState = cir.getReturnValue();
         var processor = StructureReplacementProcessor.THREAD_LOCAL.get();
-        if (blockState != null && processor != null && !blockState.isAir()) {
-            processor.registerBlock(new BlockPos(pos));
+        if (processor != null) {
+            var blockPos = pos instanceof BlockPos.MutableBlockPos mutableBlockPos ? mutableBlockPos.immutable() : pos;
+            processor.registerBlock(state, blockPos);
         }
     }
 }
