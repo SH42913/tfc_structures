@@ -7,6 +7,7 @@ import com.farco.tfc_structures.processors.DummySurfaceBuilderContext;
 import com.farco.tfc_structures.utils.Pair;
 import net.dries007.tfc.common.blocks.SandstoneBlockType;
 import net.dries007.tfc.common.blocks.TFCBlocks;
+import net.dries007.tfc.common.blocks.rock.Ore;
 import net.dries007.tfc.common.blocks.rock.Rock;
 import net.dries007.tfc.common.blocks.soil.SandBlockType;
 import net.dries007.tfc.common.blocks.soil.SoilBlockType;
@@ -26,6 +27,7 @@ import net.dries007.tfc.world.surface.SurfaceState;
 import net.dries007.tfc.world.surface.SurfaceStates;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
@@ -62,7 +64,9 @@ public class TFCReplaceFeature implements ReplaceFeature {
     private final Map<Block, Wood.BlockType> blockToWoodBlockTypeMap;
     private final List<Pair<TagKey<Block>, Wood.BlockType>> tagToWoodBlockTypeMappings;
     private final List<Pair<Block, SoilBlockType>> blockToSoilBlockTypeMappings;
+    private final List<Pair<TagKey<Block>, Ore>> tagToOreMappings;
 
+    private Registry<Block> blockRegistry;
     private DummySurfaceBuilderContext surfaceBuilderContext;
     private RockSettings cachedSurfaceRock;
     private Wood cachedWood;
@@ -107,10 +111,23 @@ public class TFCReplaceFeature implements ReplaceFeature {
                 new Pair<>(Blocks.MUD_BRICKS, SoilBlockType.MUD_BRICKS),
                 new Pair<>(Blocks.MUDDY_MANGROVE_ROOTS, SoilBlockType.MUDDY_ROOTS)
         );
+
+        tagToOreMappings = List.of(
+                new Pair<>(BlockTags.GOLD_ORES, Ore.NATIVE_GOLD),
+                new Pair<>(BlockTags.IRON_ORES, Ore.MAGNETITE),
+                new Pair<>(BlockTags.DIAMOND_ORES, Ore.GRAPHITE),
+                new Pair<>(BlockTags.REDSTONE_ORES, Ore.CINNABAR),
+                new Pair<>(BlockTags.LAPIS_ORES, Ore.LAPIS_LAZULI),
+                new Pair<>(BlockTags.COAL_ORES, Ore.BITUMINOUS_COAL),
+                new Pair<>(BlockTags.EMERALD_ORES, Ore.EMERALD),
+                new Pair<>(BlockTags.COPPER_ORES, Ore.NATIVE_COPPER)
+        );
     }
 
     @Override
     public void prepareData(WorldGenLevel level, RandomSource random, ChunkPos rootChunkPos, BoundingBox box, ChunkPos chunkPos) {
+        blockRegistry = level.registryAccess().registryOrThrow(Registries.BLOCK);
+
         int x = rootChunkPos.getMiddleBlockX();
         int z = rootChunkPos.getMiddleBlockZ();
         int y = level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, x, z);
@@ -159,16 +176,16 @@ public class TFCReplaceFeature implements ReplaceFeature {
             case ReplacementConfig.TFC_WOOD_TYPE -> replaceTFCWood(originalState);
             case ReplacementConfig.TFC_SOIL_TYPE -> replaceTFCSoil(level, pos, originalState);
             case ReplacementConfig.TFC_SAND_TYPE -> replaceTFCSand(level, pos, originalState);
+            case ReplacementConfig.TFC_ORE_TYPE -> replaceTFCOre(originalState);
             default -> throw new RuntimeException("Type " + replacementType + " is not supported");
         };
     }
 
     private Block replaceTFCStone(BlockState original, Rock.BlockType blockType) {
-        Block hardenedStone = cachedSurfaceRock.hardened();
-        var rock = getRockByHardenedBlock(hardenedStone);
+        var rock = getRockFromRockSettings(cachedSurfaceRock);
         if (rock == null) {
             TFCStructuresMod.LOGGER.warn("Rock was not detected, so it will be hardened one");
-            return hardenedStone;
+            return cachedSurfaceRock.hardened();
         }
 
         Block replacement;
@@ -222,7 +239,6 @@ public class TFCReplaceFeature implements ReplaceFeature {
         }
 
         if (blockType == null) {
-            var blockRegistry = level.registryAccess().registryOrThrow(Registries.BLOCK);
             var location = blockRegistry.getKey(original.getBlock());
             TFCStructuresMod.LOGGER.warn("Soil block type was not detected, will be used common DIRT (original={})", location);
             blockType = SoilBlockType.DIRT;
@@ -252,14 +268,16 @@ public class TFCReplaceFeature implements ReplaceFeature {
 
         var sandBlockType = genSandBlockType(sandBlock);
         if (sandBlockType == null) {
-            TFCStructuresMod.LOGGER.warn("SandBlockType was not detected, can't replace block");
+            var location = blockRegistry.getKey(original.getBlock());
+            TFCStructuresMod.LOGGER.warn("SandBlockType was not detected, can't replace block {}", location);
             return null;
         }
 
         Block originalBlock = original.getBlock();
         var sandstoneBlockType = getSandstoneBlockType(originalBlock);
         if (sandstoneBlockType == null) {
-            TFCStructuresMod.LOGGER.warn("SandStoneBlockType was not detected, can't replace block");
+            var location = blockRegistry.getKey(original.getBlock());
+            TFCStructuresMod.LOGGER.warn("SandStoneBlockType was not detected, can't replace block {}", location);
             return null;
         }
 
@@ -278,9 +296,38 @@ public class TFCReplaceFeature implements ReplaceFeature {
         return replacement;
     }
 
-    private static Rock getRockByHardenedBlock(Block block) {
+    private @Nullable Block replaceTFCOre(BlockState originalState) {
+        var rock = getRockFromRockSettings(cachedSurfaceRock);
+        if (rock == null) {
+            var location = blockRegistry.getKey(originalState.getBlock());
+            TFCStructuresMod.LOGGER.warn("Rock was not detected, can't replace block {}", location);
+            return null;
+        }
+
+        Ore ore = null;
+        for (Pair<TagKey<Block>, Ore> mapping : tagToOreMappings) {
+            if (originalState.is(mapping.first())) {
+                ore = mapping.second();
+            }
+        }
+
+        if (ore == null) {
+            var location = blockRegistry.getKey(originalState.getBlock());
+            TFCStructuresMod.LOGGER.warn("Ore type was not detected, can't replace block {}", location);
+            return null;
+        }
+
+        if (ore.isGraded()) {
+            return TFCBlocks.GRADED_ORES.get(rock).get(ore).get(Ore.Grade.NORMAL).get();
+        } else {
+            return TFCBlocks.ORES.get(rock).get(ore).get();
+        }
+    }
+
+    private static Rock getRockFromRockSettings(RockSettings rockSettings) {
+        var block = rockSettings.raw();
         for (Rock rock : Rock.VALUES) {
-            Block rockBlock = rock.getBlock(Rock.BlockType.HARDENED).get();
+            Block rockBlock = rock.getBlock(Rock.BlockType.RAW).get();
             if (block.equals(rockBlock)) {
                 return rock;
             }

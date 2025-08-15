@@ -19,6 +19,7 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
     public static final String TFC_WOOD_TYPE = "WOOD";
     public static final String TFC_SOIL_TYPE = "SOIL";
     public static final String TFC_SAND_TYPE = "SAND";
+    public static final String TFC_ORE_TYPE = "ORE";
     public static final String TFC_SKIP_TYPE = "SKIP";
 
     private record Direct(String original, String replacement) {
@@ -119,6 +120,7 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
         var stoneFunctional = Set.of(Blocks.STONECUTTER, Blocks.GRINDSTONE, Blocks.LODESTONE, Blocks.GLOWSTONE);
         var brickNames = List.of("brick");
         var sandNames = List.of("sand", "gravel");
+        var oreNames = List.of("ore");
         var woodNames = WoodType.values().map(WoodType::name).toList();
         var woodBlocksSet = Set.of(Blocks.CRAFTING_TABLE, Blocks.CHEST, Blocks.TRAPPED_CHEST, Blocks.LECTERN, Blocks.BOOKSHELF);
         var soilBlockSet = Set.of(Blocks.GRASS_BLOCK, Blocks.DIRT_PATH, Blocks.DIRT, Blocks.FARMLAND, Blocks.COARSE_DIRT);
@@ -146,6 +148,8 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
                 conversionType = TFC_BRICK_TYPE;
             } else if (sandNames.stream().anyMatch(predicate)) {
                 conversionType = TFC_SAND_TYPE;
+            } else if (oreNames.stream().anyMatch(predicate)) {
+                conversionType = TFC_ORE_TYPE;
             } else if (!stoneFunctional.contains(block) && stoneNames.stream().anyMatch(predicate)) {
                 conversionType = TFC_STONE_TYPE;
             } else {
