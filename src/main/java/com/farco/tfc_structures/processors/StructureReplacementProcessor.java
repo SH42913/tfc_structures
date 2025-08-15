@@ -10,7 +10,10 @@ import net.dries007.tfc.common.capabilities.food.FoodCapability;
 import net.dries007.tfc.common.capabilities.food.IFood;
 import net.dries007.tfc.util.Helpers;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -20,6 +23,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -30,6 +34,8 @@ import java.util.List;
 
 public class StructureReplacementProcessor {
     public static final ThreadLocal<StructureReplacementProcessor> THREAD_LOCAL = new ThreadLocal<>();
+    private static final TagKey<Block> TFC_SHELVES = TagKey.create(Registries.BLOCK, ResourceLocation.parse("tfc:bookshelves"));
+    private static final List<Direction> HORIZONTAL_DIRECTIONS = List.of(Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
 
     private final List<ReplaceFeature> replaceFeatures;
     private final HashSet<BlockPos> registeredBlocks;
@@ -148,6 +154,18 @@ public class StructureReplacementProcessor {
                 food.setCreationDate(FoodCapability.getRoundedCreationDate());
                 decaying.setStack(itemStack);
                 blockEntity.setChanged();
+            }
+        }
+
+        if (newState.is(TFC_SHELVES)) {
+            for (Direction direction : HORIZONTAL_DIRECTIONS) {
+                var neighbourPos = pos.relative(direction);
+                var neighbourState = chunkAccess.getBlockState(neighbourPos);
+                if (neighbourState.getCollisionShape(chunkAccess, neighbourPos).isEmpty()) {
+                    newState = newState.setValue(BlockStateProperties.HORIZONTAL_FACING, direction);
+                    chunkAccess.setBlockState(pos, newState, false);
+                    break;
+                }
             }
         }
     }
