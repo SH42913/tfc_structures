@@ -1,20 +1,23 @@
-# TFC Structures
+# Dynamic TFC Structures
 
-Did you ever dream to fill your **TerraFirmaCraft** world with authentic structures? TFC Structures will bring them to
+Did you ever dream to fill your **TerraFirmaCraft** world with authentic structures? Dynamic TFC Structures will bring
+them to
 your world!
 
-TFC Structures can activate any world-gen structure and replace their blocks with TerraFirmaCraft analogues like it was
-built specially for TFC. TFC Structures is also fully configurable, you may find configuration files in *
-*config/tfc\_structures** folder. By default, only vanilla structures are activated, but you can activate any other
+Dynamic TFC Structures can activate any world-gen structure and replace their blocks with TerraFirmaCraft analogues like
+it was
+built specially for TFC. Dynamic TFC Structures is also fully configurable, you may find configuration files in
+**config/tfc\_structures** folder. By default, only vanilla structures are activated, but you can activate any other
 modded structure.
 
 ## Disclaimer
 
-Be aware that TFC Structures is currently in **ALPHA**, so it **contains bugs** and there are **a lot of things to do**.
+Be aware that Dynamic TFC Structures is currently in **ALPHA**, so it **contains bugs** and there are **a lot of things
+to do**.
 
 ## Configurations
 
-TFC Structures has 3 configuration files:
+Dynamic TFC Structures has 3 configuration files:
 
 * **common-config.toml**  
   _allowedDimensions_ \- list of dimensions where structure block will be replaced with TFC blocks  
@@ -34,7 +37,9 @@ TFC Structures has 3 configuration files:
 
 ## TFC Structures Datapacks folder
 
-TFC Structures generates its own data-pack using configuration files, so it has its own directory for datapacks - *
-*tfc\_structures\_datapacks/tfc\_structures\_main**. But you may place YOUR datapacks or KubeJS-like datapack folder(use
+Dynamic TFC Structures generates its own data-pack using configuration files, so it has its own directory for
+datapacks -
+**tfc\_structures\_datapacks/tfc\_structures\_main**. But you may place YOUR datapacks or KubeJS-like datapack folder(
+use
 tfc\_structures\_main datapack as an example) directly to **tfc\_structures\_datapacks** folder, and it will load upon
 world creation.
