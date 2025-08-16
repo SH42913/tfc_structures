@@ -137,6 +137,10 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
         list.add(new Direct("minecraft:polished_andesite", "tfc:rock/smooth/andesite"));
         list.add(new Direct("minecraft:polished_andesite_stairs", "tfc:rock/smooth/andesite_stairs"));
         list.add(new Direct("minecraft:polished_andesite_slab", "tfc:rock/smooth/andesite_slab"));
+        list.add(new Direct("minecraft:blackstone", "tfc:smooth_sandstone/black"));
+        list.add(new Direct("minecraft:blackstone_stairs", "tfc:smooth_sandstone/black_stairs"));
+        list.add(new Direct("minecraft:blackstone_slab", "tfc:smooth_sandstone/black_slab"));
+        list.add(new Direct("minecraft:blackstone_wall", "tfc:smooth_sandstone/black_wall"));
         return list;
     }
 
