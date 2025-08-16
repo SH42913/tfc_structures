@@ -71,7 +71,6 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
 
     private static @NotNull List<Direct> getDefaultDirect() {
         List<Direct> list = new ArrayList<>();
-        list.add(new Direct("minecraft:campfire", "tfc:firepit"));
         list.add(new Direct("minecraft:anvil", "tfc:metal/anvil/bismuth_bronze"));
         list.add(new Direct("minecraft:chipped_anvil", "tfc:metal/anvil/bronze"));
         list.add(new Direct("minecraft:damaged_anvil", "tfc:metal/anvil/copper"));
