@@ -27,7 +27,7 @@
               "function": "minecraft:enchant_randomly"
             }
           ],
-          "name": "minecraft:iron_boots",
+          "name": "tfc:metal/boots/bronze",
           "weight": 8
         },
         {
@@ -76,7 +76,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:iron_nugget",
+          "name": "tfc:ore/small_magnetite",
           "weight": 10
         },
         {
@@ -108,7 +108,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:string",
+          "name": "tfc:wool_yarn",
           "weight": 20
         },
         {

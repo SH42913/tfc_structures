@@ -17,7 +17,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:diamond",
+          "name": "tfc:gem/diamond",
           "weight": 5
         },
         {
@@ -33,7 +33,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:iron_ingot",
+          "name": "tfc:metal/ingot/bronze",
           "weight": 15
         },
         {
@@ -49,7 +49,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:gold_ingot",
+          "name": "tfc:ore/rich_native_gold",
           "weight": 15
         },
         {
@@ -65,7 +65,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:emerald",
+          "name": "tfc:gem/emerald",
           "weight": 15
         },
         {
@@ -123,17 +123,17 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:iron_horse_armor",
+          "name": "tfc:metal/horse_armor/bronze",
           "weight": 15
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:golden_horse_armor",
+          "name": "tfc:metal/horse_armor/bismuth_bronze",
           "weight": 10
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:diamond_horse_armor",
+          "name": "tfc:metal/horse_armor/wrought_iron",
           "weight": 5
         },
         {
@@ -199,7 +199,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:gunpowder",
+          "name": "tfc:powder/saltpeter",
           "weight": 10
         },
         {
@@ -231,7 +231,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:string",
+          "name": "tfc:wool_yarn",
           "weight": 10
         },
         {
@@ -247,7 +247,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:sand",
+          "name": "tfc:sand/pink",
           "weight": 10
         }
       ],

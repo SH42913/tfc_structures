@@ -13,7 +13,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:netherite_ingot",
+          "name": "tfc:metal/ingot/black_steel",
           "weight": 15
         },
         {
@@ -25,7 +25,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:ancient_debris",
+          "name": "tfc:metal/ingot/pig_iron",
           "weight": 10
         },
         {
@@ -37,7 +37,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:netherite_scrap",
+          "name": "tfc:metal/ingot/steel",
           "weight": 8
         },
         {
@@ -49,7 +49,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:ancient_debris",
+          "name": "tfc:metal/ingot/pig_iron",
           "weight": 4
         },
         {
@@ -68,7 +68,7 @@
               "function": "minecraft:enchant_randomly"
             }
           ],
-          "name": "minecraft:diamond_sword",
+          "name": "tfc:metal/sword/wrought_iron",
           "weight": 6
         },
         {
@@ -87,7 +87,7 @@
               "function": "minecraft:enchant_randomly"
             }
           ],
-          "name": "minecraft:diamond_chestplate",
+          "name": "tfc:metal/chestplate/steel",
           "weight": 6
         },
         {
@@ -106,7 +106,7 @@
               "function": "minecraft:enchant_randomly"
             }
           ],
-          "name": "minecraft:diamond_helmet",
+          "name": "tfc:metal/helmet/steel",
           "weight": 6
         },
         {
@@ -125,7 +125,7 @@
               "function": "minecraft:enchant_randomly"
             }
           ],
-          "name": "minecraft:diamond_leggings",
+          "name": "tfc:metal/greaves/steel",
           "weight": 6
         },
         {
@@ -144,32 +144,32 @@
               "function": "minecraft:enchant_randomly"
             }
           ],
-          "name": "minecraft:diamond_boots",
+          "name": "tfc:metal/boots/steel",
           "weight": 6
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:diamond_sword",
+          "name": "tfc:metal/sword/wrought_iron",
           "weight": 6
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:diamond_chestplate",
+          "name": "tfc:metal/chestplate/steel",
           "weight": 5
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:diamond_helmet",
+          "name": "tfc:metal/helmet/steel",
           "weight": 5
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:diamond_boots",
+          "name": "tfc:metal/boots/steel",
           "weight": 5
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:diamond_leggings",
+          "name": "tfc:metal/greaves/wrought_iron",
           "weight": 5
         },
         {
@@ -185,7 +185,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:diamond",
+          "name": "tfc:metal/ingot/steel",
           "weight": 5
         },
         {
@@ -234,7 +234,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:gold_block"
+          "name": "tfc:metal/block/gold"
         },
         {
           "type": "minecraft:item",
@@ -249,7 +249,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:iron_block"
+          "name": "tfc:metal/block/bronze"
         },
         {
           "type": "minecraft:item",
@@ -264,7 +264,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:gold_ingot"
+          "name": "tfc:metal/ingot/gold"
         },
         {
           "type": "minecraft:item",
@@ -279,7 +279,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:iron_ingot"
+          "name": "tfc:metal/ingot/bronze"
         },
         {
           "type": "minecraft:item",

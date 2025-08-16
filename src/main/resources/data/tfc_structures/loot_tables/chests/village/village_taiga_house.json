@@ -17,7 +17,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:iron_nugget"
+          "name": "tfc:ore/small_magnetite"
         },
         {
           "type": "minecraft:item",
@@ -42,7 +42,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:potato",
+          "name": "tfc:food/potato",
           "weight": 10
         },
         {
@@ -58,7 +58,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:sweet_berries",
+          "name": "tfc:food/gooseberry",
           "weight": 5
         },
         {
@@ -74,7 +74,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:bread",
+          "name": "tfc:food/rye_bread",
           "weight": 10
         },
         {
@@ -90,7 +90,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:pumpkin_seeds",
+          "name": "tfc:seeds/cabbage",
           "weight": 5
         },
         {
@@ -110,7 +110,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:emerald",
+          "name": "tfc:gem/emerald",
           "weight": 2
         },
         {
@@ -126,7 +126,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:spruce_sapling",
+          "name": "tfc:wood/sapling/spruce",
           "weight": 5
         },
         {
@@ -146,7 +146,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:spruce_log",
+          "name": "tfc:wood/log/spruce",
           "weight": 10
         }
       ],

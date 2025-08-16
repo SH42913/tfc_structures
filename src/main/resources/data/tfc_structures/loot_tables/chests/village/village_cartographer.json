@@ -33,7 +33,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:paper",
+          "name": "tfc:unrefined_paper",
           "weight": 15
         },
         {
@@ -54,7 +54,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:bread",
+          "name": "tfc:food/wheat_bread",
           "weight": 15
         },
         {

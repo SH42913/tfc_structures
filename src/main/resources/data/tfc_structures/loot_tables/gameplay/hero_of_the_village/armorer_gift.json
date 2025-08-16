@@ -6,19 +6,19 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:chainmail_helmet"
+          "name": "tfc:metal/helmet/black_bronze"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:chainmail_chestplate"
+          "name": "tfc:metal/chestplate/black_bronze"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:chainmail_leggings"
+          "name": "tfc:metal/greaves/black_bronze"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:chainmail_boots"
+          "name": "tfc:metal/boots/black_bronze"
         }
       ],
       "rolls": 1.0

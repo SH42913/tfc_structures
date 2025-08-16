@@ -17,7 +17,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:diamond",
+          "name": "tfc:ore/diamond",
           "weight": 3
         },
         {
@@ -33,7 +33,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:iron_ingot",
+          "name": "tfc:metal/ingot/bronze",
           "weight": 10
         },
         {
@@ -49,7 +49,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:gold_ingot",
+          "name": "tfc:ore/rich_native_gold",
           "weight": 15
         },
         {
@@ -65,7 +65,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:bamboo",
+          "name": "tfc:food/sugarcane",
           "weight": 15
         },
         {
@@ -81,7 +81,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:emerald",
+          "name": "tfc:gem/emerald",
           "weight": 2
         },
         {
@@ -123,15 +123,15 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:iron_horse_armor"
+          "name": "tfc:metal/horse_armor/bronze"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:golden_horse_armor"
+          "name": "tfc:metal/horse_armor/bismuth_bronze"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:diamond_horse_armor"
+          "name": "tfc:metal/horse_armor/wrought_iron"
         },
         {
           "type": "minecraft:item",

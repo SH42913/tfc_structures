@@ -17,7 +17,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:apple",
+          "name": "tfc:food/red_apple",
           "weight": 15
         },
         {
@@ -33,7 +33,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:coal",
+          "name": "minecraft:charcoal",
           "weight": 15
         },
         {
@@ -49,12 +49,12 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:gold_nugget",
+          "name": "tfc:ore/small_native_gold",
           "weight": 10
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:stone_axe",
+          "name": "tfc:metal/axe/copper",
           "weight": 2
         },
         {
@@ -64,7 +64,7 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:emerald"
+          "name": "tfc:gem/emerald"
         },
         {
           "type": "minecraft:item",
@@ -79,7 +79,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:wheat",
+          "name": "tfc:food/oat_grain",
           "weight": 10
         }
       ],

@@ -16,7 +16,7 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:chicken",
+          "name": "tfc:food/chicken",
           "weight": 10
         },
         {
@@ -31,7 +31,7 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:string",
+          "name": "tfc:wool_yarn",
           "weight": 10
         },
         {

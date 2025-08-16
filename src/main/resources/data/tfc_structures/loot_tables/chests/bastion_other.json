@@ -16,7 +16,7 @@
               "function": "minecraft:enchant_randomly"
             }
           ],
-          "name": "minecraft:diamond_pickaxe",
+          "name": "tfc:metal/pickaxe/steel",
           "weight": 6
         },
         {
@@ -28,7 +28,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:diamond_shovel",
+          "name": "tfc:metal/shovel/steel",
           "weight": 6
         },
         {
@@ -59,7 +59,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:ancient_debris",
+          "name": "tfc:metal/ingot/pig_iron",
           "weight": 12
         },
         {
@@ -71,7 +71,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:netherite_scrap",
+          "name": "tfc:metal/ingot/steel",
           "weight": 4
         },
         {
@@ -182,7 +182,7 @@
               "function": "minecraft:enchant_randomly"
             }
           ],
-          "name": "minecraft:iron_sword",
+          "name": "tfc:metal/sword/bronze",
           "weight": 2
         },
         {
@@ -194,7 +194,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:iron_block",
+          "name": "tfc:metal/block/bronze",
           "weight": 2
         },
         {
@@ -212,7 +212,7 @@
               "function": "minecraft:enchant_randomly"
             }
           ],
-          "name": "minecraft:golden_boots"
+          "name": "tfc:metal/boots/bismuth_bronze"
         },
         {
           "type": "minecraft:item",
@@ -226,7 +226,7 @@
               "function": "minecraft:enchant_randomly"
             }
           ],
-          "name": "minecraft:golden_axe"
+          "name": "tfc:metal/axe/bismuth_bronze"
         },
         {
           "type": "minecraft:item",
@@ -237,7 +237,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:gold_block",
+          "name": "tfc:metal/block/gold",
           "weight": 2
         },
         {
@@ -264,7 +264,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:gold_ingot",
+          "name": "tfc:metal/ingot/gold",
           "weight": 2
         },
         {
@@ -280,7 +280,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:iron_ingot",
+          "name": "tfc:metal/ingot/bronze",
           "weight": 2
         },
         {
@@ -292,7 +292,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:golden_sword"
+          "name": "tfc:metal/sword/bismuth_bronze"
         },
         {
           "type": "minecraft:item",
@@ -303,7 +303,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:golden_chestplate"
+          "name": "tfc:metal/chestplate/bismuth_bronze"
         },
         {
           "type": "minecraft:item",
@@ -314,7 +314,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:golden_helmet"
+          "name": "tfc:metal/helmet/bismuth_bronze"
         },
         {
           "type": "minecraft:item",
@@ -325,7 +325,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:golden_leggings"
+          "name": "tfc:metal/greaves/bismuth_bronze"
         },
         {
           "type": "minecraft:item",
@@ -336,7 +336,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:golden_boots"
+          "name": "tfc:metal/boots/bismuth_bronze"
         },
         {
           "type": "minecraft:item",
@@ -389,7 +389,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:chain"
+          "name": "tfc:metal/chain/wrought_iron"
         },
         {
           "type": "minecraft:item",
@@ -435,7 +435,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:iron_nugget"
+          "name": "tfc:ore/small_magnetite"
         },
         {
           "type": "minecraft:item",
@@ -465,7 +465,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:gold_nugget"
+          "name": "tfc:ore/small_native_gold"
         },
         {
           "type": "minecraft:item",
@@ -480,7 +480,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:string"
+          "name": "tfc:wool_yarn"
         },
         {
           "type": "minecraft:item",
@@ -507,7 +507,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:cooked_porkchop"
+          "name": "tfc:food/cooked_pork"
         }
       ],
       "rolls": {

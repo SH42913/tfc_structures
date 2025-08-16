@@ -6,7 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:emerald"
+          "name": "tfc:gem/opal"
         },
         {
           "type": "minecraft:item",

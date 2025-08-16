@@ -47,7 +47,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:bread",
+          "name": "tfc:food/wheat_bread",
           "weight": 5
         },
         {
@@ -72,7 +72,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:emerald"
+          "name": "tfc:gem/topaz"
         }
       ],
       "rolls": {

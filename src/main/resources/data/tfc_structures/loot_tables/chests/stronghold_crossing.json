@@ -17,7 +17,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:iron_ingot",
+          "name": "tfc:metal/ingot/bronze",
           "weight": 10
         },
         {
@@ -33,7 +33,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:gold_ingot",
+          "name": "tfc:ore/rich_native_gold",
           "weight": 5
         },
         {
@@ -65,7 +65,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:coal",
+          "name": "tfc:ore/lignite",
           "weight": 10
         },
         {
@@ -81,7 +81,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:bread",
+          "name": "tfc:food/wheat_bread",
           "weight": 15
         },
         {
@@ -97,12 +97,12 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:apple",
+          "name": "tfc:food/red_apple",
           "weight": 15
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:iron_pickaxe"
+          "name": "tfc:metal/pickaxe/bronze"
         },
         {
           "type": "minecraft:item",

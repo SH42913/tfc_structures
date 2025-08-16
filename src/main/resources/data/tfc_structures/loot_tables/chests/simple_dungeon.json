@@ -41,17 +41,17 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:golden_horse_armor",
+          "name": "tfc:metal/horse_armor/bismuth_bronze",
           "weight": 10
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:iron_horse_armor",
+          "name": "tfc:metal/horse_armor/bronze",
           "weight": 15
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:diamond_horse_armor",
+          "name": "tfc:metal/horse_armor/wrought_iron",
           "weight": 5
         },
         {
@@ -87,7 +87,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:iron_ingot",
+          "name": "tfc:metal/ingot/bronze",
           "weight": 10
         },
         {
@@ -103,12 +103,12 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:gold_ingot",
+          "name": "tfc:ore/rich_native_gold",
           "weight": 5
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:bread",
+          "name": "tfc:food/wheat_bread",
           "weight": 20
         },
         {
@@ -124,12 +124,12 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:wheat",
+          "name": "tfc:food/wheat_grain",
           "weight": 20
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:bucket",
+          "name": "tfc:wooden_bucket",
           "weight": 10
         },
         {
@@ -145,7 +145,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:redstone",
+          "name": "tfc:ore/cinnabar",
           "weight": 15
         },
         {
@@ -161,7 +161,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:coal",
+          "name": "minecraft:charcoal",
           "weight": 15
         },
         {
@@ -177,7 +177,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:melon_seeds",
+          "name": "tfc:seeds/papyrus",
           "weight": 10
         },
         {
@@ -193,7 +193,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:pumpkin_seeds",
+          "name": "tfc:seeds/squash",
           "weight": 10
         },
         {
@@ -209,7 +209,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:beetroot_seeds",
+          "name": "tfc:seeds/jute",
           "weight": 10
         }
       ],
@@ -251,7 +251,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:gunpowder",
+          "name": "tfc:powder/saltpeter",
           "weight": 10
         },
         {
@@ -283,7 +283,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:string",
+          "name": "tfc:wool_yarn",
           "weight": 10
         }
       ],

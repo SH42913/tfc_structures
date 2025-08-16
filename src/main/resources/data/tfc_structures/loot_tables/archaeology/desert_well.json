@@ -16,11 +16,11 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:brick"
+          "name": "tfc:alabaster_brick"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:emerald"
+          "name": "tfc:gem/emerald"
         },
         {
           "type": "minecraft:item",

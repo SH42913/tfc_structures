@@ -6,7 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:bread"
+          "name": "tfc:food/wheat_bread"
         },
         {
           "type": "minecraft:item",
@@ -14,7 +14,7 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:cookie"
+          "name": "tfc:food/boiled_egg"
         }
       ],
       "rolls": 1.0

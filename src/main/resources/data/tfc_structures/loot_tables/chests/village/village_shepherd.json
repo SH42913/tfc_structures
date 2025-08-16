@@ -17,7 +17,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:white_wool",
+          "name": "tfc:wool",
           "weight": 6
         },
         {
@@ -86,11 +86,11 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:emerald"
+          "name": "tfc:gem/amethys"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:shears"
+          "name": "tfc:metal/shears/copper"
         },
         {
           "type": "minecraft:item",
@@ -105,7 +105,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:wheat",
+          "name": "tfc:food/wheat_grain",
           "weight": 6
         }
       ],

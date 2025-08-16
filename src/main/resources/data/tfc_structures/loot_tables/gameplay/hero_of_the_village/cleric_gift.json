@@ -10,7 +10,7 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:lapis_lazuli"
+          "name": "tfc:gem/lapis_lazuli"
         }
       ],
       "rolls": 1.0

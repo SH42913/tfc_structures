@@ -6,7 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:emerald"
+          "name": "tfc:gem/pyrite"
         },
         {
           "type": "minecraft:item",
@@ -21,7 +21,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:cod",
+          "name": "tfc:food/cod",
           "weight": 2
         },
         {
@@ -37,7 +37,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:salmon"
+          "name": "tfc:food/salmon"
         },
         {
           "type": "minecraft:item",
@@ -52,7 +52,11 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:water_bucket"
+          "name": "tfc:wooden_bucket"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "tfc:wood/barrel/oak"
         },
         {
           "type": "minecraft:item",
@@ -67,22 +71,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:barrel"
-        },
-        {
-          "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 3.0,
-                "min": 1.0
-              },
-              "function": "minecraft:set_count"
-            }
-          ],
-          "name": "minecraft:wheat_seeds",
+          "name": "tfc:seeds/wheat_seeds",
           "weight": 3
         },
         {
@@ -98,7 +87,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:coal",
+          "name": "minecraft:charcoal",
           "weight": 2
         }
       ],

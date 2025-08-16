@@ -33,7 +33,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:paper",
+          "name": "tfc:unrefined_paper",
           "weight": 20
         },
         {

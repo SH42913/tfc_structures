@@ -6,11 +6,11 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:stone_axe"
+          "name": "tfc:metal/axe/copper"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:wooden_axe",
+          "name": "tfc:stone/axe/igneous_extrusive",
           "weight": 3
         }
       ],
@@ -21,11 +21,11 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:stone_pickaxe"
+          "name": "tfc:metal/pickaxe/copper"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:wooden_pickaxe",
+          "name": "tfc:stone/shovel/igneous_extrusive",
           "weight": 3
         }
       ],
@@ -47,7 +47,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:apple",
+          "name": "tfc:food/red_apple",
           "weight": 5
         },
         {
@@ -63,7 +63,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:bread",
+          "name": "tfc:food/wheat_bread",
           "weight": 3
         },
         {
@@ -79,7 +79,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:salmon",
+          "name": "tfc:food/salmon",
           "weight": 3
         }
       ],
@@ -117,7 +117,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:oak_planks",
+          "name": "tfc:wood/planks/oak",
           "weight": 10
         },
         {
@@ -133,7 +133,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:oak_log",
+          "name": "tfc:wood/log/oak",
           "weight": 3
         },
         {
@@ -149,7 +149,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:spruce_log",
+          "name": "tfc:wood/log/spruce",
           "weight": 3
         },
         {
@@ -165,7 +165,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:birch_log",
+          "name": "tfc:wood/log/birch",
           "weight": 3
         },
         {
@@ -181,7 +181,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:jungle_log",
+          "name": "tfc:wood/log/palm",
           "weight": 3
         },
         {
@@ -197,7 +197,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:acacia_log",
+          "name": "tfc:wood/log/acacia",
           "weight": 3
         },
         {
@@ -213,7 +213,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:dark_oak_log",
+          "name": "tfc:wood/log/blackwood",
           "weight": 3
         },
         {
@@ -229,7 +229,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:mangrove_log",
+          "name": "tfc:wood/log/mangrove",
           "weight": 3
         }
       ],

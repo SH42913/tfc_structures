@@ -93,7 +93,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:gold_block"
+          "name": "tfc:metal/block/gold"
         },
         {
           "type": "minecraft:item",
@@ -108,7 +108,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:gold_ingot"
+          "name": "tfc:metal/ingot/gold"
         },
         {
           "type": "minecraft:item",
@@ -123,7 +123,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:iron_ingot"
+          "name": "tfc:metal/ingot/bronze"
         },
         {
           "type": "minecraft:item",
@@ -134,21 +134,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:golden_sword"
-        },
-        {
-          "type": "minecraft:item",
-          "functions": [
-            {
-              "add": false,
-              "count": 1.0,
-              "function": "minecraft:set_count"
-            },
-            {
-              "function": "minecraft:enchant_randomly"
-            }
-          ],
-          "name": "minecraft:golden_chestplate"
+          "name": "tfc:metal/sword/bismuth_bronze"
         },
         {
           "type": "minecraft:item",
@@ -162,7 +148,7 @@
               "function": "minecraft:enchant_randomly"
             }
           ],
-          "name": "minecraft:golden_helmet"
+          "name": "tfc:metal/chestplate/bismuth_bronze"
         },
         {
           "type": "minecraft:item",
@@ -176,7 +162,7 @@
               "function": "minecraft:enchant_randomly"
             }
           ],
-          "name": "minecraft:golden_leggings"
+          "name": "tfc:metal/helmet/bismuth_bronze"
         },
         {
           "type": "minecraft:item",
@@ -190,7 +176,7 @@
               "function": "minecraft:enchant_randomly"
             }
           ],
-          "name": "minecraft:golden_boots"
+          "name": "tfc:metal/greaves/bismuth_bronze"
         },
         {
           "type": "minecraft:item",
@@ -204,7 +190,21 @@
               "function": "minecraft:enchant_randomly"
             }
           ],
-          "name": "minecraft:golden_axe"
+          "name": "tfc:metal/boots/bismuth_bronze"
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": 1.0,
+              "function": "minecraft:set_count"
+            },
+            {
+              "function": "minecraft:enchant_randomly"
+            }
+          ],
+          "name": "tfc:metal/axe/bismuth_bronze"
         }
       ],
       "rolls": {
@@ -229,7 +229,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:string"
+          "name": "tfc:wool_yarn"
         },
         {
           "type": "minecraft:item",
@@ -274,7 +274,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:iron_nugget"
+          "name": "tfc:ore/small_magnetite"
         },
         {
           "type": "minecraft:item",
@@ -289,7 +289,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:gold_nugget"
+          "name": "tfc:ore/small_native_gold"
         }
       ],
       "rolls": {

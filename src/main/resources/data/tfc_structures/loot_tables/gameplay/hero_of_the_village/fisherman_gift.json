@@ -6,11 +6,11 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:cod"
+          "name": "tfc:food/cod"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:salmon"
+          "name": "tfc:food/salmon"
         }
       ],
       "rolls": 1.0

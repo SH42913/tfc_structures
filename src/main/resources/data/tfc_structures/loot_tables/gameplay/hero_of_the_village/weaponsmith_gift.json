@@ -6,15 +6,15 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:stone_axe"
+          "name": "tfc:metal/axe/copper"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:golden_axe"
+          "name": "tfc:metal/axe/bismuth_bronze"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:iron_axe"
+          "name": "tfc:metal/axe/bronze"
         }
       ],
       "rolls": 1.0

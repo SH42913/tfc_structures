@@ -6,17 +6,17 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:emerald",
+          "name": "tfc:gem/emerald",
           "weight": 2
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:wheat",
+          "name": "tfc:food/wheat_grain",
           "weight": 2
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:wooden_hoe",
+          "name": "tfc:stone/hoe/igneous_extrusive",
           "weight": 2
         },
         {
@@ -26,7 +26,7 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:brick",
+          "name": "tfc:alabaster_brick",
           "weight": 2
         },
         {
@@ -56,22 +56,22 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:red_candle",
+          "name": "tfc:candle/red",
           "weight": 2
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:green_candle",
+          "name": "tfc:candle/green",
           "weight": 2
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:purple_candle",
+          "name": "tfc:candle/purple",
           "weight": 2
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:brown_candle",
+          "name": "tfc:candle/brown",
           "weight": 2
         },
         {
@@ -104,31 +104,31 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:spruce_hanging_sign"
+          "name": "tfc:wood/hanging_sign/copper/spruce"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:oak_hanging_sign"
+          "name": "tfc:wood/hanging_sign/copper/oak"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:gold_nugget"
+          "name": "tfc:ore/small_native_gold"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:coal"
+          "name": "minecraft:charcoal"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:wheat_seeds"
+          "name": "tfc:seeds/sugarcane"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:beetroot_seeds"
+          "name": "tfc:seeds/papyrus"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:dead_bush"
+          "name": "tfc:plant/dead_bush"
         },
         {
           "type": "minecraft:item",
@@ -136,7 +136,7 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:string"
+          "name": "tfc:wool_yarn"
         },
         {
           "type": "minecraft:item",

@@ -17,7 +17,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:iron_ingot",
+          "name": "tfc:metal/ingot/bronze",
           "weight": 90
         },
         {
@@ -33,7 +33,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:gold_ingot",
+          "name": "tfc:metal/ingot/gold",
           "weight": 10
         },
         {
@@ -49,12 +49,12 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:emerald",
+          "name": "tfc:gem/emerald",
           "weight": 40
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:diamond",
+          "name": "tfc:gem/diamond",
           "weight": 5
         },
         {
@@ -85,7 +85,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:iron_nugget",
+          "name": "tfc:ore/small_magnetite",
           "weight": 50
         },
         {
@@ -101,7 +101,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:gold_nugget",
+          "name": "tfc:ore/small_native_gold",
           "weight": 10
         },
         {
@@ -117,7 +117,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:lapis_lazuli",
+          "name": "tfc:gem/lapis_lazuli",
           "weight": 20
         }
       ],

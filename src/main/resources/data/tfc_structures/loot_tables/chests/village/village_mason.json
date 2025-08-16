@@ -25,12 +25,12 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:stone",
+          "name": "tfc:rock/raw/marble",
           "weight": 2
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:stone_bricks",
+          "name": "tfc:rock/bricks/marble",
           "weight": 2
         },
         {
@@ -46,7 +46,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:bread",
+          "name": "tfc:food/wheat_bread",
           "weight": 4
         },
         {
@@ -55,11 +55,11 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:smooth_stone"
+          "name": "tfc:rock/smooth/marble"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:emerald"
+          "name": "tfc:gem/amethyst"
         }
       ],
       "rolls": {

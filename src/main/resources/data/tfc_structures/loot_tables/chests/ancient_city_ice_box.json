@@ -68,7 +68,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:baked_potato"
+          "name": "tfc:food/baked_potato"
         },
         {
           "type": "minecraft:item",

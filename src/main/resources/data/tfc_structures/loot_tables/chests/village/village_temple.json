@@ -17,7 +17,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:redstone",
+          "name": "tfc:ore/cinnabar",
           "weight": 2
         },
         {
@@ -33,7 +33,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:bread",
+          "name": "tfc:food/wheat_bread",
           "weight": 7
         },
         {
@@ -65,7 +65,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:lapis_lazuli"
+          "name": "tfc:gem/lapis_lazuli"
         },
         {
           "type": "minecraft:item",
@@ -80,7 +80,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:gold_ingot"
+          "name": "tfc:ore/rich_native_gold"
         },
         {
           "type": "minecraft:item",
@@ -95,7 +95,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:emerald"
+          "name": "tfc:gem/diamond"
         }
       ],
       "rolls": {

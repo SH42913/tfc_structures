@@ -6,19 +6,19 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:stone_pickaxe"
+          "name": "tfc:metal/pickaxe/copper"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:stone_axe"
+          "name": "tfc:metal/axe/copper"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:stone_hoe"
+          "name": "tfc:metal/hoe/copper"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:stone_shovel"
+          "name": "tfc:metal/shovel/copper"
         }
       ],
       "rolls": 1.0

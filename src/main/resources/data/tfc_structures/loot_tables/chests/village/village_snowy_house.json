@@ -26,7 +26,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:potato",
+          "name": "tfc:food/potato",
           "weight": 10
         },
         {
@@ -42,7 +42,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:bread",
+          "name": "tfc:food/oat_bread",
           "weight": 10
         },
         {
@@ -58,16 +58,16 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:beetroot_seeds",
+          "name": "tfc:seeds/cabbage",
           "weight": 10
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:beetroot_soup"
+          "name": "tfc:food/dairy_soup"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:furnace"
+          "name": "tfc:ceramic/pot"
         },
         {
           "type": "minecraft:item",
@@ -82,7 +82,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:emerald"
+          "name": "tfc:gem/emerald"
         },
         {
           "type": "minecraft:item",
@@ -113,7 +113,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:coal",
+          "name": "minecraft:charcoal",
           "weight": 5
         }
       ],

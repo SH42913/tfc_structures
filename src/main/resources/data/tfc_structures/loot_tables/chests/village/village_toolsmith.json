@@ -17,7 +17,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:diamond"
+          "name": "tfc:gem/sapphire"
         },
         {
           "type": "minecraft:item",
@@ -32,7 +32,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:iron_ingot",
+          "name": "tfc:metal/ingot/bronze",
           "weight": 5
         },
         {
@@ -48,7 +48,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:gold_ingot"
+          "name": "tfc:ore/rich_native_gold"
         },
         {
           "type": "minecraft:item",
@@ -63,12 +63,12 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:bread",
+          "name": "tfc:food/wheat_bread",
           "weight": 15
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:iron_pickaxe",
+          "name": "tfc:metal/pickaxe/bronze",
           "weight": 5
         },
         {
@@ -84,7 +84,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:coal"
+          "name": "minecraft:charcoal"
         },
         {
           "type": "minecraft:item",
@@ -104,7 +104,7 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:iron_shovel",
+          "name": "tfc:metal/shovel/bronze",
           "weight": 5
         }
       ],

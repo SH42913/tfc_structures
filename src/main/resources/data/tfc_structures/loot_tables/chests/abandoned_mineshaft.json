@@ -30,7 +30,7 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:iron_pickaxe",
+          "name": "tfc:metal/pickaxe/bronze",
           "weight": 5
         },
         {
@@ -56,7 +56,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:iron_ingot",
+          "name": "tfc:ore/rich_magnetite",
           "weight": 10
         },
         {
@@ -72,7 +72,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:gold_ingot",
+          "name": "tfc:ore/rich_native_gold",
           "weight": 5
         },
         {
@@ -88,7 +88,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:redstone",
+          "name": "tfc:ore/cinnabar",
           "weight": 5
         },
         {
@@ -104,7 +104,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:lapis_lazuli",
+          "name": "tfc:ore/lapis_lazuli",
           "weight": 5
         },
         {
@@ -120,7 +120,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:diamond",
+          "name": "tfc:ore/diamond",
           "weight": 3
         },
         {
@@ -136,7 +136,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:coal",
+          "name": "tfc:ore/bituminous_coal",
           "weight": 10
         },
         {
@@ -152,7 +152,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:bread",
+          "name": "tfc:food/wheat_bread",
           "weight": 15
         },
         {
@@ -184,7 +184,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:melon_seeds",
+          "name": "tfc:seeds/squash",
           "weight": 10
         },
         {
@@ -200,7 +200,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:pumpkin_seeds",
+          "name": "tfc:seeds/carrot",
           "weight": 10
         },
         {
@@ -216,7 +216,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:beetroot_seeds",
+          "name": "tfc:seeds/beet",
           "weight": 10
         }
       ],
@@ -306,7 +306,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:torch",
+          "name": "tfc:dead_torch",
           "weight": 15
         }
       ],

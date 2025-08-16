@@ -6,23 +6,23 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:cooked_rabbit"
+          "name": "tfc:food/cooked_rabbit"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:cooked_chicken"
+          "name": "tfc:food/cooked_chicken"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:cooked_porkchop"
+          "name": "tfc:food/cooked_pork"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:cooked_beef"
+          "name": "tfc:food/cooked_beef"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:cooked_mutton"
+          "name": "tfc:food/cooked_mutton"
         }
       ],
       "rolls": 1.0

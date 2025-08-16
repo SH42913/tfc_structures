@@ -17,12 +17,12 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:coal",
+          "name": "tfc:ore/bituminous_coal",
           "weight": 10
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:stone_axe",
+          "name": "tfc:metal/axe/copper",
           "weight": 2
         },
         {
@@ -32,7 +32,7 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:emerald"
+          "name": "tfc:gem/emerald"
         },
         {
           "type": "minecraft:item",
@@ -47,7 +47,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:wheat",
+          "name": "tfc:food/wheat_grain",
           "weight": 10
         }
       ],
@@ -66,7 +66,7 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:golden_helmet"
+          "name": "tfc:metal/helmet/bismuth_bronze"
         },
         {
           "type": "minecraft:item",
@@ -75,7 +75,7 @@
               "function": "minecraft:enchant_randomly"
             }
           ],
-          "name": "minecraft:fishing_rod",
+          "name": "tfc:metal/fishing_rod/copper",
           "weight": 5
         },
         {

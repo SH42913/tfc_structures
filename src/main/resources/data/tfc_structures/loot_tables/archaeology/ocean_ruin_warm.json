@@ -22,31 +22,31 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:iron_axe"
+          "name": "tfc:metal/axe/bronze"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:emerald",
+          "name": "tfc:ore/emerald",
           "weight": 2
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:wheat",
+          "name": "tfc:food/barley_grain",
           "weight": 2
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:wooden_hoe",
+          "name": "tfc:stone/hoe/igneous_extrusive",
           "weight": 2
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:coal",
+          "name": "minecraft:charcoal",
           "weight": 2
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:gold_nugget",
+          "name": "tfc:ore/small_native_gold",
           "weight": 2
         }
       ],

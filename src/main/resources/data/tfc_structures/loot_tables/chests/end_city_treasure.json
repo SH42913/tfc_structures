@@ -17,7 +17,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:diamond",
+          "name": "tfc:metal/ingot/steel",
           "weight": 5
         },
         {
@@ -33,7 +33,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:iron_ingot",
+          "name": "tfc:metal/ingot/bronze",
           "weight": 10
         },
         {
@@ -49,7 +49,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:gold_ingot",
+          "name": "tfc:metal/ingot/gold",
           "weight": 15
         },
         {
@@ -65,7 +65,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:emerald",
+          "name": "tfc:gem/emerald",
           "weight": 2
         },
         {
@@ -81,7 +81,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:beetroot_seeds",
+          "name": "tfc:seeds/papyrus",
           "weight": 5
         },
         {
@@ -91,15 +91,15 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:iron_horse_armor"
+          "name": "tfc:metal/horse_armor/bronze"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:golden_horse_armor"
+          "name": "tfc:metal/horse_armor/bismuth_bronze"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:diamond_horse_armor"
+          "name": "tfc:metal/horse_armor/wrought_iron"
         },
         {
           "type": "minecraft:item",
@@ -114,7 +114,7 @@
               "treasure": true
             }
           ],
-          "name": "minecraft:diamond_sword",
+          "name": "tfc:metal/sword/wrought_iron",
           "weight": 3
         },
         {
@@ -130,7 +130,7 @@
               "treasure": true
             }
           ],
-          "name": "minecraft:diamond_boots",
+          "name": "tfc:metal/boots/steel",
           "weight": 3
         },
         {
@@ -146,7 +146,7 @@
               "treasure": true
             }
           ],
-          "name": "minecraft:diamond_chestplate",
+          "name": "tfc:metal/chestplate/steel",
           "weight": 3
         },
         {
@@ -162,7 +162,7 @@
               "treasure": true
             }
           ],
-          "name": "minecraft:diamond_leggings",
+          "name": "tfc:metal/greaves/steel",
           "weight": 3
         },
         {
@@ -178,7 +178,7 @@
               "treasure": true
             }
           ],
-          "name": "minecraft:diamond_helmet",
+          "name": "tfc:metal/helmet/steel",
           "weight": 3
         },
         {
@@ -194,7 +194,7 @@
               "treasure": true
             }
           ],
-          "name": "minecraft:diamond_pickaxe",
+          "name": "tfc:metal/pickaxe/steel",
           "weight": 3
         },
         {
@@ -210,7 +210,7 @@
               "treasure": true
             }
           ],
-          "name": "minecraft:diamond_shovel",
+          "name": "tfc:metal/shovel/steel",
           "weight": 3
         },
         {
@@ -226,7 +226,7 @@
               "treasure": true
             }
           ],
-          "name": "minecraft:iron_sword",
+          "name": "tfc:metal/sword/bronze",
           "weight": 3
         },
         {
@@ -242,7 +242,7 @@
               "treasure": true
             }
           ],
-          "name": "minecraft:iron_boots",
+          "name": "tfc:metal/boots/bronze",
           "weight": 3
         },
         {
@@ -258,7 +258,7 @@
               "treasure": true
             }
           ],
-          "name": "minecraft:iron_chestplate",
+          "name": "tfc:metal/chestplate/bronze",
           "weight": 3
         },
         {
@@ -274,7 +274,7 @@
               "treasure": true
             }
           ],
-          "name": "minecraft:iron_leggings",
+          "name": "tfc:metal/greaves/bronze",
           "weight": 3
         },
         {
@@ -290,7 +290,7 @@
               "treasure": true
             }
           ],
-          "name": "minecraft:iron_helmet",
+          "name": "tfc:metal/helmet/bronze",
           "weight": 3
         },
         {
@@ -306,7 +306,7 @@
               "treasure": true
             }
           ],
-          "name": "minecraft:iron_pickaxe",
+          "name": "tfc:metal/pickaxe/bronze",
           "weight": 3
         },
         {
@@ -322,7 +322,7 @@
               "treasure": true
             }
           ],
-          "name": "minecraft:iron_shovel",
+          "name": "tfc:metal/shovel/bronze",
           "weight": 3
         }
       ],

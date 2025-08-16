@@ -27,7 +27,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:iron_ingot",
+          "name": "tfc:metal/ingot/bronze",
           "weight": 20
         },
         {
@@ -43,7 +43,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:gold_ingot",
+          "name": "tfc:metal/ingot/gold",
           "weight": 10
         },
         {
@@ -85,7 +85,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:emerald",
+          "name": "tfc:gem/emerald",
           "weight": 5
         },
         {
@@ -101,7 +101,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:diamond",
+          "name": "tfc:gem/diamond",
           "weight": 5
         },
         {
@@ -117,7 +117,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:prismarine_crystals",
+          "name": "minecraft:nautilus_shell",
           "weight": 5
         }
       ],
@@ -136,7 +136,7 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:iron_sword"
+          "name": "tfc:metal/sword/bronze"
         }
       ],
       "rolls": {
@@ -161,7 +161,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:cooked_cod"
+          "name": "tfc:food/cooked_cod"
         },
         {
           "type": "minecraft:item",
@@ -176,7 +176,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:cooked_salmon"
+          "name": "tfc:food/cooked_salmon"
         }
       ],
       "rolls": 2.0

@@ -17,7 +17,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:paper",
+          "name": "tfc:unrefined_paper",
           "weight": 8
         },
         {
@@ -33,7 +33,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:potato",
+          "name": "tfc:food/potato",
           "weight": 7
         },
         {
@@ -65,7 +65,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:poisonous_potato",
+          "name": "tfc:food/cattail_root",
           "weight": 7
         },
         {
@@ -81,7 +81,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:carrot",
+          "name": "tfc:food/carrot",
           "weight": 7
         },
         {
@@ -97,7 +97,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:wheat",
+          "name": "tfc:food/wheat_grain",
           "weight": 7
         },
         {
@@ -173,7 +173,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:coal",
+          "name": "minecraft:charcoal",
           "weight": 6
         },
         {
@@ -205,7 +205,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:pumpkin",
+          "name": "tfc:pumpkin",
           "weight": 2
         },
         {
@@ -221,7 +221,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:bamboo",
+          "name": "tfc:food/sugarcane",
           "weight": 2
         },
         {
@@ -237,7 +237,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:gunpowder",
+          "name": "tfc:powder/saltpeter",
           "weight": 3
         },
         {

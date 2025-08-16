@@ -31,7 +31,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:wheat",
+          "name": "tfc:food/wheat_grain",
           "weight": 7
         },
         {
@@ -47,7 +47,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:potato",
+          "name": "tfc:food/potato",
           "weight": 5
         },
         {
@@ -63,7 +63,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:carrot",
+          "name": "tfc:food/carrot",
           "weight": 5
         }
       ],
@@ -89,7 +89,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:dark_oak_log"
+          "name": "tfc:wood/log/blackwood"
         }
       ],
       "rolls": {
@@ -119,7 +119,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:string",
+          "name": "tfc:wool_yarn",
           "weight": 4
         },
         {
@@ -167,7 +167,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:iron_ingot",
+          "name": "tfc:metal/ingot/bronze",
           "weight": 3
         },
         {
@@ -191,7 +191,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:goat_horn"
+          "name": "tfc:goat_horn"
         }
       ],
       "functions": [

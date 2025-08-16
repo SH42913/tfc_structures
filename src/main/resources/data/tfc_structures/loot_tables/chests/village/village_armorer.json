@@ -17,7 +17,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:iron_ingot",
+          "name": "tfc:metal/ingot/bronze",
           "weight": 2
         },
         {
@@ -33,16 +33,16 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:bread",
+          "name": "tfc:food/wheat_bread",
           "weight": 4
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:iron_helmet"
+          "name": "tfc:metal/helmet/bronze"
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:emerald"
+          "name": "tfc:gem/topaz"
         }
       ],
       "rolls": {

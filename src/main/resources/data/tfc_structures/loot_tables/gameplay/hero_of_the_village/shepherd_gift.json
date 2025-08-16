@@ -6,7 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "minecraft:white_wool"
+          "name": "tfc:wool"
         },
         {
           "type": "minecraft:item",
