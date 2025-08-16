@@ -62,6 +62,7 @@ public abstract class StructureStartMixin {
             var rootChunkPos = getChunkPos();
             var worldGenRandom = new WorldgenRandom(WorldgenRandom.Algorithm.XOROSHIRO.newInstance(worldSeed));
             worldGenRandom.setLargeFeatureSeed(worldSeed, rootChunkPos.x, rootChunkPos.z);
+            TFCStructuresMod.LOGGER.debug("Applying replacements for structure at {}, randomCheck={}", getChunkPos(), worldGenRandom.nextLong());
             processor.applyReplacements(level, worldGenRandom, rootChunkPos, box, chunkPos);
         }
     }

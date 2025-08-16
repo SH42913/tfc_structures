@@ -222,7 +222,8 @@ public class TFCReplaceFeature implements ReplaceFeature {
         }
 
         if (blockType == null) {
-            TFCStructuresMod.LOGGER.warn("Wood block type was not detected, will be used common WOOD");
+            var location = blockRegistry.getKey(original.getBlock());
+            TFCStructuresMod.LOGGER.warn("Wood block type of {} was not detected, will be used common WOOD", location);
             blockType = Wood.BlockType.WOOD;
         }
 
@@ -240,7 +241,7 @@ public class TFCReplaceFeature implements ReplaceFeature {
 
         if (blockType == null) {
             var location = blockRegistry.getKey(original.getBlock());
-            TFCStructuresMod.LOGGER.warn("Soil block type was not detected, will be used common DIRT (original={})", location);
+            TFCStructuresMod.LOGGER.warn("Soil block type of {} was not detected, will be used common DIRT", location);
             blockType = SoilBlockType.DIRT;
         }
 
@@ -269,7 +270,7 @@ public class TFCReplaceFeature implements ReplaceFeature {
         var sandBlockType = genSandBlockType(sandBlock);
         if (sandBlockType == null) {
             var location = blockRegistry.getKey(original.getBlock());
-            TFCStructuresMod.LOGGER.warn("SandBlockType was not detected, can't replace block {}", location);
+            TFCStructuresMod.LOGGER.warn("SandBlockType of {} was not detected, can't replace block", location);
             return null;
         }
 
@@ -277,7 +278,7 @@ public class TFCReplaceFeature implements ReplaceFeature {
         var sandstoneBlockType = getSandstoneBlockType(originalBlock);
         if (sandstoneBlockType == null) {
             var location = blockRegistry.getKey(original.getBlock());
-            TFCStructuresMod.LOGGER.warn("SandStoneBlockType was not detected, can't replace block {}", location);
+            TFCStructuresMod.LOGGER.warn("SandStoneBlockType of {} was not detected, can't replace block", location);
             return null;
         }
 
