@@ -1,6 +1,7 @@
 package com.farco.tfc_structures.config;
 
 import com.farco.tfc_structures.TFCStructuresMod;
+import com.farco.tfc_structures.utils.Pair;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -12,7 +13,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.function.Predicate;
 
-public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> tfcWorldReplacement) {
+public record ReplacementConfig(List<Direct> directReplacements,
+                                List<Random> randomReplacements,
+                                List<TFCWorld> tfcWorldReplacements) {
     public static final String CONFIG_NAME = "replacement_config.json";
     public static final String TFC_STONE_TYPE = "STONE";
     public static final String TFC_BRICK_TYPE = "BRICK";
@@ -23,6 +26,9 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
     public static final String TFC_SKIP_TYPE = "SKIP";
 
     private record Direct(String original, String replacement) {
+    }
+
+    private record Random(String original, boolean perBlock, List<String> replacements) {
     }
 
     private record TFCWorld(String original, String type) {
@@ -50,10 +56,42 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
         return map;
     }
 
+    public Map<ResourceLocation, Pair<Boolean, List<ResourceLocation>>> getRandomReplacementMap() {
+        IForgeRegistry<Block> blocks = ForgeRegistries.BLOCKS;
+        var map = new HashMap<ResourceLocation, Pair<Boolean, List<ResourceLocation>>>(randomReplacements.size());
+        for (Random entry : randomReplacements) {
+            var originalLocation = ResourceLocation.parse(entry.original);
+            if (!blocks.containsKey(originalLocation)) {
+                TFCStructuresMod.LOGGER.error("Original for Random with ID {} not found", entry.original);
+                continue;
+            }
+
+            List<ResourceLocation> replacements = new ArrayList<>(entry.replacements.size());
+            for (String replacement : entry.replacements) {
+                var replacementLocation = ResourceLocation.parse(replacement);
+                if (!blocks.containsKey(replacementLocation)) {
+                    TFCStructuresMod.LOGGER.error("Random replacement with ID {} not found", replacement);
+                    continue;
+                }
+
+                replacements.add(replacementLocation);
+            }
+
+            if (replacements.isEmpty()) {
+                TFCStructuresMod.LOGGER.error("There's no random replacements for {}", originalLocation);
+                continue;
+            }
+
+            map.put(originalLocation, new Pair<>(entry.perBlock, replacements));
+        }
+
+        return map;
+    }
+
     public Map<ResourceLocation, String> getTfcWorldReplacementMap() {
         IForgeRegistry<Block> blocks = ForgeRegistries.BLOCKS;
-        var map = new HashMap<ResourceLocation, String>(tfcWorldReplacement.size());
-        for (TFCWorld entry : tfcWorldReplacement) {
+        var map = new HashMap<ResourceLocation, String>(tfcWorldReplacements.size());
+        for (TFCWorld entry : tfcWorldReplacements) {
             var originalLocation = ResourceLocation.parse(entry.original);
             if (blocks.containsKey(originalLocation)) {
                 map.put(originalLocation, entry.type);
@@ -66,7 +104,7 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
     }
 
     public static ReplacementConfig getDefaultConfig() {
-        return new ReplacementConfig(getDefaultDirect(), getDefaultTFCWorld());
+        return new ReplacementConfig(getDefaultDirect(), getDefaultRandom(), getDefaultTFCWorld());
     }
 
     private static @NotNull List<Direct> getDefaultDirect() {
@@ -141,6 +179,12 @@ public record ReplacementConfig(List<Direct> directReplacements, List<TFCWorld> 
         list.add(new Direct("minecraft:blackstone_slab", "tfc:smooth_sandstone/black_slab"));
         list.add(new Direct("minecraft:blackstone_wall", "tfc:smooth_sandstone/black_wall"));
         return list;
+    }
+
+    private static @NotNull List<Random> getDefaultRandom() {
+        return List.of(
+                new Random("minecraft:dark_oak_planks", true, List.of("tfc:metal/block/gold", "tfc:metal/block/bronze", "tfc:metal/block/copper"))
+        );
     }
 
     private static @NotNull List<TFCWorld> getDefaultTFCWorld() {

@@ -11,6 +11,7 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.jetbrains.annotations.Nullable;
 
 public interface ReplaceFeature {
-    void prepareData(WorldGenLevel level, RandomSource random, ChunkPos boundingBox, BoundingBox box, ChunkPos chunkPos);
+    void prepareData(WorldGenLevel level, RandomSource random, ChunkPos rootChunkPos, BoundingBox box, ChunkPos chunkPos);
+
     @Nullable Block replaceBlock(WorldGenLevel level, BlockPos pos, BlockState originalState, ResourceLocation originalLocation);
 }

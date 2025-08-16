@@ -4,6 +4,7 @@ import com.farco.tfc_structures.TFCStructuresMod;
 import com.farco.tfc_structures.config.ReplacementConfig;
 import com.farco.tfc_structures.data.StructureData;
 import com.farco.tfc_structures.processors.features.DirectReplaceFeature;
+import com.farco.tfc_structures.processors.features.RandomReplaceFeature;
 import com.farco.tfc_structures.processors.features.ReplaceFeature;
 import com.farco.tfc_structures.processors.features.TFCReplaceFeature;
 import net.dries007.tfc.common.blockentities.DecayingBlockEntity;
@@ -52,6 +53,7 @@ public class StructureReplacementProcessor {
 
         replaceFeatures = List.of(
                 new DirectReplaceFeature(replacementConfig.getDirectReplacementMap()),
+                new RandomReplaceFeature(replacementConfig.getRandomReplacementMap()),
                 new TFCReplaceFeature(replacementConfig.getTfcWorldReplacementMap())
         );
 
@@ -68,7 +70,7 @@ public class StructureReplacementProcessor {
 
     public void applyReplacements(WorldGenLevel level, RandomSource random, ChunkPos rootChunkPos, BoundingBox box, ChunkPos chunkPos) {
         for (ReplaceFeature feature : replaceFeatures) {
-            feature.prepareData(level, random, rootChunkPos, box, chunkPos);
+            feature.prepareData(level, random.fork(), rootChunkPos, box, chunkPos);
         }
 
         var chunkAccess = level.getChunk(chunkPos.x, chunkPos.z);
