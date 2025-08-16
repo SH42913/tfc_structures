@@ -6,11 +6,9 @@ import com.farco.tfc_structures.data.StructureData;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.structure.Structure;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public final class StructureConfig {
     public static final String CONFIG_NAME = "structure_config.json";
@@ -47,6 +45,16 @@ public final class StructureConfig {
         }
     }
 
+    public @Nullable StructureData getDataByLocation(ResourceLocation location) {
+        for (StructureData structureData : activeStructures) {
+            if (structureData.getResourceLocation().equals(location)) {
+                return structureData;
+            }
+        }
+
+        return null;
+    }
+
     public static StructureConfig getDefaultConfig() {
         var config = new StructureConfig();
         config.biomeTags = BiomeTag.getDefaultBiomeTags();
@@ -58,28 +66,28 @@ public final class StructureConfig {
 
     private static List<StructureData> getVanillaStructures() {
         List<StructureData> list = new ArrayList<>();
-        list.add(new StructureData("minecraft:buried_treasure", List.of(BiomeTag.BEACH.getTagId(), BiomeTag.OCEANIC_MOUNTAIN_LAKE.getTagId())));
-        list.add(new StructureData("minecraft:desert_pyramid", List.of(BiomeTag.BADLANDS.getTagId(), BiomeTag.HILL.getTagId(), "tfc:shore", "tfc:plateau")));
-        list.add(new StructureData("minecraft:pillager_outpost", List.of(BiomeTag.CANYONS.getTagId(), BiomeTag.BADLANDS.getTagId(), BiomeTag.ANY_MOUNTAINS.getTagId(), "tfc:rolling_hills", "tfc:highlands")));
-        list.add(new StructureData("minecraft:shipwreck", List.of(BiomeTag.ANY_OCEAN.getTagId())));
-        list.add(new StructureData("minecraft:shipwreck_beached", List.of(BiomeTag.BEACH.getTagId(), BiomeTag.SWAMP.getTagId())));
-        list.add(new StructureData("minecraft:stronghold", List.of(BiomeTag.ANY_MOUNTAINS.getTagId())));
-        list.add(new StructureData("minecraft:swamp_hut", List.of(BiomeTag.SWAMP.getTagId(), BiomeTag.COMMON_LAKE.getTagId(), "tfc:tidal_flats")));
-        list.add(new StructureData("minecraft:trail_ruins", List.of(BiomeTag.HIGHLANDS.getTagId(), "tfc:old_mountains", "tfc:low_canyons", "tfc:hills", "tfc:plateau")));
-        list.add(new StructureData("minecraft:village_desert", List.of(BiomeTag.BEACH.getTagId(), BiomeTag.BADLANDS.getTagId())));
-        list.add(new StructureData("minecraft:village_plains", List.of(BiomeTag.PLAINS.getTagId(), BiomeTag.HILL.getTagId())));
-        list.add(new StructureData("minecraft:village_savanna", List.of("tfc:badlands", "tfc:shore", "tfc:plateau")));
-        list.add(new StructureData("minecraft:village_taiga", List.of(BiomeTag.PLAINS.getTagId(), BiomeTag.HILL.getTagId())));
-        list.add(new StructureData("minecraft:mansion", List.of(BiomeTag.BADLANDS.getTagId(), BiomeTag.PLAINS.getTagId())));
-        list.add(new StructureData("minecraft:jungle_pyramid", List.of(BiomeTag.BADLANDS.getTagId(), BiomeTag.CANYONS.getTagId(), BiomeTag.HIGHLANDS.getTagId(), "tfc:rolling_hills", "tfc:plateau")));
-        list.add(new StructureData("minecraft:ocean_ruin_cold", List.of(BiomeTag.DEEP_OCEAN.getTagId(), "tfc:ocean")));
-        list.add(new StructureData("minecraft:ocean_ruin_warm", List.of(BiomeTag.COMMON_OCEAN.getTagId(), "tfc:deep_ocean")));
-        list.add(new StructureData("minecraft:monument", List.of(BiomeTag.DEEP_OCEAN.getTagId())));
-        list.add(new StructureData("minecraft:ruined_portal", List.of(BiomeTag.PLAINS.getTagId(), BiomeTag.HILL.getTagId())));
-        list.add(new StructureData("minecraft:ruined_portal_swamp", List.of(BiomeTag.SWAMP.getTagId())));
-        list.add(new StructureData("minecraft:ruined_portal_mountain", List.of(BiomeTag.ANY_MOUNTAINS.getTagId())));
-        list.add(new StructureData("minecraft:ruined_portal_ocean", List.of(BiomeTag.ANY_OCEAN.getTagId(), BiomeTag.ANY_LAKE.getTagId(), BiomeTag.RIVER.getTagId())));
-        list.add(new StructureData("minecraft:ruined_portal_desert", List.of(BiomeTag.BADLANDS.getTagId(), BiomeTag.BEACH.getTagId())));
+        list.add(new StructureData("minecraft:buried_treasure", List.of(BiomeTag.BEACH.getTagId(), BiomeTag.OCEANIC_MOUNTAIN_LAKE.getTagId()), Collections.emptyMap()));
+        list.add(new StructureData("minecraft:desert_pyramid", List.of(BiomeTag.BADLANDS.getTagId(), BiomeTag.HILL.getTagId(), "tfc:shore", "tfc:plateau"), Collections.emptyMap()));
+        list.add(new StructureData("minecraft:pillager_outpost", List.of(BiomeTag.CANYONS.getTagId(), BiomeTag.BADLANDS.getTagId(), BiomeTag.ANY_MOUNTAINS.getTagId(), "tfc:rolling_hills", "tfc:highlands"), Collections.emptyMap()));
+        list.add(new StructureData("minecraft:shipwreck", List.of(BiomeTag.ANY_OCEAN.getTagId()), Collections.emptyMap()));
+        list.add(new StructureData("minecraft:shipwreck_beached", List.of(BiomeTag.BEACH.getTagId(), BiomeTag.SWAMP.getTagId()), Collections.emptyMap()));
+        list.add(new StructureData("minecraft:stronghold", List.of(BiomeTag.ANY_MOUNTAINS.getTagId()), Collections.emptyMap()));
+        list.add(new StructureData("minecraft:swamp_hut", List.of(BiomeTag.SWAMP.getTagId(), BiomeTag.COMMON_LAKE.getTagId(), "tfc:tidal_flats"), Collections.emptyMap()));
+        list.add(new StructureData("minecraft:trail_ruins", List.of(BiomeTag.HIGHLANDS.getTagId(), "tfc:old_mountains", "tfc:low_canyons", "tfc:hills", "tfc:plateau"), Collections.emptyMap()));
+        list.add(new StructureData("minecraft:village_desert", List.of(BiomeTag.BEACH.getTagId(), BiomeTag.BADLANDS.getTagId()), Collections.emptyMap()));
+        list.add(new StructureData("minecraft:village_plains", List.of(BiomeTag.PLAINS.getTagId(), BiomeTag.HILL.getTagId()), Collections.emptyMap()));
+        list.add(new StructureData("minecraft:village_savanna", List.of("tfc:badlands", "tfc:shore", "tfc:plateau"), Collections.emptyMap()));
+        list.add(new StructureData("minecraft:village_taiga", List.of(BiomeTag.PLAINS.getTagId(), BiomeTag.HILL.getTagId()), Collections.emptyMap()));
+        list.add(new StructureData("minecraft:mansion", List.of(BiomeTag.BADLANDS.getTagId(), BiomeTag.PLAINS.getTagId()), Collections.emptyMap()));
+        list.add(new StructureData("minecraft:jungle_pyramid", List.of(BiomeTag.BADLANDS.getTagId(), BiomeTag.CANYONS.getTagId(), BiomeTag.HIGHLANDS.getTagId(), "tfc:rolling_hills", "tfc:plateau"), Collections.emptyMap()));
+        list.add(new StructureData("minecraft:ocean_ruin_cold", List.of(BiomeTag.DEEP_OCEAN.getTagId(), "tfc:ocean"), Collections.emptyMap()));
+        list.add(new StructureData("minecraft:ocean_ruin_warm", List.of(BiomeTag.COMMON_OCEAN.getTagId(), "tfc:deep_ocean"), Collections.emptyMap()));
+        list.add(new StructureData("minecraft:monument", List.of(BiomeTag.DEEP_OCEAN.getTagId()), Collections.emptyMap()));
+        list.add(new StructureData("minecraft:ruined_portal", List.of(BiomeTag.PLAINS.getTagId(), BiomeTag.HILL.getTagId()), Collections.emptyMap()));
+        list.add(new StructureData("minecraft:ruined_portal_swamp", List.of(BiomeTag.SWAMP.getTagId()), Collections.emptyMap()));
+        list.add(new StructureData("minecraft:ruined_portal_mountain", List.of(BiomeTag.ANY_MOUNTAINS.getTagId()), Collections.emptyMap()));
+        list.add(new StructureData("minecraft:ruined_portal_ocean", List.of(BiomeTag.ANY_OCEAN.getTagId(), BiomeTag.ANY_LAKE.getTagId(), BiomeTag.RIVER.getTagId()), Collections.emptyMap()));
+        list.add(new StructureData("minecraft:ruined_portal_desert", List.of(BiomeTag.BADLANDS.getTagId(), BiomeTag.BEACH.getTagId()), Collections.emptyMap()));
         return list;
     }
 

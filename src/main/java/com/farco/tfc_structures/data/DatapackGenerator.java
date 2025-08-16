@@ -108,7 +108,7 @@ public final class DatapackGenerator {
         }
 
         for (String structureId : structureConfig.disabledStructures) {
-            addStructureToMap(new StructureData(structureId, Collections.emptyList()), modIdToStructuresMap);
+            addStructureToMap(new StructureData(structureId, Collections.emptyList(), Collections.emptyMap()), modIdToStructuresMap);
         }
 
         for (var entry : modIdToStructuresMap.entrySet()) {

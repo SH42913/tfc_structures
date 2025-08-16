@@ -2,6 +2,7 @@ package com.farco.tfc_structures.processors;
 
 import com.farco.tfc_structures.TFCStructuresMod;
 import com.farco.tfc_structures.config.ReplacementConfig;
+import com.farco.tfc_structures.data.StructureData;
 import com.farco.tfc_structures.processors.features.DirectReplaceFeature;
 import com.farco.tfc_structures.processors.features.ReplaceFeature;
 import com.farco.tfc_structures.processors.features.TFCReplaceFeature;
@@ -12,6 +13,7 @@ import net.dries007.tfc.util.Helpers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
@@ -26,21 +28,28 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.storage.loot.LootDataManager;
+import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.List;
 
 public class StructureReplacementProcessor {
     public static final ThreadLocal<StructureReplacementProcessor> THREAD_LOCAL = new ThreadLocal<>();
+    private static final String LOOT_TABLE_NAME = "LootTable";
     private static final TagKey<Block> TFC_SHELVES = TagKey.create(Registries.BLOCK, ResourceLocation.parse("tfc:bookshelves"));
     private static final List<Direction> HORIZONTAL_DIRECTIONS = List.of(Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
 
+    private final @Nullable StructureData structureData;
     private final List<ReplaceFeature> replaceFeatures;
     private final HashSet<BlockPos> registeredBlocks;
 
-    public StructureReplacementProcessor(ReplacementConfig replacementConfig) {
+    public StructureReplacementProcessor(@Nullable StructureData structureData, ReplacementConfig replacementConfig) {
+        this.structureData = structureData;
+
         replaceFeatures = List.of(
                 new DirectReplaceFeature(replacementConfig.getDirectReplacementMap()),
                 new TFCReplaceFeature(replacementConfig.getTfcWorldReplacementMap())
@@ -81,7 +90,7 @@ public class StructureReplacementProcessor {
             chunkAccess.setBlockState(pos, newState, false);
 
             if (originalEntity != null) {
-                replaceBlockEntity(pos, originalState, originalEntity, newState, chunkAccess);
+                replaceBlockEntity(pos, originalState, originalEntity, newState, chunkAccess, level);
             } else {
                 createBlockEntity(pos, newState, chunkAccess);
             }
@@ -112,7 +121,7 @@ public class StructureReplacementProcessor {
         return newState;
     }
 
-    private static void replaceBlockEntity(BlockPos pos, BlockState originalState, BlockEntity originalEntity, BlockState newState, ChunkAccess chunkAccess) {
+    private void replaceBlockEntity(BlockPos pos, BlockState originalState, BlockEntity originalEntity, BlockState newState, ChunkAccess chunkAccess, WorldGenLevel level) {
         BlockEntity newEntity = null;
         if (newState.getBlock() instanceof EntityBlock entityBlock) {
             newEntity = entityBlock.newBlockEntity(pos, newState);
@@ -125,16 +134,42 @@ public class StructureReplacementProcessor {
             return;
         }
 
-        var originalTag = originalEntity.saveWithFullMetadata();
+        CompoundTag originalTag = originalEntity.saveWithFullMetadata();
+        //noinspection DataFlowIssue due WorldGenLevel always has Server
+        replaceLootTable(originalTag, level.getServer().getLootData());
         newEntity.load(originalTag);
         chunkAccess.setBlockEntity(newEntity);
+    }
+
+    private void replaceLootTable(CompoundTag originalTag, LootDataManager lootData) {
+        if (!originalTag.contains(LOOT_TABLE_NAME)) {
+            return;
+        }
+
+        String originalLootTable = originalTag.getString(LOOT_TABLE_NAME);
+        TFCStructuresMod.LOGGER.debug("Detected LootTable = {}", originalLootTable);
+
+        String newLootTable = structureData != null && structureData.lootTablesMap() != null
+                ? structureData.lootTablesMap().get(originalLootTable)
+                : null;
+
+        if (newLootTable == null) {
+            newLootTable = originalLootTable.replace("minecraft", TFCStructuresMod.MODID);
+        }
+
+        var lootTableLocation = ResourceLocation.parse(newLootTable);
+        if (lootData.getLootTable(lootTableLocation) == LootTable.EMPTY) {
+            TFCStructuresMod.LOGGER.warn("Can't replace {} with {} due it's not valid", originalLootTable, newLootTable);
+            return;
+        }
+
+        originalTag.putString(LOOT_TABLE_NAME, newLootTable);
     }
 
     private void createBlockEntity(BlockPos pos, BlockState newState, ChunkAccess chunkAccess) {
         BlockEntity newEntity = null;
         if (newState.getBlock() instanceof EntityBlock entityBlock) {
             newEntity = entityBlock.newBlockEntity(pos, newState);
-
         }
 
         if (newEntity != null) {

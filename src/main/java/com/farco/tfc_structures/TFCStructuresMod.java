@@ -47,7 +47,7 @@ public class TFCStructuresMod {
     private static final DatapackGenerator DATAPACK_GENERATOR;
 
     public static ReplacementConfig replacementConfig;
-    private StructureConfig structureConfig;
+    public static StructureConfig structureConfig;
 
     static {
         LOGGER = LogUtils.getLogger();

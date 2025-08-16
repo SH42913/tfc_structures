@@ -2,6 +2,7 @@ package com.farco.tfc_structures.mixin;
 
 import com.farco.tfc_structures.TFCStructuresMod;
 import com.farco.tfc_structures.config.CommonConfig;
+import com.farco.tfc_structures.data.StructureData;
 import com.farco.tfc_structures.processors.StructureReplacementProcessor;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -46,7 +47,12 @@ public abstract class StructureStartMixin {
             return;
         }
 
-        StructureReplacementProcessor processor = new StructureReplacementProcessor(TFCStructuresMod.replacementConfig);
+        StructureData structureData = TFCStructuresMod.structureConfig.getDataByLocation(location);
+        if (structureData == null) {
+            TFCStructuresMod.LOGGER.warn("Can't get structure data for {}", location);
+        }
+
+        StructureReplacementProcessor processor = new StructureReplacementProcessor(structureData, TFCStructuresMod.replacementConfig);
         StructureReplacementProcessor.THREAD_LOCAL.set(processor);
         TFCStructuresMod.LOGGER.debug("Start structure replacement for {} at {}", location, getChunkPos());
     }
