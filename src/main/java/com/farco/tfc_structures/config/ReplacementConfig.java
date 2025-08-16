@@ -109,24 +109,14 @@ public record ReplacementConfig(List<Direct> directReplacements,
 
     private static @NotNull List<Direct> getDefaultDirect() {
         List<Direct> list = new ArrayList<>();
-        list.add(new Direct("minecraft:anvil", "tfc:metal/anvil/bismuth_bronze"));
-        list.add(new Direct("minecraft:chipped_anvil", "tfc:metal/anvil/bronze"));
-        list.add(new Direct("minecraft:damaged_anvil", "tfc:metal/anvil/copper"));
-        list.add(new Direct("minecraft:chain", "tfc:metal/chain/wrought_iron"));
-        list.add(new Direct("minecraft:iron_bars", "tfc:metal/bars/wrought_iron"));
         list.add(new Direct("minecraft:iron_block", "tfc:metal/block/wrought_iron"));
-        list.add(new Direct("minecraft:iron_trapdoor", "tfc:metal/trapdoor/wrought_iron"));
         list.add(new Direct("minecraft:gold_block", "tfc:metal/block/gold"));
         list.add(new Direct("minecraft:cake", "tfc:cake"));
         list.add(new Direct("minecraft:pumpkin", "tfc:pumpkin"));
         list.add(new Direct("minecraft:pumpkin_stem", "tfc:crop/pumpkin"));
         list.add(new Direct("minecraft:melon", "tfc:melon"));
         list.add(new Direct("minecraft:melon_stem", "tfc:crop/melon"));
-        list.add(new Direct("minecraft:wheat", "tfc:crop/wheat"));
         list.add(new Direct("minecraft:hay_block", "tfc:thatch"));
-        list.add(new Direct("minecraft:beetroots", "tfc:crop/beet"));
-        list.add(new Direct("minecraft:potatoes", "tfc:crop/potato"));
-        list.add(new Direct("minecraft:carrots", "tfc:crop/carrot"));
         list.add(new Direct("minecraft:dandelion", "tfc:plant/dandelion"));
         list.add(new Direct("minecraft:poppy", "tfc:plant/poppy"));
         list.add(new Direct("minecraft:blue_orchid", "tfc:plant/blue_orchid"));
@@ -145,11 +135,11 @@ public record ReplacementConfig(List<Direct> directReplacements,
         list.add(new Direct("minecraft:rose_bush", "tfc:plant/rose"));
         list.add(new Direct("minecraft:peony", "tfc:plant/pulsatilla"));
         list.add(new Direct("minecraft:grass", "tfc:plant/bromegrass"));
-        list.add(new Direct("minecraft:fern", "tfc:plant/sword_fern"));
+        list.add(new Direct("minecraft:fern", "tfc:plant/lady_fern"));
         list.add(new Direct("minecraft:dead_bush", "tfc:plant/dead_bush"));
         list.add(new Direct("minecraft:vine", "tfc:plant/jungle_vines"));
         list.add(new Direct("minecraft:tall_grass", "tfc:plant/fountain_grass"));
-        list.add(new Direct("minecraft:large_fern", "tfc:plant/king_fern"));
+        list.add(new Direct("minecraft:large_fern", "tfc:plant/ostrich_fern"));
         list.add(new Direct("minecraft:seagrass", "tfc:plant/turtle_grass"));
         list.add(new Direct("minecraft:sea_pickle", "tfc:sea_pickle"));
         list.add(new Direct("minecraft:kelp", "tfc:plant/leafy_kelp"));
@@ -182,8 +172,63 @@ public record ReplacementConfig(List<Direct> directReplacements,
     }
 
     private static @NotNull List<Random> getDefaultRandom() {
+        List<String> anvils = List.of("tfc:metal/anvil/copper", "tfc:metal/anvil/bismuth_bronze", "tfc:metal/anvil/black_bronze", "tfc:metal/anvil/bronze");
         return List.of(
-                new Random("minecraft:dark_oak_planks", true, List.of("tfc:metal/block/gold", "tfc:metal/block/bronze", "tfc:metal/block/copper"))
+                new Random("minecraft:chain", false, List.of(
+                        "tfc:metal/chain/copper",
+                        "tfc:metal/chain/bismuth_bronze",
+                        "tfc:metal/chain/black_bronze",
+                        "tfc:metal/chain/bronze",
+                        "tfc:metal/chain/wrought_iron"
+                )),
+                new Random("minecraft:iron_bars", false, List.of(
+                        "tfc:metal/bars/copper",
+                        "tfc:metal/bars/bismuth_bronze",
+                        "tfc:metal/bars/black_bronze",
+                        "tfc:metal/bars/bronze",
+                        "tfc:metal/bars/wrought_iron"
+                )),
+                new Random("minecraft:iron_trapdoor", false, List.of(
+                        "tfc:metal/trapdoor/copper",
+                        "tfc:metal/trapdoor/bismuth_bronze",
+                        "tfc:metal/trapdoor/black_bronze",
+                        "tfc:metal/trapdoor/bronze",
+                        "tfc:metal/trapdoor/wrought_iron"
+                )),
+                new Random("minecraft:anvil", true, anvils),
+                new Random("minecraft:chipped_anvil", true, anvils),
+                new Random("minecraft:damaged_anvil", true, anvils),
+                new Random("minecraft:wheat", true, List.of(
+                        "tfc:crop/barley",
+                        "tfc:crop/oat",
+                        "tfc:crop/rye",
+                        "tfc:crop/maize",
+                        "tfc:crop/wheat",
+                        "tfc:crop/rice"
+                )),
+                new Random("minecraft:beetroots", true, List.of(
+                        "tfc:crop/beet",
+                        "tfc:crop/cabbage",
+                        "tfc:crop/green_bean",
+                        "tfc:crop/soybean",
+                        "tfc:crop/jute",
+                        "tfc:crop/papyrus"
+                )),
+                new Random("minecraft:potatoes", true, List.of(
+                        "tfc:crop/potato",
+                        "tfc:crop/onion",
+                        "tfc:crop/garlic",
+                        "tfc:crop/pumpkin",
+                        "tfc:crop/melon",
+                        "tfc:crop/squash",
+                        "tfc:crop/sugarcane"
+                )),
+                new Random("minecraft:carrots", true, List.of(
+                        "tfc:crop/carrot",
+                        "tfc:crop/tomato",
+                        "tfc:crop/yellow_bell_pepper",
+                        "tfc:crop/red_bell_pepper"
+                ))
         );
     }
 
