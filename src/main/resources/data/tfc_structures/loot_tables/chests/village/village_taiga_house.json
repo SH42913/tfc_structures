@@ -21,12 +21,12 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:fern",
+          "name": "tfc:plant/lady_fern",
           "weight": 2
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:large_fern",
+          "name": "tfc:plant/ostrich_fern",
           "weight": 2
         },
         {

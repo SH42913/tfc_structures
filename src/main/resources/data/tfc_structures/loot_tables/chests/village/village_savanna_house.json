@@ -21,12 +21,12 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:grass",
+          "name": "tfc:plant/bromegrass",
           "weight": 5
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:tall_grass",
+          "name": "tfc:plant/fountain_grass",
           "weight": 5
         },
         {

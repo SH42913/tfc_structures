@@ -89,7 +89,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "tfc:wood/log/blackwood"
+          "name": "tfc:wood/log/hickory"
         }
       ],
       "rolls": {
