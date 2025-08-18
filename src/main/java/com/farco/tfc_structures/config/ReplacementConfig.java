@@ -164,10 +164,27 @@ public record ReplacementConfig(List<Direct> directReplacements,
         list.add(new Direct("minecraft:polished_andesite", "tfc:rock/smooth/andesite"));
         list.add(new Direct("minecraft:polished_andesite_stairs", "tfc:rock/smooth/andesite_stairs"));
         list.add(new Direct("minecraft:polished_andesite_slab", "tfc:rock/smooth/andesite_slab"));
-        list.add(new Direct("minecraft:blackstone", "tfc:smooth_sandstone/black"));
-        list.add(new Direct("minecraft:blackstone_stairs", "tfc:smooth_sandstone/black_stairs"));
-        list.add(new Direct("minecraft:blackstone_slab", "tfc:smooth_sandstone/black_slab"));
-        list.add(new Direct("minecraft:blackstone_wall", "tfc:smooth_sandstone/black_wall"));
+        list.add(new Direct("minecraft:blackstone", "tfc:rock/hardened/basalt"));
+        list.add(new Direct("minecraft:blackstone_stairs", "tfc:rock/raw/basalt_stairs"));
+        list.add(new Direct("minecraft:blackstone_slab", "tfc:rock/raw/basalt_slab"));
+        list.add(new Direct("minecraft:blackstone_wall", "tfc:rock/raw/basalt_wall"));
+        list.add(new Direct("minecraft:polished_blackstone", "tfc:rock/smooth/basalt"));
+        list.add(new Direct("minecraft:polished_blackstone_stairs", "tfc:rock/smooth/basalt_stairs"));
+        list.add(new Direct("minecraft:polished_blackstone_slab", "tfc:rock/smooth/basalt_slab"));
+        list.add(new Direct("minecraft:polished_blackstone_wall", "tfc:rock/smooth/basalt_wall"));
+        list.add(new Direct("minecraft:chiseled_polished_blackstone", "tfc:rock/chiseled/basalt"));
+        list.add(new Direct("minecraft:polished_blackstone_bricks", "tfc:rock/smooth/basalt"));
+        list.add(new Direct("minecraft:polished_blackstone_brick_stairs", "tfc:rock/smooth/basalt_stairs"));
+        list.add(new Direct("minecraft:polished_blackstone_brick_slab", "tfc:rock/smooth/basalt_slab"));
+        list.add(new Direct("minecraft:polished_blackstone_brick_wall", "tfc:rock/smooth/basalt_wall"));
+        list.add(new Direct("minecraft:raw_iron_block", "tfc:metal/block/wrought_iron"));
+        list.add(new Direct("minecraft:raw_copper_block", "minecraft:copper_block"));
+        list.add(new Direct("minecraft:raw_gold_block", "tfc:metal/block/gold"));
+        list.add(new Direct("minecraft:packed_mud", "tfc:smooth_mud_bricks"));
+        list.add(new Direct("minecraft:mud_bricks", "tfc:mud_bricks/sandy_loam"));
+        list.add(new Direct("minecraft:mud_brick_stairs", "tfc:mud_bricks/sandy_loam_stairs"));
+        list.add(new Direct("minecraft:mud_brick_slab", "tfc:mud_bricks/sandy_loam_slab"));
+        list.add(new Direct("minecraft:mud_brick_wall", "tfc:mud_bricks/sandy_loam_wall"));
         return list;
     }
 
