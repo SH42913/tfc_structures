@@ -23,26 +23,27 @@ public final class StructureConfig {
 
     //  A list of structures that exists in Minecraft, but is not registered in that config
     //  This list will be updated when server is started
-    public Set<String> unregisteredStructures;
+    public List<String> unregisteredStructures;
 
     public void refreshUnused(Registry<Structure> structureRegistry) {
         var allStructures = structureRegistry.keySet().stream().map(ResourceLocation::toString).toList();
-        unregisteredStructures.clear();
-        unregisteredStructures.addAll(allStructures);
 
+        var structures = new HashSet<>(allStructures);
         for (StructureData structure : activeStructures) {
             if (!structureRegistry.containsKey(structure.getResourceLocation())) {
                 TFCStructuresMod.LOGGER.warn("Structure {} is not valid", structure.id());
             } else {
-                unregisteredStructures.remove(structure.id());
+                structures.remove(structure.id());
             }
         }
 
         for (String structure : disabledStructures) {
             if (structureRegistry.containsKey(ResourceLocation.parse(structure))) {
-                unregisteredStructures.remove(structure);
+                structures.remove(structure);
             }
         }
+
+        unregisteredStructures = structures.stream().sorted().toList();
     }
 
     public @Nullable StructureData getDataByLocation(ResourceLocation location) {
@@ -60,7 +61,7 @@ public final class StructureConfig {
         config.biomeTags = BiomeTag.getDefaultBiomeTags();
         config.activeStructures = getVanillaStructures();
         config.disabledStructures = getDisabledVanillaStructures();
-        config.unregisteredStructures = new HashSet<>();
+        config.unregisteredStructures = Collections.emptyList();
         return config;
     }
 
