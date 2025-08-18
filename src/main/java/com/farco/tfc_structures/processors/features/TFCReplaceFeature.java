@@ -66,6 +66,7 @@ public class TFCReplaceFeature implements ReplaceFeature {
     private final List<Pair<Block, SoilBlockType>> blockToSoilBlockTypeMappings;
     private final List<Pair<TagKey<Block>, Ore>> tagToOreMappings;
 
+    private boolean tfcGeneratorAvailable;
     private Registry<Block> blockRegistry;
     private DummySurfaceBuilderContext surfaceBuilderContext;
     private RockSettings cachedSurfaceRock;
@@ -126,6 +127,13 @@ public class TFCReplaceFeature implements ReplaceFeature {
 
     @Override
     public void prepareData(WorldGenLevel level, RandomSource random, ChunkPos rootChunkPos, BoundingBox box, ChunkPos chunkPos) {
+        var chunkGenerator = level.getLevel().getChunkSource().getGenerator();
+        tfcGeneratorAvailable = chunkGenerator instanceof TFCChunkGenerator;
+        if (!tfcGeneratorAvailable) {
+            TFCStructuresMod.LOGGER.warn("Cannot use TFCReplaceFeature due TFCChunkGenerator is not in use");
+            return;
+        }
+
         blockRegistry = level.registryAccess().registryOrThrow(Registries.BLOCK);
 
         int x = rootChunkPos.getMiddleBlockX();
@@ -158,6 +166,10 @@ public class TFCReplaceFeature implements ReplaceFeature {
 
     @Override
     public @Nullable Block replaceBlock(WorldGenLevel level, BlockPos pos, BlockState originalState, ResourceLocation originalLocation) {
+        if (!tfcGeneratorAvailable) {
+            return null;
+        }
+
         String replacementType = replacementMap.get(originalLocation);
         if (replacementType == null) {
             return null;
