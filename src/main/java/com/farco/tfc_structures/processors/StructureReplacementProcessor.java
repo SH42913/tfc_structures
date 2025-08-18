@@ -8,6 +8,8 @@ import com.farco.tfc_structures.processors.features.RandomReplaceFeature;
 import com.farco.tfc_structures.processors.features.ReplaceFeature;
 import com.farco.tfc_structures.processors.features.TFCReplaceFeature;
 import net.dries007.tfc.common.blockentities.DecayingBlockEntity;
+import net.dries007.tfc.common.blocks.TFCBlockStateProperties;
+import net.dries007.tfc.common.blocks.plant.ITallPlant;
 import net.dries007.tfc.common.capabilities.food.FoodCapability;
 import net.dries007.tfc.common.capabilities.food.IFood;
 import net.dries007.tfc.util.Helpers;
@@ -26,7 +28,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BedPart;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.storage.loot.LootDataManager;
@@ -47,6 +51,7 @@ public class StructureReplacementProcessor {
     private final @Nullable StructureData structureData;
     private final List<ReplaceFeature> replaceFeatures;
     private final HashSet<BlockPos> registeredBlocks;
+    private final HashSet<BlockPos> blocksToSkip;
 
     public StructureReplacementProcessor(@Nullable StructureData structureData, ReplacementConfig replacementConfig) {
         this.structureData = structureData;
@@ -58,6 +63,7 @@ public class StructureReplacementProcessor {
         );
 
         registeredBlocks = new HashSet<>();
+        blocksToSkip = new HashSet<>();
     }
 
     public void registerBlock(BlockState state, BlockPos blockPos) {
@@ -75,6 +81,10 @@ public class StructureReplacementProcessor {
 
         var chunkAccess = level.getChunk(chunkPos.x, chunkPos.z);
         for (BlockPos pos : registeredBlocks) {
+            if (blocksToSkip.contains(pos)) {
+                continue;
+            }
+
             BlockState originalState = chunkAccess.getBlockState(pos);
             if (originalState.isAir()) {
                 TFCStructuresMod.LOGGER.warn("Registered block at {} was moved or removed", pos);
@@ -180,6 +190,8 @@ public class StructureReplacementProcessor {
     }
 
     private void postProcessNewBlock(BlockPos pos, Block newBlock, BlockState newState, ChunkAccess chunkAccess) {
+        postProcessDoubleBlocks(pos, newBlock, newState, chunkAccess);
+
         var blockEntity = chunkAccess.getBlockEntity(pos);
         if (blockEntity instanceof DecayingBlockEntity decaying) {
             Item item = newBlock.asItem();
@@ -204,6 +216,46 @@ public class StructureReplacementProcessor {
                     break;
                 }
             }
+        }
+    }
+
+    private void postProcessDoubleBlocks(BlockPos pos, Block newBlock, BlockState newState, ChunkAccess chunkAccess) {
+        var bedPartProperty = BlockStateProperties.BED_PART;
+        var doubleBlockHalfProperty = BlockStateProperties.DOUBLE_BLOCK_HALF;
+        var tallPlantPartProperty = TFCBlockStateProperties.TALL_PLANT_PART;
+
+        BlockPos secondPartPos = null;
+        BlockState secondPartState = Helpers.copyProperties(newBlock.defaultBlockState(), newState);
+        if (newState.hasProperty(bedPartProperty)) {
+            BedPart value = newState.getValue(bedPartProperty);
+            Direction direction = newState.getValue(BlockStateProperties.HORIZONTAL_FACING);
+            secondPartPos = pos.relative(direction);
+            secondPartState = value == BedPart.FOOT
+                    ? secondPartState.setValue(bedPartProperty, BedPart.HEAD)
+                    : secondPartState.setValue(bedPartProperty, BedPart.FOOT);
+        } else if (newState.hasProperty(doubleBlockHalfProperty)) {
+            DoubleBlockHalf value = newState.getValue(doubleBlockHalfProperty);
+            if (value == DoubleBlockHalf.LOWER) {
+                secondPartPos = pos.above();
+                secondPartState = secondPartState.setValue(doubleBlockHalfProperty, DoubleBlockHalf.UPPER);
+            } else {
+                secondPartPos = pos.below();
+                secondPartState = secondPartState.setValue(doubleBlockHalfProperty, DoubleBlockHalf.LOWER);
+            }
+        } else if (newState.hasProperty(tallPlantPartProperty)) {
+            ITallPlant.Part value = newState.getValue(tallPlantPartProperty);
+            if (value == ITallPlant.Part.LOWER) {
+                secondPartPos = pos.above();
+                secondPartState = secondPartState.setValue(tallPlantPartProperty, ITallPlant.Part.UPPER);
+            } else {
+                secondPartPos = pos.below();
+                secondPartState = secondPartState.setValue(tallPlantPartProperty, ITallPlant.Part.LOWER);
+            }
+        }
+
+        if (secondPartPos != null) {
+            chunkAccess.setBlockState(secondPartPos, secondPartState, false);
+            blocksToSkip.add(secondPartPos);
         }
     }
 }
