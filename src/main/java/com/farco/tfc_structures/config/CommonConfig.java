@@ -67,6 +67,14 @@ public class CommonConfig {
                     "minecraft:stripped_cherry_wood"
             ), CommonConfig::validateBlockIds);
 
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> CRACKED_BRICKS = BUILDER
+            .comment("List to separate cracked bricks from others (it will generate #cracked_bricks tag)")
+            .defineList("crackedBricks", List.of(
+                    "minecraft:cracked_stone_bricks",
+                    "minecraft:cracked_deepslate_bricks",
+                    "minecraft:cracked_deepslate_tiles"
+            ), CommonConfig::validateBlockIds);
+
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 
     public static Set<ResourceLocation> allowedDimensionsSet;

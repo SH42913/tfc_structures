@@ -99,6 +99,9 @@ public final class DatapackGenerator {
 
         TagValues strippedWoods = new TagValues(new ArrayList<>(CommonConfig.STRIPPED_WOOD.get()));
         generateTag(blockTagsFolder, TFCStructuresMod.STRIPPED_WOOD_TAG_NAME, strippedWoods);
+
+        TagValues crackedBricks = new TagValues(new ArrayList<>(CommonConfig.CRACKED_BRICKS.get()));
+        generateTag(blockTagsFolder, TFCStructuresMod.CRACKED_BRICKS_TAG_NAME, crackedBricks);
     }
 
     private void generateActiveStructures(StructureConfig structureConfig) throws IOException {

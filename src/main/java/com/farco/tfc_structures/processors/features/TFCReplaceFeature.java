@@ -211,6 +211,8 @@ public class TFCReplaceFeature implements ReplaceFeature {
             replacement = rock.getSlab(blockType).get();
         } else if (original.is(BlockTags.WALLS)) {
             replacement = rock.getWall(blockType).get();
+        } else if (original.is(TFCStructuresMod.CRACKED_BRICKS_TAG)) {
+            replacement = rock.getBlock(Rock.BlockType.CRACKED_BRICKS).get();
         } else {
             replacement = rock.getBlock(blockType).get();
         }
