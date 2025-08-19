@@ -85,12 +85,11 @@ public class TFCStructuresMod {
 
     private void onServerStarted(ServerStartedEvent event) {
         RegistryAccess.Frozen registryAccess = event.getServer().registryAccess();
-        Registry<Structure> structureRegistry = registryAccess.registryOrThrow(Registries.STRUCTURE);
-        structureConfig.refreshUnused(structureRegistry);
+        Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registries.BIOME);
+        structureConfig.refreshUnused(biomeRegistry);
         CONFIG_PROVIDER.save(StructureConfig.CONFIG_NAME, structureConfig);
 
         if (CommonConfig.BIOMES_TAGS_STRUCTURES_TO_LOGS.get()) {
-            Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registries.BIOME);
             for (ResourceLocation location : biomeRegistry.keySet()) {
                 LOGGER.info("[BIOME] {}", location.toString());
             }
@@ -104,6 +103,7 @@ public class TFCStructuresMod {
                 LOGGER.info("[BIOME_TAG] {} contains {}", tagLocation, String.join(", ", biomes));
             }
 
+            Registry<Structure> structureRegistry = registryAccess.registryOrThrow(Registries.STRUCTURE);
             for (ResourceLocation location : structureRegistry.keySet()) {
                 LOGGER.info("[STRUCTURE] {}", location.toString());
             }

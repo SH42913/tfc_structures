@@ -112,7 +112,7 @@ public class StructureReplacementProcessor {
     }
 
     private Block getReplacementBlock(WorldGenLevel level, BlockPos pos, BlockState original) {
-        ResourceLocation originalLocation = ForgeRegistries.BLOCKS.getKey(original.getBlock());
+        ResourceLocation originalLocation = level.registryAccess().registryOrThrow(Registries.BLOCK).getKey(original.getBlock());
         if (originalLocation == null) {
             return null;
         }
