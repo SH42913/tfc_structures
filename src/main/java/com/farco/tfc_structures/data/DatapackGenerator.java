@@ -20,8 +20,9 @@ import java.nio.file.Path;
 import java.util.*;
 
 public final class DatapackGenerator {
-    public static final String DATA_PACK_FOLDER_NAME = TFCStructuresMod.MODID + "_main";
-    public static final String PACK_MCMETA_NAME = "pack.mcmeta";
+    private static final String DATA_PACK_FOLDER_NAME = TFCStructuresMod.MODID + "_main";
+    private static final String PACK_MCMETA_NAME = "pack.mcmeta";
+    private static final String DATA_FOLDER_NAME = "data";
 
     public record TagValues(Collection<String> values) {
     }
@@ -46,6 +47,7 @@ public final class DatapackGenerator {
     public void refreshDatapack(StructureConfig structureConfig) {
         try {
             initDatapackIfNeeded();
+            recreateDataFolder();
             generateBlocksTag();
             generateBiomeTags(structureConfig);
             generateActiveStructures(structureConfig);
@@ -71,6 +73,12 @@ public final class DatapackGenerator {
         SaveJson(packMetaPath, packMeta);
     }
 
+    private void recreateDataFolder() throws IOException {
+        Path dataFolder = datapackFolderPath.resolve(DATA_FOLDER_NAME);
+        FileUtils.deleteQuietly(new File(dataFolder.toUri()));
+        Files.createDirectories(dataFolder);
+    }
+
     private void generateBiomeTags(StructureConfig structureConfig) throws IOException {
         for (BiomeTag tag : structureConfig.biomeTags) {
             var location = ResourceLocation.parse(tag.id());
@@ -84,7 +92,7 @@ public final class DatapackGenerator {
 
     private void generateBlocksTag() throws IOException {
         Path blockTagsFolder = datapackFolderPath
-                .resolve("data")
+                .resolve(DATA_FOLDER_NAME)
                 .resolve(TFCStructuresMod.MODID)
                 .resolve("tags")
                 .resolve("blocks");
@@ -119,7 +127,6 @@ public final class DatapackGenerator {
             var structures = entry.getValue();
 
             Path hasStructureFolder = buildBiomeTagsFolderPath(datapackFolderPath, modId).resolve("has_structure");
-            FileUtils.deleteQuietly(new File(hasStructureFolder.toUri()));
             Files.createDirectories(hasStructureFolder);
 
             for (StructureData structure : structures) {
