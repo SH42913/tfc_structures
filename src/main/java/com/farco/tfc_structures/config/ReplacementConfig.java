@@ -138,7 +138,7 @@ public record ReplacementConfig(List<Direct> directReplacements,
         list.add(new Direct("minecraft:fern", "tfc:plant/lady_fern"));
         list.add(new Direct("minecraft:dead_bush", "tfc:plant/dead_bush"));
         list.add(new Direct("minecraft:vine", "tfc:plant/jungle_vines"));
-        list.add(new Direct("minecraft:tall_grass", "tfc:plant/fountain_grass"));
+        list.add(new Direct("minecraft:tall_grass", "tfc:plant/tall_fescue_grass"));
         list.add(new Direct("minecraft:large_fern", "tfc:plant/ostrich_fern"));
         list.add(new Direct("minecraft:seagrass", "tfc:plant/turtle_grass"));
         list.add(new Direct("minecraft:sea_pickle", "tfc:sea_pickle"));
@@ -258,7 +258,7 @@ public record ReplacementConfig(List<Direct> directReplacements,
         var oreNames = List.of("ore");
         var woodNames = WoodType.values().map(WoodType::name).toList();
         var woodBlocksSet = Set.of(Blocks.CRAFTING_TABLE, Blocks.CHEST, Blocks.TRAPPED_CHEST, Blocks.LECTERN, Blocks.BOOKSHELF);
-        var soilBlockSet = Set.of(Blocks.GRASS_BLOCK, Blocks.DIRT_PATH, Blocks.DIRT, Blocks.FARMLAND, Blocks.COARSE_DIRT);
+        var soilBlockSet = Set.of(Blocks.GRASS_BLOCK, Blocks.DIRT_PATH, Blocks.DIRT, Blocks.FARMLAND, Blocks.COARSE_DIRT, Blocks.PODZOL, Blocks.ROOTED_DIRT, Blocks.MUD, Blocks.MUDDY_MANGROVE_ROOTS);
 
         var list = new ArrayList<TFCWorld>();
         for (var entry : ForgeRegistries.BLOCKS.getEntries()) {
