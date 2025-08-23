@@ -1,6 +1,8 @@
 package com.farco.tfc_structures.data;
 
 import com.farco.tfc_structures.TFCStructuresMod;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.dries007.tfc.world.biome.TFCBiomes;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
@@ -10,6 +12,11 @@ import java.util.Collection;
 import java.util.List;
 
 public record BiomeTag(String id, List<String> tagValues) {
+    public static final Codec<BiomeTag> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.STRING.fieldOf("id").forGetter(BiomeTag::id),
+            Codec.STRING.listOf().fieldOf("tagValues").forGetter(BiomeTag::tagValues)
+    ).apply(instance, BiomeTag::new));
+
     public BiomeTag(String id, Collection<ResourceKey<Biome>> biomes) {
         this(id, biomes.stream().map(key -> key.location().toString()).toList());
     }

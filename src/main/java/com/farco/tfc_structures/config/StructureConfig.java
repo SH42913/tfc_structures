@@ -3,29 +3,41 @@ package com.farco.tfc_structures.config;
 import com.farco.tfc_structures.TFCStructuresMod;
 import com.farco.tfc_structures.data.BiomeTag;
 import com.farco.tfc_structures.data.StructureData;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public final class StructureConfig {
+    public static final Codec<StructureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            BiomeTag.CODEC.listOf().fieldOf("biomeTags").forGetter(cfg -> cfg.biomeTags),
+            StructureData.CODEC.listOf().fieldOf("activeStructures").forGetter(cfg -> cfg.activeStructures),
+            Codec.STRING.listOf().fieldOf("disabledStructures").forGetter(cfg -> cfg.disabledStructures),
+            Codec.STRING.listOf().fieldOf("unregisteredStructures").forGetter(cfg -> cfg.unregisteredStructures)
+    ).apply(instance, StructureConfig::new));
+
     public static final String CONFIG_NAME = "structure_config.json";
     public static final String HAS_STRUCTURE = "has_structure/";
 
     public List<BiomeTag> biomeTags;
-
-    //  Add desired structures from unregistered_structures here
-    //  You can find available biome tags(or add new one) in tfc_structures_datapack\data\minecraft\tags\worldgen\biome
     public List<StructureData> activeStructures;
-
-    public Set<String> disabledStructures;
-
-    //  A list of structures that exists in Minecraft, but is not registered in that config
-    //  This list will be updated when server is started
+    public List<String> disabledStructures;
     public List<String> unregisteredStructures;
+
+    public StructureConfig(List<BiomeTag> biomeTags, List<StructureData> activeStructures, List<String> disabledStructures, List<String> unregisteredStructures) {
+        this.biomeTags = biomeTags;
+        this.activeStructures = activeStructures;
+        this.disabledStructures = disabledStructures;
+        this.unregisteredStructures = unregisteredStructures;
+    }
 
     public void refreshUnused(Registry<Biome> biomeRegistry) {
         var allHasStructureTags = biomeRegistry.getTags()
@@ -63,12 +75,11 @@ public final class StructureConfig {
     }
 
     public static StructureConfig getDefaultConfig() {
-        var config = new StructureConfig();
-        config.biomeTags = BiomeTag.getDefaultBiomeTags();
-        config.activeStructures = getVanillaStructures();
-        config.disabledStructures = getDisabledVanillaStructures();
-        config.unregisteredStructures = Collections.emptyList();
-        return config;
+        return new StructureConfig(
+                BiomeTag.getDefaultBiomeTags(),
+                getVanillaStructures(),
+                getDisabledVanillaStructures(),
+                Collections.emptyList());
     }
 
     private static List<StructureData> getVanillaStructures() {
@@ -100,8 +111,8 @@ public final class StructureConfig {
         return list;
     }
 
-    private static Set<String> getDisabledVanillaStructures() {
-        return Set.of(
+    private static List<String> getDisabledVanillaStructures() {
+        return List.of(
                 "minecraft:mineshaft_mesa",
                 "minecraft:igloo",
                 "minecraft:village_snowy"

@@ -71,8 +71,8 @@ public class TFCStructuresMod {
 
     private void commonSetup(FMLCommonSetupEvent event) {
         LOGGER.info("Common setup of {}", MODID);
-        structureConfig = CONFIG_PROVIDER.load(StructureConfig.CONFIG_NAME, StructureConfig.class, StructureConfig::getDefaultConfig);
-        replacementConfig = CONFIG_PROVIDER.load(ReplacementConfig.CONFIG_NAME, ReplacementConfig.class, ReplacementConfig::getDefaultConfig);
+        structureConfig = CONFIG_PROVIDER.load(StructureConfig.CONFIG_NAME, StructureConfig.CODEC, StructureConfig::getDefaultConfig);
+        replacementConfig = CONFIG_PROVIDER.load(ReplacementConfig.CONFIG_NAME, ReplacementConfig.CODEC, ReplacementConfig::getDefaultConfig);
     }
 
     private void addPackFinder(AddPackFindersEvent event) {
@@ -87,7 +87,7 @@ public class TFCStructuresMod {
         RegistryAccess.Frozen registryAccess = event.getServer().registryAccess();
         Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registries.BIOME);
         structureConfig.refreshUnused(biomeRegistry);
-        CONFIG_PROVIDER.save(StructureConfig.CONFIG_NAME, structureConfig);
+        CONFIG_PROVIDER.save(StructureConfig.CONFIG_NAME, structureConfig, StructureConfig.CODEC);
 
         if (CommonConfig.BIOMES_TAGS_STRUCTURES_TO_LOGS.get()) {
             for (ResourceLocation location : biomeRegistry.keySet()) {

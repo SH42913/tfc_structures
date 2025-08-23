@@ -2,6 +2,8 @@ package com.farco.tfc_structures.config;
 
 import com.farco.tfc_structures.TFCStructuresMod;
 import com.farco.tfc_structures.utils.Pair;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -16,6 +18,12 @@ import java.util.function.Predicate;
 public record ReplacementConfig(List<Direct> directReplacements,
                                 List<Random> randomReplacements,
                                 List<TFCWorld> tfcWorldReplacements) {
+    public static final Codec<ReplacementConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Direct.CODEC.listOf().fieldOf("directReplacements").forGetter(ReplacementConfig::directReplacements),
+            Random.CODEC.listOf().fieldOf("randomReplacements").forGetter(ReplacementConfig::randomReplacements),
+            TFCWorld.CODEC.listOf().fieldOf("tfcWorldReplacements").forGetter(ReplacementConfig::tfcWorldReplacements)
+    ).apply(instance, ReplacementConfig::new));
+
     public static final String CONFIG_NAME = "replacement_config.json";
     public static final String TFC_STONE_TYPE = "STONE";
     public static final String TFC_BRICK_TYPE = "BRICK";
@@ -26,12 +34,25 @@ public record ReplacementConfig(List<Direct> directReplacements,
     public static final String TFC_SKIP_TYPE = "SKIP";
 
     private record Direct(String original, String replacement) {
+        public static final Codec<Direct> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                Codec.STRING.fieldOf("original").forGetter(Direct::original),
+                Codec.STRING.fieldOf("replacement").forGetter(Direct::replacement)
+        ).apply(instance, Direct::new));
     }
 
     private record Random(String original, boolean perBlock, List<String> replacements) {
+        public static final Codec<Random> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                Codec.STRING.fieldOf("original").forGetter(Random::original),
+                Codec.BOOL.optionalFieldOf("perBlock", false).forGetter(Random::perBlock),
+                Codec.STRING.listOf().fieldOf("replacements").forGetter(Random::replacements)
+        ).apply(instance, Random::new));
     }
 
     private record TFCWorld(String original, String type) {
+        public static final Codec<TFCWorld> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                Codec.STRING.fieldOf("original").forGetter(TFCWorld::original),
+                Codec.STRING.fieldOf("type").forGetter(TFCWorld::type)
+        ).apply(instance, TFCWorld::new));
     }
 
     public Map<ResourceLocation, ResourceLocation> getDirectReplacementMap() {
