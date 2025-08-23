@@ -3,13 +3,21 @@ package com.farco.tfc_structures.data;
 import com.farco.tfc_structures.TFCStructuresMod;
 import com.farco.tfc_structures.config.CommonConfig;
 import com.farco.tfc_structures.config.StructureConfig;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.mojang.serialization.JsonOps;
+import net.minecraft.SharedConstants;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
+import net.minecraft.server.packs.metadata.pack.PackMetadataSectionSerializer;
 import net.minecraft.server.packs.repository.FolderRepositorySource;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.repository.RepositorySource;
+import net.minecraft.tags.TagEntry;
+import net.minecraft.tags.TagFile;
+import net.minecraft.util.GsonHelper;
 import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,31 +25,23 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 public final class DatapackGenerator {
+    private static final PackMetadataSection VERSION_METADATA_SECTION = new PackMetadataSection(Component.literal(TFCStructuresMod.MODID + " generated data-pack"), SharedConstants.getCurrentVersion().getPackVersion(PackType.SERVER_DATA));
     private static final String DATA_PACK_FOLDER_NAME = TFCStructuresMod.MODID + "_main";
     private static final String PACK_MCMETA_NAME = "pack.mcmeta";
     private static final String DATA_FOLDER_NAME = "data";
 
-    public record TagValues(Collection<String> values) {
-    }
-
-    private record Pack(int pack_format, String description) {
-    }
-
-    private record PackMeta(Pack pack) {
-    }
-
     private final Path datapacksFolderPath;
     private final Path datapackFolderPath;
-    private final Gson GSON;
 
     public DatapackGenerator(Path datapacksFolderPath) {
         this.datapacksFolderPath = datapacksFolderPath;
         this.datapackFolderPath = this.datapacksFolderPath.resolve(DATA_PACK_FOLDER_NAME);
-
-        GSON = new GsonBuilder().setPrettyPrinting().create();
     }
 
     public void refreshDatapack(StructureConfig structureConfig) {
@@ -69,8 +69,10 @@ public final class DatapackGenerator {
 
         Files.createDirectories(datapackFolderPath);
 
-        PackMeta packMeta = new PackMeta(new Pack(15, TFCStructuresMod.MODID + " generated data-pack"));
-        SaveJson(packMetaPath, packMeta);
+        JsonObject pack = new JsonObject();
+        JsonObject metadata = new PackMetadataSectionSerializer().toJson(VERSION_METADATA_SECTION);
+        pack.add("pack", metadata);
+        SaveJson(packMetaPath, pack);
     }
 
     private void recreateDataFolder() throws IOException {
@@ -86,7 +88,7 @@ public final class DatapackGenerator {
             Path biomeTagsFolder = buildBiomeTagsFolderPath(datapackFolderPath, location.getNamespace());
             Files.createDirectories(biomeTagsFolder);
 
-            generateTag(biomeTagsFolder, location.getPath(), tag.tagValues());
+            generateTag(biomeTagsFolder, location.getPath(), buildBlocksTagFile(tag.tagValues()));
         }
     }
 
@@ -99,17 +101,26 @@ public final class DatapackGenerator {
 
         Files.createDirectories(blockTagsFolder);
 
-        TagValues mossyBlocks = new TagValues(new ArrayList<>(CommonConfig.MOSSY_BLOCKS.get()));
-        generateTag(blockTagsFolder, TFCStructuresMod.MOSSY_TAG_NAME, mossyBlocks);
+        generateTag(blockTagsFolder, TFCStructuresMod.MOSSY_TAG_NAME, buildBlocksTagFile(CommonConfig.MOSSY_BLOCKS.get()));
+        generateTag(blockTagsFolder, TFCStructuresMod.STRIPPED_LOG_TAG_NAME, buildBlocksTagFile(CommonConfig.STRIPPED_LOGS.get()));
+        generateTag(blockTagsFolder, TFCStructuresMod.STRIPPED_WOOD_TAG_NAME, buildBlocksTagFile(CommonConfig.STRIPPED_WOOD.get()));
+        generateTag(blockTagsFolder, TFCStructuresMod.CRACKED_BRICKS_TAG_NAME, buildBlocksTagFile(CommonConfig.CRACKED_BRICKS.get()));
+    }
 
-        TagValues strippedLogs = new TagValues(new ArrayList<>(CommonConfig.STRIPPED_LOGS.get()));
-        generateTag(blockTagsFolder, TFCStructuresMod.STRIPPED_LOG_TAG_NAME, strippedLogs);
+    private TagFile buildBlocksTagFile(List<? extends String> ids) {
+        var entries = new ArrayList<TagEntry>(ids.size());
+        for (String id : ids) {
+            boolean isTag = id.startsWith("#");
+            if (isTag) {
+                id = id.replace("#", "");
+            }
 
-        TagValues strippedWoods = new TagValues(new ArrayList<>(CommonConfig.STRIPPED_WOOD.get()));
-        generateTag(blockTagsFolder, TFCStructuresMod.STRIPPED_WOOD_TAG_NAME, strippedWoods);
-
-        TagValues crackedBricks = new TagValues(new ArrayList<>(CommonConfig.CRACKED_BRICKS.get()));
-        generateTag(blockTagsFolder, TFCStructuresMod.CRACKED_BRICKS_TAG_NAME, crackedBricks);
+            ResourceLocation location = ResourceLocation.parse(id);
+            entries.add(isTag
+                    ? TagEntry.tag(location)
+                    : TagEntry.element(location));
+        }
+        return new TagFile(entries, false);
     }
 
     private void generateActiveStructures(StructureConfig structureConfig) throws IOException {
@@ -131,7 +142,7 @@ public final class DatapackGenerator {
 
             for (StructureData structure : structures) {
                 String shortName = structure.getResourceLocation().getPath();
-                generateTag(hasStructureFolder, shortName, structure.getAllowedBiomesAsTagValues());
+                generateTag(hasStructureFolder, shortName, buildBlocksTagFile(structure.allowedBiomes()));
             }
         }
     }
@@ -156,12 +167,14 @@ public final class DatapackGenerator {
                 .resolve("biome");
     }
 
-    private void generateTag(Path folder, String name, TagValues tagValues) throws IOException {
+    private void generateTag(Path folder, String name, TagFile tagFile) throws IOException {
         Path filePath = folder.resolve(name + ".json");
-        SaveJson(filePath, tagValues);
+        JsonElement jsonElement = TagFile.CODEC.encodeStart(JsonOps.INSTANCE, tagFile).result().orElseThrow();
+        SaveJson(filePath, jsonElement);
     }
 
-    private void SaveJson(Path filePath, Object target) throws IOException {
-        Files.writeString(filePath, GSON.toJson(target));
+    private void SaveJson(Path filePath, JsonElement jsonElement) throws IOException {
+        String jsonString = GsonHelper.toStableString(jsonElement);
+        Files.writeString(filePath, jsonString);
     }
 }

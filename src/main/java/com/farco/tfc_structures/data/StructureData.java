@@ -9,8 +9,4 @@ public record StructureData(String id, List<String> allowedBiomes, Map<String, S
     public ResourceLocation getResourceLocation() {
         return ResourceLocation.parse(id);
     }
-
-    public DatapackGenerator.TagValues getAllowedBiomesAsTagValues() {
-        return new DatapackGenerator.TagValues(allowedBiomes);
-    }
 }

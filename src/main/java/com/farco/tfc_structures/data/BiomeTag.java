@@ -9,13 +9,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public record BiomeTag(String id, DatapackGenerator.TagValues tagValues) {
-    public BiomeTag(String id, List<String> links) {
-        this(id, new DatapackGenerator.TagValues(links));
-    }
-
+public record BiomeTag(String id, List<String> tagValues) {
     public BiomeTag(String id, Collection<ResourceKey<Biome>> biomes) {
-        this(id, new DatapackGenerator.TagValues(biomes.stream().map(key -> key.location().toString()).toList()));
+        this(id, biomes.stream().map(key -> key.location().toString()).toList());
     }
 
     public String getTagId() {
