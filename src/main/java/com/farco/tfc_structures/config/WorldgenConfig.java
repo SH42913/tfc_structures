@@ -21,21 +21,21 @@ public final class WorldgenConfig {
     public static final Codec<WorldgenConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             BiomeTag.CODEC.listOf().fieldOf("biomeTags").forGetter(cfg -> cfg.biomeTags),
             Codec.STRING.listOf().fieldOf("disabledStructures").forGetter(cfg -> cfg.disabledStructures),
-            Codec.STRING.listOf().fieldOf("unregisteredStructures").forGetter(cfg -> cfg.unregisteredStructures)
+            Codec.STRING.listOf().fieldOf("defaultWorldgenStructures").forGetter(cfg -> cfg.defaultWorldgenStructures)
     ).apply(instance, WorldgenConfig::new));
 
     public static final String CONFIG_NAME = "worldgen_config.json";
 
     public List<BiomeTag> biomeTags;
     public List<String> disabledStructures;
-    public List<String> unregisteredStructures;
+    public List<String> defaultWorldgenStructures;
 
     private Map<String, TagKey<Biome>> structureToTagMap;
 
-    public WorldgenConfig(List<BiomeTag> biomeTags, List<String> disabledStructures, List<String> unregisteredStructures) {
+    public WorldgenConfig(List<BiomeTag> biomeTags, List<String> disabledStructures, List<String> defaultWorldgenStructures) {
         this.biomeTags = biomeTags;
         this.disabledStructures = disabledStructures;
-        this.unregisteredStructures = unregisteredStructures;
+        this.defaultWorldgenStructures = defaultWorldgenStructures;
     }
 
     public void refreshUnused(Registry<Structure> structureRegistry) {
@@ -62,7 +62,7 @@ public final class WorldgenConfig {
             }
         }
 
-        unregisteredStructures = structures.stream().sorted().toList();
+        defaultWorldgenStructures = structures.stream().sorted().toList();
     }
 
     public static WorldgenConfig getDefaultConfig() {

@@ -24,7 +24,7 @@ public final class StructureConfig {
         public static final Data EMPTY = new Data(Collections.emptyMap());
     }
 
-    public static final String CONFIG_NAME = "structure_config.json";
+    public static final String CONFIG_NAME = "structures_config.json";
 
     public Map<String, Data> structures;
 
