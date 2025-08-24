@@ -50,7 +50,6 @@ public final class DatapackGenerator {
             recreateDataFolder();
             generateBlocksTag();
             generateBiomeTags(worldgenConfig);
-            generateActiveStructures(worldgenConfig);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -81,14 +80,21 @@ public final class DatapackGenerator {
         Files.createDirectories(dataFolder);
     }
 
-    private void generateBiomeTags(WorldgenConfig structureConfig) throws IOException {
-        for (BiomeTag tag : structureConfig.biomeTags) {
+    private void generateBiomeTags(WorldgenConfig worldgenConfig) throws IOException {
+        var withDisabled = new ArrayList<>(worldgenConfig.biomeTags);
+        withDisabled.add(new BiomeTag(TFCStructuresMod.MODID + ":disabled", Collections.emptyList(), worldgenConfig.disabledStructures));
+
+        for (BiomeTag tag : withDisabled) {
             var location = ResourceLocation.parse(tag.id());
 
             Path biomeTagsFolder = buildBiomeTagsFolderPath(datapackFolderPath, location.getNamespace());
             Files.createDirectories(biomeTagsFolder);
 
-            generateTag(biomeTagsFolder, location.getPath(), buildBlocksTagFile(tag.tagValues()));
+            generateTag(biomeTagsFolder, location.getPath(), buildTagFile(tag.biomes()));
+
+            if (!tag.structures().isEmpty()) {
+                generateStructuresFor(tag);
+            }
         }
     }
 
@@ -101,13 +107,13 @@ public final class DatapackGenerator {
 
         Files.createDirectories(blockTagsFolder);
 
-        generateTag(blockTagsFolder, TFCStructuresMod.MOSSY_TAG_NAME, buildBlocksTagFile(CommonConfig.MOSSY_BLOCKS.get()));
-        generateTag(blockTagsFolder, TFCStructuresMod.STRIPPED_LOG_TAG_NAME, buildBlocksTagFile(CommonConfig.STRIPPED_LOGS.get()));
-        generateTag(blockTagsFolder, TFCStructuresMod.STRIPPED_WOOD_TAG_NAME, buildBlocksTagFile(CommonConfig.STRIPPED_WOOD.get()));
-        generateTag(blockTagsFolder, TFCStructuresMod.CRACKED_BRICKS_TAG_NAME, buildBlocksTagFile(CommonConfig.CRACKED_BRICKS.get()));
+        generateTag(blockTagsFolder, TFCStructuresMod.MOSSY_TAG_NAME, buildTagFile(CommonConfig.MOSSY_BLOCKS.get()));
+        generateTag(blockTagsFolder, TFCStructuresMod.STRIPPED_LOG_TAG_NAME, buildTagFile(CommonConfig.STRIPPED_LOGS.get()));
+        generateTag(blockTagsFolder, TFCStructuresMod.STRIPPED_WOOD_TAG_NAME, buildTagFile(CommonConfig.STRIPPED_WOOD.get()));
+        generateTag(blockTagsFolder, TFCStructuresMod.CRACKED_BRICKS_TAG_NAME, buildTagFile(CommonConfig.CRACKED_BRICKS.get()));
     }
 
-    private TagFile buildBlocksTagFile(List<? extends String> ids) {
+    private TagFile buildTagFile(List<? extends String> ids) {
         var entries = new ArrayList<TagEntry>(ids.size());
         for (String id : ids) {
             boolean isTag = id.startsWith("#");
@@ -123,14 +129,18 @@ public final class DatapackGenerator {
         return new TagFile(entries, false);
     }
 
-    private void generateActiveStructures(WorldgenConfig structureConfig) throws IOException {
-        var modIdToStructuresMap = new HashMap<String, List<StructureData>>();
-        for (StructureData structure : structureConfig.activeStructures) {
-            addStructureToMap(structure, modIdToStructuresMap);
-        }
+    private void generateStructuresFor(BiomeTag biomeTag) throws IOException {
+        var modIdToStructuresMap = new HashMap<String, List<ResourceLocation>>();
+        for (String structure : biomeTag.structures()) {
+            var resourceLocation = ResourceLocation.parse(structure);
+            var modId = resourceLocation.getNamespace();
+            var locations = modIdToStructuresMap.get(modId);
+            if (locations == null) {
+                locations = new ArrayList<>();
+            }
 
-        for (String structureId : structureConfig.disabledStructures) {
-            addStructureToMap(new StructureData(structureId, Collections.emptyList()), modIdToStructuresMap);
+            locations.add(resourceLocation);
+            modIdToStructuresMap.put(modId, locations);
         }
 
         for (var entry : modIdToStructuresMap.entrySet()) {
@@ -140,22 +150,12 @@ public final class DatapackGenerator {
             Path hasStructureFolder = buildBiomeTagsFolderPath(datapackFolderPath, modId).resolve("has_structure");
             Files.createDirectories(hasStructureFolder);
 
-            for (StructureData structure : structures) {
-                String shortName = structure.getResourceLocation().getPath();
-                generateTag(hasStructureFolder, shortName, buildBlocksTagFile(structure.allowedBiomes()));
+            for (ResourceLocation structure : structures) {
+                String shortName = structure.getPath();
+                TagFile tagFile = buildTagFile(List.of(biomeTag.getTagId()));
+                generateTag(hasStructureFolder, shortName, tagFile);
             }
         }
-    }
-
-    private static void addStructureToMap(StructureData structure, HashMap<String, List<StructureData>> map) {
-        var modId = structure.getResourceLocation().getNamespace();
-        var locations = map.getOrDefault(modId, null);
-        if (locations == null) {
-            locations = new ArrayList<>();
-        }
-
-        locations.add(structure);
-        map.put(modId, locations);
     }
 
     private static @NotNull Path buildBiomeTagsFolderPath(Path datapackFolder, String modId) {

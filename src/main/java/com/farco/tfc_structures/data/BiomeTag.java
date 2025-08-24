@@ -9,21 +9,29 @@ import net.minecraft.world.level.biome.Biome;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
-public record BiomeTag(String id, List<String> tagValues) {
+public record BiomeTag(String id, List<String> biomes, List<String> structures) {
     public static final Codec<BiomeTag> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("id").forGetter(BiomeTag::id),
-            Codec.STRING.listOf().fieldOf("tagValues").forGetter(BiomeTag::tagValues)
+            Codec.STRING.listOf().fieldOf("biomes").forGetter(BiomeTag::biomes),
+            Codec.STRING.listOf().fieldOf("structures").forGetter(BiomeTag::structures)
     ).apply(instance, BiomeTag::new));
 
     public BiomeTag(String id, Collection<ResourceKey<Biome>> biomes) {
-        this(id, biomes.stream().map(key -> key.location().toString()).toList());
+        this(id, biomes.stream().map(key -> key.location().toString()).toList(), Collections.emptyList());
+    }
+
+    public BiomeTag(String id, List<BiomeTag> tags) {
+        this(id, tags.stream().map(BiomeTag::getTagId).toList(), Collections.emptyList());
     }
 
     public String getTagId() {
         return '#' + id;
     }
+
+    public static final BiomeTag ALL_TFC_BIOMES = new BiomeTag(TFCStructuresMod.MODID + ":all_tfc_biomes", TFCBiomes.getAllKeys());
 
     public static final BiomeTag BEACH = new BiomeTag(TFCStructuresMod.MODID + ":is_beach", List.of(
             TFCBiomes.TIDAL_FLATS.key(),
@@ -47,9 +55,9 @@ public record BiomeTag(String id, List<String> tagValues) {
     ));
 
     public static final BiomeTag ANY_LAKE = new BiomeTag(TFCStructuresMod.MODID + ":is_any_lake", List.of(
-            COMMON_LAKE.getTagId(),
-            MOUNTAIN_LAKE.getTagId(),
-            OCEANIC_MOUNTAIN_LAKE.getTagId()
+            COMMON_LAKE,
+            MOUNTAIN_LAKE,
+            OCEANIC_MOUNTAIN_LAKE
     ));
 
     public static final BiomeTag RIVER = new BiomeTag(TFCStructuresMod.MODID + ":is_river", List.of(
@@ -86,8 +94,8 @@ public record BiomeTag(String id, List<String> tagValues) {
     ));
 
     public static final BiomeTag ANY_MOUNTAINS = new BiomeTag(TFCStructuresMod.MODID + ":is_any_mountains", List.of(
-            COMMON_MOUNTAINS.getTagId(),
-            VOLCANIC_MOUNTAINS.getTagId()
+            COMMON_MOUNTAINS,
+            VOLCANIC_MOUNTAINS
     ));
 
     public static final BiomeTag DEEP_OCEAN = new BiomeTag(TFCStructuresMod.MODID + ":is_deep_ocean", List.of(
@@ -101,8 +109,8 @@ public record BiomeTag(String id, List<String> tagValues) {
     ));
 
     public static final BiomeTag ANY_OCEAN = new BiomeTag(TFCStructuresMod.MODID + ":is_any_ocean", List.of(
-            DEEP_OCEAN.getTagId(),
-            COMMON_OCEAN.getTagId()
+            DEEP_OCEAN,
+            COMMON_OCEAN
     ));
 
     public static final BiomeTag SWAMP = new BiomeTag(TFCStructuresMod.MODID + ":is_swamp", List.of(
@@ -115,14 +123,7 @@ public record BiomeTag(String id, List<String> tagValues) {
             TFCBiomes.PLATEAU.key()
     ));
 
-    public static final BiomeTag VILLAGE_BIOMES = new BiomeTag(TFCStructuresMod.MODID + ":village_biomes", List.of(
-            PLAINS.getTagId(),
-            HILL.getTagId()
-    ));
-
-    public static final BiomeTag ALL_TFC_BIOMES = new BiomeTag(TFCStructuresMod.MODID + ":all_tfc_biomes", TFCBiomes.getAllKeys());
-
-    public static List<BiomeTag> getDefaultBiomeTags() {
+    public static List<BiomeTag> getBuiltinBiomeTags() {
         var list = new ArrayList<BiomeTag>();
         list.add(BEACH);
         list.add(OCEANIC_MOUNTAIN_LAKE);
@@ -142,7 +143,6 @@ public record BiomeTag(String id, List<String> tagValues) {
         list.add(ANY_OCEAN);
         list.add(SWAMP);
         list.add(PLAINS);
-        list.add(VILLAGE_BIOMES);
         list.add(ALL_TFC_BIOMES);
         return list;
     }
