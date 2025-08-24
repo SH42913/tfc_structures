@@ -17,6 +17,7 @@ import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagFile;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.GsonHelper;
 import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
@@ -81,16 +82,15 @@ public final class DatapackGenerator {
 
     private void generateBiomeTags(WorldgenConfig worldgenConfig) throws IOException {
         var withDisabled = new ArrayList<>(worldgenConfig.biomeTags);
-        withDisabled.add(new BiomeTag(TFCStructuresMod.MODID + ":disabled", Collections.emptyList(), worldgenConfig.disabledStructures));
+        var disabledLocation = ResourceLocation.fromNamespaceAndPath(TFCStructuresMod.MODID, "disabled");
+        withDisabled.add(new BiomeTag(disabledLocation, Collections.emptyList(), worldgenConfig.disabledStructures));
 
         for (BiomeTag tag : withDisabled) {
-            var location = ResourceLocation.parse(tag.id());
-
-            Path biomeTagsFolder = buildBiomeTagsFolderPath(datapackFolderPath, location.getNamespace());
+            Path biomeTagsFolder = buildBiomeTagsFolderPath(datapackFolderPath, tag.id().getNamespace());
             Files.createDirectories(biomeTagsFolder);
 
             TagFile tagFile = buildTagFile(tag.biomes());
-            generateTag(biomeTagsFolder, location.getPath(), tagFile);
+            generateTag(biomeTagsFolder, tag.id().getPath(), tagFile);
         }
     }
 
@@ -103,26 +103,28 @@ public final class DatapackGenerator {
 
         Files.createDirectories(blockTagsFolder);
 
-        generateTag(blockTagsFolder, TFCStructuresMod.MOSSY_TAG_NAME, buildTagFile(CommonConfig.MOSSY_BLOCKS.get()));
-        generateTag(blockTagsFolder, TFCStructuresMod.STRIPPED_LOG_TAG_NAME, buildTagFile(CommonConfig.STRIPPED_LOGS.get()));
-        generateTag(blockTagsFolder, TFCStructuresMod.STRIPPED_WOOD_TAG_NAME, buildTagFile(CommonConfig.STRIPPED_WOOD.get()));
-        generateTag(blockTagsFolder, TFCStructuresMod.CRACKED_BRICKS_TAG_NAME, buildTagFile(CommonConfig.CRACKED_BRICKS.get()));
+        generateTag(blockTagsFolder, TFCStructuresMod.MOSSY_TAG_NAME, buildTagFileFromIds(CommonConfig.MOSSY_BLOCKS.get()));
+        generateTag(blockTagsFolder, TFCStructuresMod.STRIPPED_LOG_TAG_NAME, buildTagFileFromIds(CommonConfig.STRIPPED_LOGS.get()));
+        generateTag(blockTagsFolder, TFCStructuresMod.STRIPPED_WOOD_TAG_NAME, buildTagFileFromIds(CommonConfig.STRIPPED_WOOD.get()));
+        generateTag(blockTagsFolder, TFCStructuresMod.CRACKED_BRICKS_TAG_NAME, buildTagFileFromIds(CommonConfig.CRACKED_BRICKS.get()));
     }
 
-    private TagFile buildTagFile(List<? extends String> ids) {
-        var entries = new ArrayList<TagEntry>(ids.size());
-        for (String id : ids) {
-            boolean isTag = id.startsWith("#");
-            if (isTag) {
-                id = id.replace("#", "");
-            }
+    private TagFile buildTagFileFromIds(List<? extends String> elementIds) {
+        var elements = elementIds.stream()
+                .map(ResourceLocation::parse)
+                .map(location -> new ExtraCodecs.TagOrElementLocation(location, false))
+                .toList();
+        return buildTagFile(elements);
+    }
 
-            ResourceLocation location = ResourceLocation.parse(id);
-            entries.add(isTag
-                    ? TagEntry.tag(location)
-                    : TagEntry.element(location));
+    private TagFile buildTagFile(List<ExtraCodecs.TagOrElementLocation> elements) {
+        var entries = new ArrayList<TagEntry>(elements.size());
+        for (var element : elements) {
+            entries.add(element.tag()
+                    ? TagEntry.tag(element.id())
+                    : TagEntry.element(element.id()));
         }
-        return new TagFile(entries, false);
+        return new TagFile(entries, true);
     }
 
     private static @NotNull Path buildBiomeTagsFolderPath(Path datapackFolder, String modId) {

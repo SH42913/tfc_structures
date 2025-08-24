@@ -33,24 +33,32 @@ public record ReplacementConfig(List<Direct> directReplacements,
     public static final String TFC_ORE_TYPE = "ORE";
     public static final String TFC_SKIP_TYPE = "SKIP";
 
-    private record Direct(String original, String replacement) {
+    private record Direct(ResourceLocation original, ResourceLocation replacement) {
         public static final Codec<Direct> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.STRING.fieldOf("original").forGetter(Direct::original),
-                Codec.STRING.fieldOf("replacement").forGetter(Direct::replacement)
+                ResourceLocation.CODEC.fieldOf("original").forGetter(Direct::original),
+                ResourceLocation.CODEC.fieldOf("replacement").forGetter(Direct::replacement)
         ).apply(instance, Direct::new));
+
+        public Direct(String originalString, String replacementString) {
+            this(ResourceLocation.parse(originalString), ResourceLocation.parse(replacementString));
+        }
     }
 
-    private record Random(String original, boolean perBlock, List<String> replacements) {
+    private record Random(ResourceLocation original, boolean perBlock, List<ResourceLocation> replacements) {
         public static final Codec<Random> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.STRING.fieldOf("original").forGetter(Random::original),
+                ResourceLocation.CODEC.fieldOf("original").forGetter(Random::original),
                 Codec.BOOL.optionalFieldOf("perBlock", false).forGetter(Random::perBlock),
-                Codec.STRING.listOf().fieldOf("replacements").forGetter(Random::replacements)
+                ResourceLocation.CODEC.listOf().fieldOf("replacements").forGetter(Random::replacements)
         ).apply(instance, Random::new));
+
+        public Random(String originalString, boolean perBlock, List<String> replacementStrings) {
+            this(ResourceLocation.parse(originalString), perBlock, replacementStrings.stream().map(ResourceLocation::parse).toList());
+        }
     }
 
-    private record TFCWorld(String original, String type) {
+    private record TFCWorld(ResourceLocation original, String type) {
         public static final Codec<TFCWorld> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.STRING.fieldOf("original").forGetter(TFCWorld::original),
+                ResourceLocation.CODEC.fieldOf("original").forGetter(TFCWorld::original),
                 Codec.STRING.fieldOf("type").forGetter(TFCWorld::type)
         ).apply(instance, TFCWorld::new));
     }
@@ -59,19 +67,17 @@ public record ReplacementConfig(List<Direct> directReplacements,
         IForgeRegistry<Block> blocks = ForgeRegistries.BLOCKS;
         var map = new HashMap<ResourceLocation, ResourceLocation>(directReplacements.size());
         for (Direct entry : directReplacements) {
-            var originalLocation = ResourceLocation.parse(entry.original);
-            if (!blocks.containsKey(originalLocation)) {
+            if (!blocks.containsKey(entry.original)) {
                 TFCStructuresMod.LOGGER.error("Original with ID {} not found", entry.original);
                 continue;
             }
 
-            var replacementLocation = ResourceLocation.parse(entry.replacement);
-            if (!blocks.containsKey(replacementLocation)) {
+            if (!blocks.containsKey(entry.replacement)) {
                 TFCStructuresMod.LOGGER.error("Replacement with ID {} not found", entry.replacement);
                 continue;
             }
 
-            map.put(originalLocation, replacementLocation);
+            map.put(entry.original, entry.replacement);
         }
 
         return map;
@@ -81,29 +87,27 @@ public record ReplacementConfig(List<Direct> directReplacements,
         IForgeRegistry<Block> blocks = ForgeRegistries.BLOCKS;
         var map = new HashMap<ResourceLocation, Pair<Boolean, List<ResourceLocation>>>(randomReplacements.size());
         for (Random entry : randomReplacements) {
-            var originalLocation = ResourceLocation.parse(entry.original);
-            if (!blocks.containsKey(originalLocation)) {
+            if (!blocks.containsKey(entry.original)) {
                 TFCStructuresMod.LOGGER.error("Original for Random with ID {} not found", entry.original);
                 continue;
             }
 
             List<ResourceLocation> replacements = new ArrayList<>(entry.replacements.size());
-            for (String replacement : entry.replacements) {
-                var replacementLocation = ResourceLocation.parse(replacement);
-                if (!blocks.containsKey(replacementLocation)) {
+            for (var replacement : entry.replacements) {
+                if (!blocks.containsKey(replacement)) {
                     TFCStructuresMod.LOGGER.error("Random replacement with ID {} not found", replacement);
                     continue;
                 }
 
-                replacements.add(replacementLocation);
+                replacements.add(replacement);
             }
 
             if (replacements.isEmpty()) {
-                TFCStructuresMod.LOGGER.error("There's no random replacements for {}", originalLocation);
+                TFCStructuresMod.LOGGER.error("There's no random replacements for {}", entry.original);
                 continue;
             }
 
-            map.put(originalLocation, new Pair<>(entry.perBlock, replacements));
+            map.put(entry.original, new Pair<>(entry.perBlock, replacements));
         }
 
         return map;
@@ -113,9 +117,8 @@ public record ReplacementConfig(List<Direct> directReplacements,
         IForgeRegistry<Block> blocks = ForgeRegistries.BLOCKS;
         var map = new HashMap<ResourceLocation, String>(tfcWorldReplacements.size());
         for (TFCWorld entry : tfcWorldReplacements) {
-            var originalLocation = ResourceLocation.parse(entry.original);
-            if (blocks.containsKey(originalLocation)) {
-                map.put(originalLocation, entry.type);
+            if (blocks.containsKey(entry.original)) {
+                map.put(entry.original, entry.type);
             } else {
                 TFCStructuresMod.LOGGER.error("Original for TFC replacement with ID {} not found", entry.original);
             }
@@ -312,7 +315,7 @@ public record ReplacementConfig(List<Direct> directReplacements,
                 continue;
             }
 
-            list.add(new TFCWorld(location.toString(), conversionType));
+            list.add(new TFCWorld(location, conversionType));
         }
 
         list.sort(Comparator.comparing(o -> o.original));

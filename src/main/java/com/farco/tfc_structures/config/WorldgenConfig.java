@@ -10,6 +10,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.structure.BuiltinStructures;
 import net.minecraft.world.level.levelgen.structure.Structure;
@@ -20,35 +21,33 @@ import java.util.stream.Collectors;
 public final class WorldgenConfig {
     public static final Codec<WorldgenConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             BiomeTag.CODEC.listOf().fieldOf("biomeTags").forGetter(cfg -> cfg.biomeTags),
-            Codec.STRING.listOf().fieldOf("disabledStructures").forGetter(cfg -> cfg.disabledStructures),
-            Codec.STRING.listOf().fieldOf("defaultWorldgenStructures").forGetter(cfg -> cfg.defaultWorldgenStructures)
+            ResourceLocation.CODEC.listOf().fieldOf("disabledStructures").forGetter(cfg -> cfg.disabledStructures),
+            ResourceLocation.CODEC.listOf().fieldOf("defaultWorldgenStructures").forGetter(cfg -> cfg.defaultWorldgenStructures)
     ).apply(instance, WorldgenConfig::new));
 
     public static final String CONFIG_NAME = "worldgen_config.json";
 
     public List<BiomeTag> biomeTags;
-    public List<String> disabledStructures;
-    public List<String> defaultWorldgenStructures;
+    public List<ResourceLocation> disabledStructures;
+    public List<ResourceLocation> defaultWorldgenStructures;
 
     private Map<String, TagKey<Biome>> structureToTagMap;
 
-    public WorldgenConfig(List<BiomeTag> biomeTags, List<String> disabledStructures, List<String> defaultWorldgenStructures) {
+    public WorldgenConfig(List<BiomeTag> biomeTags, List<ResourceLocation> disabledStructures, List<ResourceLocation> defaultWorldgenStructures) {
         this.biomeTags = biomeTags;
         this.disabledStructures = disabledStructures;
         this.defaultWorldgenStructures = defaultWorldgenStructures;
     }
 
     public void refreshUnused(Registry<Structure> structureRegistry) {
-        var allStructures = structureRegistry.keySet()
-                .stream().map(ResourceLocation::toString)
-                .collect(Collectors.toSet());
+        var allStructures = structureRegistry.keySet();
 
-        Set<String> activeStructures = biomeTags.stream()
+        Set<ResourceLocation> activeStructures = biomeTags.stream()
                 .flatMap(biomeTag -> biomeTag.structures().stream())
                 .collect(Collectors.toSet());
 
         var structures = new HashSet<>(allStructures);
-        for (String structure : activeStructures) {
+        for (ResourceLocation structure : activeStructures) {
             if (!allStructures.contains(structure)) {
                 TFCStructuresMod.LOGGER.warn("Structure {} is not valid", structure);
             } else {
@@ -56,7 +55,7 @@ public final class WorldgenConfig {
             }
         }
 
-        for (String structure : disabledStructures) {
+        for (var structure : disabledStructures) {
             if (allStructures.contains(structure)) {
                 structures.remove(structure);
             }
@@ -101,26 +100,26 @@ public final class WorldgenConfig {
         return list;
     }
 
-    private static BiomeTag buildBiomeTag(ResourceKey<Structure> structure, String... biomes) {
-        var location = structure.location();
-        return buildBiomeTag(location.getPath(), List.of(structure), Arrays.stream(biomes).toList());
+    private static BiomeTag buildBiomeTag(ResourceKey<Structure> structure, ExtraCodecs.TagOrElementLocation... biomes) {
+        return buildBiomeTag(structure.location().getPath(), List.of(structure), Arrays.stream(biomes).toList());
     }
 
-    private static BiomeTag buildBiomeTag(String name, List<ResourceKey<Structure>> structures, List<String> biomes) {
-        name = ResourceLocation.fromNamespaceAndPath(TFCStructuresMod.MODID, name).toString();
-        List<String> structureIds = structures.stream().map(key -> key.location().toString()).toList();
-        return new BiomeTag(name, biomes, structureIds);
+    @SuppressWarnings("SameParameterValue")
+    private static BiomeTag buildBiomeTag(String name, List<ResourceKey<Structure>> structures, List<ExtraCodecs.TagOrElementLocation> biomes) {
+        ResourceLocation location = ResourceLocation.fromNamespaceAndPath(TFCStructuresMod.MODID, name);
+        List<ResourceLocation> structureIds = structures.stream().map(ResourceKey::location).toList();
+        return new BiomeTag(location, biomes, structureIds);
     }
 
-    private static String getBiomeId(BiomeExtension biomeExtension) {
-        return biomeExtension.key().location().toString();
+    private static ExtraCodecs.TagOrElementLocation getBiomeId(BiomeExtension biomeExtension) {
+        return new ExtraCodecs.TagOrElementLocation(biomeExtension.key().location(), false);
     }
 
-    private static List<String> getDisabledVanillaStructures() {
+    private static List<ResourceLocation> getDisabledVanillaStructures() {
         return List.of(
-                BuiltinStructures.MINESHAFT_MESA.location().toString(),
-                BuiltinStructures.IGLOO.location().toString(),
-                BuiltinStructures.VILLAGE_SNOWY.location().toString()
+                BuiltinStructures.MINESHAFT_MESA.location(),
+                BuiltinStructures.IGLOO.location(),
+                BuiltinStructures.VILLAGE_SNOWY.location()
         );
     }
 
@@ -129,8 +128,8 @@ public final class WorldgenConfig {
             structureToTagMap = new HashMap<>();
             for (BiomeTag biomeTag : biomeTags) {
                 var tagKey = biomeTag.getTagKey();
-                for (String structureId : biomeTag.structures()) {
-                    structureToTagMap.put(structureId, tagKey);
+                for (ResourceLocation structureId : biomeTag.structures()) {
+                    structureToTagMap.put(structureId.toString(), tagKey);
                 }
             }
         }

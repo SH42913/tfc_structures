@@ -8,6 +8,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.level.biome.Biome;
 
 import java.util.ArrayList;
@@ -15,27 +16,29 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public record BiomeTag(String id, List<String> biomes, List<String> structures) {
+public record BiomeTag(ResourceLocation id,
+                       List<ExtraCodecs.TagOrElementLocation> biomes,
+                       List<ResourceLocation> structures) {
     public static final Codec<BiomeTag> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.STRING.fieldOf("id").forGetter(BiomeTag::id),
-            Codec.STRING.listOf().fieldOf("biomes").forGetter(BiomeTag::biomes),
-            Codec.STRING.listOf().fieldOf("structures").forGetter(BiomeTag::structures)
+            ResourceLocation.CODEC.fieldOf("id").forGetter(BiomeTag::id),
+            ExtraCodecs.TAG_OR_ELEMENT_ID.listOf().fieldOf("biomes").forGetter(BiomeTag::biomes),
+            ResourceLocation.CODEC.listOf().fieldOf("structures").forGetter(BiomeTag::structures)
     ).apply(instance, BiomeTag::new));
 
     public BiomeTag(String id, Collection<ResourceKey<Biome>> biomes) {
-        this(id, biomes.stream().map(key -> key.location().toString()).toList(), Collections.emptyList());
+        this(ResourceLocation.parse(id), biomes.stream().map(key -> new ExtraCodecs.TagOrElementLocation(key.location(), false)).toList(), Collections.emptyList());
     }
 
     public BiomeTag(String id, List<BiomeTag> tags) {
-        this(id, tags.stream().map(BiomeTag::getTagId).toList(), Collections.emptyList());
+        this(ResourceLocation.parse(id), tags.stream().map(tag -> new ExtraCodecs.TagOrElementLocation(tag.id, true)).toList(), Collections.emptyList());
     }
 
-    public String getTagId() {
-        return '#' + id;
+    public ExtraCodecs.TagOrElementLocation getTagId() {
+        return new ExtraCodecs.TagOrElementLocation(id, true);
     }
 
     public TagKey<Biome> getTagKey() {
-        return TagKey.create(Registries.BIOME, ResourceLocation.parse(id));
+        return TagKey.create(Registries.BIOME, id);
     }
 
     public static final BiomeTag ALL_TFC_BIOMES = new BiomeTag(TFCStructuresMod.MODID + ":all_tfc_biomes", TFCBiomes.getAllKeys());
@@ -132,6 +135,7 @@ public record BiomeTag(String id, List<String> biomes, List<String> structures) 
 
     public static List<BiomeTag> getBuiltinBiomeTags() {
         var list = new ArrayList<BiomeTag>();
+        list.add(ALL_TFC_BIOMES);
         list.add(BEACH);
         list.add(OCEANIC_MOUNTAIN_LAKE);
         list.add(MOUNTAIN_LAKE);
@@ -150,7 +154,6 @@ public record BiomeTag(String id, List<String> biomes, List<String> structures) 
         list.add(ANY_OCEAN);
         list.add(SWAMP);
         list.add(PLAINS);
-        list.add(ALL_TFC_BIOMES);
         return list;
     }
 }

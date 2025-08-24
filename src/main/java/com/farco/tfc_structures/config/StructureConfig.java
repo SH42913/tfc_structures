@@ -13,7 +13,7 @@ import java.util.Map;
 
 public final class StructureConfig {
     public static final Codec<StructureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.unboundedMap(Codec.STRING, Data.CODEC).fieldOf("structures").forGetter(cfg -> cfg.structures)
+            Codec.unboundedMap(ResourceLocation.CODEC, Data.CODEC).fieldOf("structures").forGetter(cfg -> cfg.structures)
     ).apply(instance, StructureConfig::new));
 
     public record Data(Map<String, String> lootTablesMap) {
@@ -26,9 +26,9 @@ public final class StructureConfig {
 
     public static final String CONFIG_NAME = "structures_config.json";
 
-    public Map<String, Data> structures;
+    public Map<ResourceLocation, Data> structures;
 
-    public StructureConfig(Map<String, Data> structures) {
+    public StructureConfig(Map<ResourceLocation, Data> structures) {
         this.structures = new HashMap<>(structures);
     }
 
@@ -37,14 +37,13 @@ public final class StructureConfig {
     }
 
     public @Nullable Data getDataByLocation(ResourceLocation location) {
-        return structures.get(location.toString());
+        return structures.get(location);
     }
 
     public void refreshUnused(Registry<Structure> structuresRegistry) {
         for (ResourceLocation location : structuresRegistry.keySet()) {
-            String key = location.toString();
-            if (!structures.containsKey(key)) {
-                structures.put(key, Data.EMPTY);
+            if (!structures.containsKey(location)) {
+                structures.put(location, Data.EMPTY);
             }
         }
     }
