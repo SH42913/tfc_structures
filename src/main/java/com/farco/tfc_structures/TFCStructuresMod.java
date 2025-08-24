@@ -85,15 +85,15 @@ public class TFCStructuresMod {
     private void onServerStarted(ServerStartedEvent event) {
         RegistryAccess.Frozen registryAccess = event.getServer().registryAccess();
 
-        Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registries.BIOME);
-        worldgenConfig.refreshUnused(biomeRegistry);
+        Registry<Structure> structureRegistry = registryAccess.registryOrThrow(Registries.STRUCTURE);
+        worldgenConfig.refreshUnused(structureRegistry);
         CONFIG_PROVIDER.save(WorldgenConfig.CONFIG_NAME, worldgenConfig, WorldgenConfig.CODEC);
 
-        Registry<Structure> structureRegistry = registryAccess.registryOrThrow(Registries.STRUCTURE);
         structureConfig.refreshUnused(structureRegistry);
         CONFIG_PROVIDER.save(StructureConfig.CONFIG_NAME, structureConfig, StructureConfig.CODEC);
 
         if (CommonConfig.BIOMES_TAGS_STRUCTURES_TO_LOGS.get()) {
+            Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registries.BIOME);
             for (ResourceLocation location : biomeRegistry.keySet()) {
                 LOGGER.info("[BIOME] {}", location.toString());
             }

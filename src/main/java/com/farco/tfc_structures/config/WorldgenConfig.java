@@ -9,6 +9,7 @@ import net.dries007.tfc.world.biome.TFCBiomes;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.structure.BuiltinStructures;
 import net.minecraft.world.level.levelgen.structure.Structure;
@@ -24,11 +25,12 @@ public final class WorldgenConfig {
     ).apply(instance, WorldgenConfig::new));
 
     public static final String CONFIG_NAME = "worldgen_config.json";
-    private static final String HAS_STRUCTURE = "has_structure/";
 
     public List<BiomeTag> biomeTags;
     public List<String> disabledStructures;
     public List<String> unregisteredStructures;
+
+    private Map<String, TagKey<Biome>> structureToTagMap;
 
     public WorldgenConfig(List<BiomeTag> biomeTags, List<String> disabledStructures, List<String> unregisteredStructures) {
         this.biomeTags = biomeTags;
@@ -36,20 +38,18 @@ public final class WorldgenConfig {
         this.unregisteredStructures = unregisteredStructures;
     }
 
-    public void refreshUnused(Registry<Biome> biomeRegistry) {
-        var allHasStructureTags = biomeRegistry.getTags()
-                .map(pair -> pair.getFirst().location())
-                .filter(location -> location.getPath().startsWith(HAS_STRUCTURE))
-                .map(location -> location.toString().replace(HAS_STRUCTURE, ""))
+    public void refreshUnused(Registry<Structure> structureRegistry) {
+        var allStructures = structureRegistry.keySet()
+                .stream().map(ResourceLocation::toString)
                 .collect(Collectors.toSet());
 
         Set<String> activeStructures = biomeTags.stream()
                 .flatMap(biomeTag -> biomeTag.structures().stream())
                 .collect(Collectors.toSet());
 
-        var structures = new HashSet<>(allHasStructureTags);
+        var structures = new HashSet<>(allStructures);
         for (String structure : activeStructures) {
-            if (!allHasStructureTags.contains(structure)) {
+            if (!allStructures.contains(structure)) {
                 TFCStructuresMod.LOGGER.warn("Structure {} is not valid", structure);
             } else {
                 structures.remove(structure);
@@ -57,7 +57,7 @@ public final class WorldgenConfig {
         }
 
         for (String structure : disabledStructures) {
-            if (allHasStructureTags.contains(structure)) {
+            if (allStructures.contains(structure)) {
                 structures.remove(structure);
             }
         }
@@ -122,5 +122,20 @@ public final class WorldgenConfig {
                 BuiltinStructures.IGLOO.location().toString(),
                 BuiltinStructures.VILLAGE_SNOWY.location().toString()
         );
+    }
+
+    public TagKey<Biome> getStructureTag(ResourceKey<Structure> structureKey) {
+        if (structureToTagMap == null) {
+            structureToTagMap = new HashMap<>();
+            for (BiomeTag biomeTag : biomeTags) {
+                var tagKey = biomeTag.getTagKey();
+                for (String structureId : biomeTag.structures()) {
+                    structureToTagMap.put(structureId, tagKey);
+                }
+            }
+        }
+
+        String structureId = structureKey.location().toString();
+        return structureToTagMap.get(structureId);
     }
 }

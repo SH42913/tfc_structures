@@ -27,7 +27,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 public final class DatapackGenerator {
@@ -90,11 +89,8 @@ public final class DatapackGenerator {
             Path biomeTagsFolder = buildBiomeTagsFolderPath(datapackFolderPath, location.getNamespace());
             Files.createDirectories(biomeTagsFolder);
 
-            generateTag(biomeTagsFolder, location.getPath(), buildTagFile(tag.biomes()));
-
-            if (!tag.structures().isEmpty()) {
-                generateStructuresFor(tag);
-            }
+            TagFile tagFile = buildTagFile(tag.biomes());
+            generateTag(biomeTagsFolder, location.getPath(), tagFile);
         }
     }
 
@@ -127,35 +123,6 @@ public final class DatapackGenerator {
                     : TagEntry.element(location));
         }
         return new TagFile(entries, false);
-    }
-
-    private void generateStructuresFor(BiomeTag biomeTag) throws IOException {
-        var modIdToStructuresMap = new HashMap<String, List<ResourceLocation>>();
-        for (String structure : biomeTag.structures()) {
-            var resourceLocation = ResourceLocation.parse(structure);
-            var modId = resourceLocation.getNamespace();
-            var locations = modIdToStructuresMap.get(modId);
-            if (locations == null) {
-                locations = new ArrayList<>();
-            }
-
-            locations.add(resourceLocation);
-            modIdToStructuresMap.put(modId, locations);
-        }
-
-        for (var entry : modIdToStructuresMap.entrySet()) {
-            var modId = entry.getKey();
-            var structures = entry.getValue();
-
-            Path hasStructureFolder = buildBiomeTagsFolderPath(datapackFolderPath, modId).resolve("has_structure");
-            Files.createDirectories(hasStructureFolder);
-
-            for (ResourceLocation structure : structures) {
-                String shortName = structure.getPath();
-                TagFile tagFile = buildTagFile(List.of(biomeTag.getTagId()));
-                generateTag(hasStructureFolder, shortName, tagFile);
-            }
-        }
     }
 
     private static @NotNull Path buildBiomeTagsFolderPath(Path datapackFolder, String modId) {

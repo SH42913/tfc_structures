@@ -4,7 +4,10 @@ import com.farco.tfc_structures.TFCStructuresMod;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.dries007.tfc.world.biome.TFCBiomes;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 
 import java.util.ArrayList;
@@ -29,6 +32,10 @@ public record BiomeTag(String id, List<String> biomes, List<String> structures) 
 
     public String getTagId() {
         return '#' + id;
+    }
+
+    public TagKey<Biome> getTagKey() {
+        return TagKey.create(Registries.BIOME, ResourceLocation.parse(id));
     }
 
     public static final BiomeTag ALL_TFC_BIOMES = new BiomeTag(TFCStructuresMod.MODID + ":all_tfc_biomes", TFCBiomes.getAllKeys());
