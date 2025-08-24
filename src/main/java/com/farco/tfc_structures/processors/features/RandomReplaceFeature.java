@@ -1,6 +1,6 @@
 package com.farco.tfc_structures.processors.features;
 
-import com.farco.tfc_structures.utils.Pair;
+import com.farco.tfc_structures.config.ReplacementConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -18,11 +18,11 @@ import java.util.List;
 import java.util.Map;
 
 public class RandomReplaceFeature implements ReplaceFeature {
-    private final Map<ResourceLocation, Pair<Boolean, List<ResourceLocation>>> replacementMap;
+    private final Map<ResourceLocation, ReplacementConfig.Random.Replacement> replacementMap;
     private Map<ResourceLocation, ResourceLocation> predefinedReplacementMap;
     private RandomSource localRandom;
 
-    public RandomReplaceFeature(Map<ResourceLocation, Pair<Boolean, List<ResourceLocation>>> replacementMap) {
+    public RandomReplaceFeature(Map<ResourceLocation, ReplacementConfig.Random.Replacement> replacementMap) {
         this.replacementMap = replacementMap;
     }
 
@@ -33,12 +33,13 @@ public class RandomReplaceFeature implements ReplaceFeature {
         predefinedReplacementMap = new HashMap<>();
         for (var entry : replacementMap.entrySet()) {
             var value = entry.getValue();
-            if (value.first()) {
+            if (value.perBlock()) {
                 continue;
             }
 
-            int randomIndex = localRandom.nextInt(value.second().size());
-            ResourceLocation replacement = value.second().get(randomIndex);
+            List<ResourceLocation> variants = value.variants();
+            int randomIndex = localRandom.nextInt(variants.size());
+            ResourceLocation replacement = value.variants().get(randomIndex);
             predefinedReplacementMap.put(entry.getKey(), replacement);
         }
     }
@@ -56,7 +57,7 @@ public class RandomReplaceFeature implements ReplaceFeature {
             return null;
         }
 
-        List<ResourceLocation> variants = pair.second();
+        List<ResourceLocation> variants = pair.variants();
         int randomIndex = localRandom.nextInt(variants.size());
         var replacementLocation = variants.get(randomIndex);
         return blockRegistry.get(replacementLocation);

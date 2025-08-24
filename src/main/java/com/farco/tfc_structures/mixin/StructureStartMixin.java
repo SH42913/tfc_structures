@@ -2,6 +2,7 @@ package com.farco.tfc_structures.mixin;
 
 import com.farco.tfc_structures.TFCStructuresMod;
 import com.farco.tfc_structures.config.CommonConfig;
+import com.farco.tfc_structures.config.ReplacementConfig;
 import com.farco.tfc_structures.config.StructureConfig;
 import com.farco.tfc_structures.processors.StructureReplacementProcessor;
 import net.minecraft.core.Registry;
@@ -11,6 +12,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
@@ -53,7 +55,11 @@ public abstract class StructureStartMixin {
             TFCStructuresMod.LOGGER.warn("Can't get structure data for {}", location);
         }
 
-        StructureReplacementProcessor processor = new StructureReplacementProcessor(structureData, TFCStructuresMod.replacementConfig);
+        Registry<Block> blockRegistry = level.registryAccess().registryOrThrow(Registries.BLOCK);
+        ReplacementConfig replacementConfig = TFCStructuresMod.replacementConfig;
+        replacementConfig.createMapsIfNeed(blockRegistry);
+
+        StructureReplacementProcessor processor = new StructureReplacementProcessor(structureData, replacementConfig);
         StructureReplacementProcessor.THREAD_LOCAL.set(processor);
         TFCStructuresMod.LOGGER.debug("Start structure replacement for {} at {}", location, getChunkPos());
     }
