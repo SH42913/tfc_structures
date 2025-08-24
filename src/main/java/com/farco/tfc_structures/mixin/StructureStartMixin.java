@@ -2,7 +2,7 @@ package com.farco.tfc_structures.mixin;
 
 import com.farco.tfc_structures.TFCStructuresMod;
 import com.farco.tfc_structures.config.CommonConfig;
-import com.farco.tfc_structures.data.StructureData;
+import com.farco.tfc_structures.config.StructureConfig;
 import com.farco.tfc_structures.processors.StructureReplacementProcessor;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -16,6 +16,7 @@ import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -47,7 +48,7 @@ public abstract class StructureStartMixin {
             return;
         }
 
-        StructureData structureData = TFCStructuresMod.structureConfig.getDataByLocation(location);
+        @Nullable StructureConfig.Data structureData = TFCStructuresMod.structureConfig.getDataByLocation(location);
         if (structureData == null) {
             TFCStructuresMod.LOGGER.warn("Can't get structure data for {}", location);
         }

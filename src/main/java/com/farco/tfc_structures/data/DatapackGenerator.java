@@ -2,7 +2,7 @@ package com.farco.tfc_structures.data;
 
 import com.farco.tfc_structures.TFCStructuresMod;
 import com.farco.tfc_structures.config.CommonConfig;
-import com.farco.tfc_structures.config.StructureConfig;
+import com.farco.tfc_structures.config.WorldgenConfig;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
@@ -44,13 +44,13 @@ public final class DatapackGenerator {
         this.datapackFolderPath = this.datapacksFolderPath.resolve(DATA_PACK_FOLDER_NAME);
     }
 
-    public void refreshDatapack(StructureConfig structureConfig) {
+    public void refreshDatapack(WorldgenConfig worldgenConfig) {
         try {
             initDatapackIfNeeded();
             recreateDataFolder();
             generateBlocksTag();
-            generateBiomeTags(structureConfig);
-            generateActiveStructures(structureConfig);
+            generateBiomeTags(worldgenConfig);
+            generateActiveStructures(worldgenConfig);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -81,7 +81,7 @@ public final class DatapackGenerator {
         Files.createDirectories(dataFolder);
     }
 
-    private void generateBiomeTags(StructureConfig structureConfig) throws IOException {
+    private void generateBiomeTags(WorldgenConfig structureConfig) throws IOException {
         for (BiomeTag tag : structureConfig.biomeTags) {
             var location = ResourceLocation.parse(tag.id());
 
@@ -123,14 +123,14 @@ public final class DatapackGenerator {
         return new TagFile(entries, false);
     }
 
-    private void generateActiveStructures(StructureConfig structureConfig) throws IOException {
+    private void generateActiveStructures(WorldgenConfig structureConfig) throws IOException {
         var modIdToStructuresMap = new HashMap<String, List<StructureData>>();
         for (StructureData structure : structureConfig.activeStructures) {
             addStructureToMap(structure, modIdToStructuresMap);
         }
 
         for (String structureId : structureConfig.disabledStructures) {
-            addStructureToMap(new StructureData(structureId, Collections.emptyList(), Collections.emptyMap()), modIdToStructuresMap);
+            addStructureToMap(new StructureData(structureId, Collections.emptyList()), modIdToStructuresMap);
         }
 
         for (var entry : modIdToStructuresMap.entrySet()) {

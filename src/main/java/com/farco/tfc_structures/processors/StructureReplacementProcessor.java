@@ -2,7 +2,7 @@ package com.farco.tfc_structures.processors;
 
 import com.farco.tfc_structures.TFCStructuresMod;
 import com.farco.tfc_structures.config.ReplacementConfig;
-import com.farco.tfc_structures.data.StructureData;
+import com.farco.tfc_structures.config.StructureConfig;
 import com.farco.tfc_structures.processors.features.DirectReplaceFeature;
 import com.farco.tfc_structures.processors.features.RandomReplaceFeature;
 import com.farco.tfc_structures.processors.features.ReplaceFeature;
@@ -48,12 +48,12 @@ public class StructureReplacementProcessor {
     private static final TagKey<Block> TFC_SHELVES = TagKey.create(Registries.BLOCK, ResourceLocation.parse("tfc:bookshelves"));
     private static final List<Direction> HORIZONTAL_DIRECTIONS = List.of(Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
 
-    private final @Nullable StructureData structureData;
+    private final @Nullable StructureConfig.Data structureData;
     private final List<ReplaceFeature> replaceFeatures;
     private final HashSet<BlockPos> registeredBlocks;
     private final HashSet<BlockPos> blocksToSkip;
 
-    public StructureReplacementProcessor(@Nullable StructureData structureData, ReplacementConfig replacementConfig) {
+    public StructureReplacementProcessor(@Nullable StructureConfig.Data structureData, ReplacementConfig replacementConfig) {
         this.structureData = structureData;
 
         replaceFeatures = List.of(

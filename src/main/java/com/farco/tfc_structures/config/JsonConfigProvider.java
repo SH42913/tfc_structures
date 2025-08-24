@@ -1,10 +1,11 @@
 package com.farco.tfc_structures.config;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
-import net.minecraft.util.GsonHelper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,9 +15,14 @@ import java.util.function.Supplier;
 
 public class JsonConfigProvider {
     private final Path configFolderPath;
+    private final Gson gson;
 
     public JsonConfigProvider(Path configFolderPath) {
         this.configFolderPath = configFolderPath;
+        this.gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .disableHtmlEscaping()
+                .create();
     }
 
     public Path getConfigPath(String configName) {
@@ -48,7 +54,7 @@ public class JsonConfigProvider {
             Files.createDirectories(configFolderPath);
 
             JsonElement jsonElement = codec.encodeStart(JsonOps.INSTANCE, config).result().orElseThrow();
-            String jsonString = GsonHelper.toStableString(jsonElement);
+            String jsonString = gson.toJson(jsonElement);
             Path configPath = getConfigPath(configName);
             Files.writeString(configPath, jsonString);
         } catch (IOException e) {

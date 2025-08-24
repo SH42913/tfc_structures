@@ -1,121 +1,51 @@
 package com.farco.tfc_structures.config;
 
-import com.farco.tfc_structures.TFCStructuresMod;
-import com.farco.tfc_structures.data.BiomeTag;
-import com.farco.tfc_structures.data.StructureData;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.levelgen.structure.Structure;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 
 public final class StructureConfig {
     public static final Codec<StructureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            BiomeTag.CODEC.listOf().fieldOf("biomeTags").forGetter(cfg -> cfg.biomeTags),
-            StructureData.CODEC.listOf().fieldOf("activeStructures").forGetter(cfg -> cfg.activeStructures),
-            Codec.STRING.listOf().fieldOf("disabledStructures").forGetter(cfg -> cfg.disabledStructures),
-            Codec.STRING.listOf().fieldOf("unregisteredStructures").forGetter(cfg -> cfg.unregisteredStructures)
+            Codec.unboundedMap(Codec.STRING, Data.CODEC).fieldOf("structures").forGetter(cfg -> cfg.structures)
     ).apply(instance, StructureConfig::new));
 
+    public record Data(Map<String, String> lootTablesMap) {
+        public static final Codec<Data> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                Codec.unboundedMap(Codec.STRING, Codec.STRING).fieldOf("lootTablesMap").forGetter(Data::lootTablesMap)
+        ).apply(instance, Data::new));
+
+        public static final Data EMPTY = new Data(Collections.emptyMap());
+    }
+
     public static final String CONFIG_NAME = "structure_config.json";
-    public static final String HAS_STRUCTURE = "has_structure/";
 
-    public List<BiomeTag> biomeTags;
-    public List<StructureData> activeStructures;
-    public List<String> disabledStructures;
-    public List<String> unregisteredStructures;
+    public Map<String, Data> structures;
 
-    public StructureConfig(List<BiomeTag> biomeTags, List<StructureData> activeStructures, List<String> disabledStructures, List<String> unregisteredStructures) {
-        this.biomeTags = biomeTags;
-        this.activeStructures = activeStructures;
-        this.disabledStructures = disabledStructures;
-        this.unregisteredStructures = unregisteredStructures;
-    }
-
-    public void refreshUnused(Registry<Biome> biomeRegistry) {
-        var allHasStructureTags = biomeRegistry.getTags()
-                .map(pair -> pair.getFirst().location())
-                .filter(location -> location.getPath().startsWith(HAS_STRUCTURE))
-                .map(location -> location.toString().replace(HAS_STRUCTURE, ""))
-                .collect(Collectors.toSet());
-
-        var structures = new HashSet<>(allHasStructureTags);
-        for (StructureData structure : activeStructures) {
-            if (!allHasStructureTags.contains(structure.id())) {
-                TFCStructuresMod.LOGGER.warn("Structure {} is not valid", structure.id());
-            } else {
-                structures.remove(structure.id());
-            }
-        }
-
-        for (String structure : disabledStructures) {
-            if (allHasStructureTags.contains(structure)) {
-                structures.remove(structure);
-            }
-        }
-
-        unregisteredStructures = structures.stream().sorted().toList();
-    }
-
-    public @Nullable StructureData getDataByLocation(ResourceLocation location) {
-        for (StructureData structureData : activeStructures) {
-            if (structureData.getResourceLocation().equals(location)) {
-                return structureData;
-            }
-        }
-
-        return null;
+    public StructureConfig(Map<String, Data> structures) {
+        this.structures = new HashMap<>(structures);
     }
 
     public static StructureConfig getDefaultConfig() {
-        return new StructureConfig(
-                BiomeTag.getDefaultBiomeTags(),
-                getVanillaStructures(),
-                getDisabledVanillaStructures(),
-                Collections.emptyList());
+        return new StructureConfig(Collections.emptyMap());
     }
 
-    private static List<StructureData> getVanillaStructures() {
-        List<StructureData> list = new ArrayList<>();
-        list.add(new StructureData("minecraft:buried_treasure", List.of(BiomeTag.BEACH.getTagId(), BiomeTag.OCEANIC_MOUNTAIN_LAKE.getTagId()), Collections.emptyMap()));
-        list.add(new StructureData("minecraft:desert_pyramid", List.of(BiomeTag.ANY_BADLANDS.getTagId(), BiomeTag.HILL.getTagId(), "tfc:shore", "tfc:plateau"), Collections.emptyMap()));
-        list.add(new StructureData("minecraft:pillager_outpost", List.of(BiomeTag.CANYONS.getTagId(), BiomeTag.ANY_BADLANDS.getTagId(), BiomeTag.ANY_MOUNTAINS.getTagId(), BiomeTag.HIGHLANDS.getTagId()), Collections.emptyMap()));
-        list.add(new StructureData("minecraft:shipwreck", List.of(BiomeTag.ANY_OCEAN.getTagId()), Collections.emptyMap()));
-        list.add(new StructureData("minecraft:shipwreck_beached", List.of(BiomeTag.BEACH.getTagId(), BiomeTag.SWAMP.getTagId()), Collections.emptyMap()));
-        list.add(new StructureData("minecraft:stronghold", List.of(BiomeTag.ANY_MOUNTAINS.getTagId()), Collections.emptyMap()));
-        list.add(new StructureData("minecraft:swamp_hut", List.of(BiomeTag.SWAMP.getTagId(), BiomeTag.ANY_LAKE.getTagId(), BiomeTag.BEACH.getTagId()), Collections.emptyMap()));
-        list.add(new StructureData("minecraft:trail_ruins", List.of(BiomeTag.HIGHLANDS.getTagId(), "tfc:old_mountains", "tfc:low_canyons", "tfc:hills", "tfc:plateau"), Collections.emptyMap()));
-        list.add(new StructureData("minecraft:village_desert", List.of(BiomeTag.VILLAGE_BIOMES.getTagId()), Collections.emptyMap()));
-        list.add(new StructureData("minecraft:village_plains", List.of(BiomeTag.VILLAGE_BIOMES.getTagId()), Collections.emptyMap()));
-        list.add(new StructureData("minecraft:village_savanna", List.of(BiomeTag.VILLAGE_BIOMES.getTagId()), Collections.emptyMap()));
-        list.add(new StructureData("minecraft:village_taiga", List.of(BiomeTag.VILLAGE_BIOMES.getTagId()), Collections.emptyMap()));
-        list.add(new StructureData("minecraft:woodland_mansion", List.of(BiomeTag.ANY_BADLANDS.getTagId(), BiomeTag.PLAINS.getTagId()), Collections.emptyMap()));
-        list.add(new StructureData("minecraft:jungle_temple", List.of(BiomeTag.ANY_BADLANDS.getTagId(), BiomeTag.CANYONS.getTagId(), BiomeTag.HIGHLANDS.getTagId()), Collections.emptyMap()));
-        list.add(new StructureData("minecraft:ocean_ruin_cold", List.of(BiomeTag.DEEP_OCEAN.getTagId(), "tfc:ocean"), Collections.emptyMap()));
-        list.add(new StructureData("minecraft:ocean_ruin_warm", List.of(BiomeTag.COMMON_OCEAN.getTagId(), "tfc:deep_ocean"), Collections.emptyMap()));
-        list.add(new StructureData("minecraft:ocean_monument", List.of(BiomeTag.DEEP_OCEAN.getTagId()), Collections.emptyMap()));
-        list.add(new StructureData("minecraft:ruined_portal_standard", List.of(BiomeTag.VILLAGE_BIOMES.getTagId()), Collections.emptyMap()));
-        list.add(new StructureData("minecraft:ruined_portal_swamp", List.of(BiomeTag.SWAMP.getTagId()), Collections.emptyMap()));
-        list.add(new StructureData("minecraft:ruined_portal_mountain", List.of(BiomeTag.ANY_MOUNTAINS.getTagId()), Collections.emptyMap()));
-        list.add(new StructureData("minecraft:ruined_portal_ocean", List.of(BiomeTag.ANY_OCEAN.getTagId(), BiomeTag.ANY_LAKE.getTagId(), BiomeTag.RIVER.getTagId()), Collections.emptyMap()));
-        list.add(new StructureData("minecraft:ruined_portal_desert", List.of(BiomeTag.ANY_BADLANDS.getTagId()), Collections.emptyMap()));
-        list.add(new StructureData("minecraft:ruined_portal_jungle", List.of(BiomeTag.HIGHLANDS.getTagId(), BiomeTag.HILL.getTagId(), BiomeTag.CANYONS.getTagId()), Collections.emptyMap()));
-        list.add(new StructureData("minecraft:mineshaft", List.of(BiomeTag.ANY_MOUNTAINS.getTagId()), Collections.emptyMap()));
-        return list;
+    public @Nullable Data getDataByLocation(ResourceLocation location) {
+        return structures.get(location.toString());
     }
 
-    private static List<String> getDisabledVanillaStructures() {
-        return List.of(
-                "minecraft:mineshaft_mesa",
-                "minecraft:igloo",
-                "minecraft:village_snowy"
-        );
+    public void refreshUnused(Registry<Structure> structuresRegistry) {
+        for (ResourceLocation location : structuresRegistry.keySet()) {
+            String key = location.toString();
+            if (!structures.containsKey(key)) {
+                structures.put(key, Data.EMPTY);
+            }
+        }
     }
 }

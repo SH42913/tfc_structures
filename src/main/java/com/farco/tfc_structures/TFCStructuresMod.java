@@ -1,9 +1,6 @@
 package com.farco.tfc_structures;
 
-import com.farco.tfc_structures.config.CommonConfig;
-import com.farco.tfc_structures.config.JsonConfigProvider;
-import com.farco.tfc_structures.config.ReplacementConfig;
-import com.farco.tfc_structures.config.StructureConfig;
+import com.farco.tfc_structures.config.*;
 import com.farco.tfc_structures.data.DatapackGenerator;
 import com.farco.tfc_structures.mixin.SurfaceBuilderContextAccessorMixin;
 import com.mojang.logging.LogUtils;
@@ -50,6 +47,7 @@ public class TFCStructuresMod {
 
     public static ReplacementConfig replacementConfig;
     public static StructureConfig structureConfig;
+    public static WorldgenConfig worldgenConfig;
 
     static {
         LOGGER = LogUtils.getLogger();
@@ -72,12 +70,13 @@ public class TFCStructuresMod {
     private void commonSetup(FMLCommonSetupEvent event) {
         LOGGER.info("Common setup of {}", MODID);
         structureConfig = CONFIG_PROVIDER.load(StructureConfig.CONFIG_NAME, StructureConfig.CODEC, StructureConfig::getDefaultConfig);
+        worldgenConfig = CONFIG_PROVIDER.load(WorldgenConfig.CONFIG_NAME, WorldgenConfig.CODEC, WorldgenConfig::getDefaultConfig);
         replacementConfig = CONFIG_PROVIDER.load(ReplacementConfig.CONFIG_NAME, ReplacementConfig.CODEC, ReplacementConfig::getDefaultConfig);
     }
 
     private void addPackFinder(AddPackFindersEvent event) {
         if (event.getPackType() == PackType.SERVER_DATA) {
-            DATAPACK_GENERATOR.refreshDatapack(structureConfig);
+            DATAPACK_GENERATOR.refreshDatapack(worldgenConfig);
             event.addRepositorySource(DATAPACK_GENERATOR.getDatapackSource());
             LOGGER.info("Added generated datapack for {}", MODID);
         }
@@ -85,8 +84,13 @@ public class TFCStructuresMod {
 
     private void onServerStarted(ServerStartedEvent event) {
         RegistryAccess.Frozen registryAccess = event.getServer().registryAccess();
+
         Registry<Biome> biomeRegistry = registryAccess.registryOrThrow(Registries.BIOME);
-        structureConfig.refreshUnused(biomeRegistry);
+        worldgenConfig.refreshUnused(biomeRegistry);
+        CONFIG_PROVIDER.save(WorldgenConfig.CONFIG_NAME, worldgenConfig, WorldgenConfig.CODEC);
+
+        Registry<Structure> structureRegistry = registryAccess.registryOrThrow(Registries.STRUCTURE);
+        structureConfig.refreshUnused(structureRegistry);
         CONFIG_PROVIDER.save(StructureConfig.CONFIG_NAME, structureConfig, StructureConfig.CODEC);
 
         if (CommonConfig.BIOMES_TAGS_STRUCTURES_TO_LOGS.get()) {
@@ -103,7 +107,6 @@ public class TFCStructuresMod {
                 LOGGER.info("[BIOME_TAG] {} contains {}", tagLocation, String.join(", ", biomes));
             }
 
-            Registry<Structure> structureRegistry = registryAccess.registryOrThrow(Registries.STRUCTURE);
             for (ResourceLocation location : structureRegistry.keySet()) {
                 LOGGER.info("[STRUCTURE] {}", location.toString());
             }
