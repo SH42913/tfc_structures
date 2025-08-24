@@ -3,7 +3,7 @@
 Did you ever dream to fill your **TerraFirmaCraft** world with authentic structures? Dynamic TFC Structures will bring
 them to your world!
 
-![](src/main/resources/META-INF/logo.png)
+![](src/main/resources/assets/tfc_structures/textures/logo.png)
 
 Dynamic TFC Structures can activate any world-gen structure and replace their blocks with TerraFirmaCraft analogues like
 it was built specially for TFC.\
