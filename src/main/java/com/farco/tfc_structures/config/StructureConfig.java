@@ -16,12 +16,13 @@ public final class StructureConfig {
             Codec.unboundedMap(ResourceLocation.CODEC, Data.CODEC).fieldOf("structures").forGetter(cfg -> cfg.structures)
     ).apply(instance, StructureConfig::new));
 
-    public record Data(Map<String, String> lootTablesMap) {
+    public record Data(String replacementPreset, Map<String, String> lootTablesMap) {
         public static final Codec<Data> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                Codec.STRING.fieldOf("replacementPreset").forGetter(Data::replacementPreset),
                 Codec.unboundedMap(Codec.STRING, Codec.STRING).fieldOf("lootTablesMap").forGetter(Data::lootTablesMap)
         ).apply(instance, Data::new));
 
-        public static final Data EMPTY = new Data(Collections.emptyMap());
+        public static final Data DEFAULT = new Data(PresetContainer.DEFAULT_OVERWORLD_PRESET_NAME, Collections.emptyMap());
     }
 
     public static final String CONFIG_NAME = "structures_config.json";
@@ -43,7 +44,7 @@ public final class StructureConfig {
     public void refreshUnused(Registry<Structure> structuresRegistry) {
         for (ResourceLocation location : structuresRegistry.keySet()) {
             if (!structures.containsKey(location)) {
-                structures.put(location, Data.EMPTY);
+                structures.put(location, Data.DEFAULT);
             }
         }
     }

@@ -2,7 +2,7 @@ package com.farco.tfc_structures.mixin;
 
 import com.farco.tfc_structures.TFCStructuresMod;
 import com.farco.tfc_structures.config.CommonConfig;
-import com.farco.tfc_structures.config.ReplacementConfig;
+import com.farco.tfc_structures.config.ReplacementPreset;
 import com.farco.tfc_structures.config.StructureConfig;
 import com.farco.tfc_structures.processors.StructureReplacementProcessor;
 import net.minecraft.core.Registry;
@@ -53,13 +53,16 @@ public abstract class StructureStartMixin {
         @Nullable StructureConfig.Data structureData = TFCStructuresMod.structureConfig.getDataByLocation(location);
         if (structureData == null) {
             TFCStructuresMod.LOGGER.warn("Can't get structure data for {}", location);
+            return;
         }
 
-        Registry<Block> blockRegistry = level.registryAccess().registryOrThrow(Registries.BLOCK);
-        ReplacementConfig replacementConfig = TFCStructuresMod.replacementConfig;
-        replacementConfig.createMapsIfNeed(blockRegistry);
+        String name = structureData.replacementPreset();
+        ReplacementPreset replacementPreset = TFCStructuresMod.presetContainer.getPresetByName(name);
 
-        StructureReplacementProcessor processor = new StructureReplacementProcessor(structureData, replacementConfig);
+        Registry<Block> blockRegistry = level.registryAccess().registryOrThrow(Registries.BLOCK);
+        replacementPreset.createMapsIfNeed(blockRegistry);
+
+        StructureReplacementProcessor processor = new StructureReplacementProcessor(structureData, replacementPreset);
         StructureReplacementProcessor.THREAD_LOCAL.set(processor);
         TFCStructuresMod.LOGGER.debug("Start structure replacement for {} at {}", location, getChunkPos());
     }

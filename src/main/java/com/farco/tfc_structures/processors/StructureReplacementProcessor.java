@@ -1,7 +1,7 @@
 package com.farco.tfc_structures.processors;
 
 import com.farco.tfc_structures.TFCStructuresMod;
-import com.farco.tfc_structures.config.ReplacementConfig;
+import com.farco.tfc_structures.config.ReplacementPreset;
 import com.farco.tfc_structures.config.StructureConfig;
 import com.farco.tfc_structures.processors.features.DirectReplaceFeature;
 import com.farco.tfc_structures.processors.features.RandomReplaceFeature;
@@ -53,13 +53,13 @@ public class StructureReplacementProcessor {
     private final HashSet<BlockPos> registeredBlocks;
     private final HashSet<BlockPos> blocksToSkip;
 
-    public StructureReplacementProcessor(@Nullable StructureConfig.Data structureData, ReplacementConfig replacementConfig) {
+    public StructureReplacementProcessor(@Nullable StructureConfig.Data structureData, ReplacementPreset replacementPreset) {
         this.structureData = structureData;
 
         replaceFeatures = List.of(
-                new DirectReplaceFeature(replacementConfig.getDirectReplacementMap()),
-                new RandomReplaceFeature(replacementConfig.getRandomReplacementMap()),
-                new TFCReplaceFeature(replacementConfig.getTfcWorldReplacementMap())
+                new DirectReplaceFeature(replacementPreset.getDirectReplacementMap()),
+                new RandomReplaceFeature(replacementPreset.getRandomReplacementMap()),
+                new TFCReplaceFeature(replacementPreset.getTfcWorldReplacementMap())
         );
 
         registeredBlocks = new HashSet<>();

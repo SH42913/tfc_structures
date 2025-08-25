@@ -1,7 +1,7 @@
 package com.farco.tfc_structures.processors.features;
 
 import com.farco.tfc_structures.TFCStructuresMod;
-import com.farco.tfc_structures.config.ReplacementConfig;
+import com.farco.tfc_structures.config.ReplacementPreset;
 import com.farco.tfc_structures.mixin.ForestFeatureAccessorMixin;
 import com.farco.tfc_structures.processors.DummySurfaceBuilderContext;
 import com.farco.tfc_structures.utils.Pair;
@@ -176,19 +176,19 @@ public class TFCReplaceFeature implements ReplaceFeature {
         }
 
         return switch (replacementType) {
-            case ReplacementConfig.TFC_SKIP_TYPE -> null;
-            case ReplacementConfig.TFC_STONE_TYPE ->
+            case ReplacementPreset.TFC_SKIP_TYPE -> null;
+            case ReplacementPreset.TFC_STONE_TYPE ->
                     replaceTFCStone(originalState, originalState.is(TFCStructuresMod.MOSSY_TAG)
                             ? Rock.BlockType.MOSSY_COBBLE
                             : Rock.BlockType.SMOOTH);
-            case ReplacementConfig.TFC_BRICK_TYPE ->
+            case ReplacementPreset.TFC_BRICK_TYPE ->
                     replaceTFCStone(originalState, originalState.is(TFCStructuresMod.MOSSY_TAG)
                             ? Rock.BlockType.MOSSY_BRICKS
                             : Rock.BlockType.BRICKS);
-            case ReplacementConfig.TFC_WOOD_TYPE -> replaceTFCWood(originalState);
-            case ReplacementConfig.TFC_SOIL_TYPE -> replaceTFCSoil(level, pos, originalState);
-            case ReplacementConfig.TFC_SAND_TYPE -> replaceTFCSand(level, pos, originalState);
-            case ReplacementConfig.TFC_ORE_TYPE -> replaceTFCOre(originalState);
+            case ReplacementPreset.TFC_WOOD_TYPE -> replaceTFCWood(originalState);
+            case ReplacementPreset.TFC_SOIL_TYPE -> replaceTFCSoil(level, pos, originalState);
+            case ReplacementPreset.TFC_SAND_TYPE -> replaceTFCSand(level, pos, originalState);
+            case ReplacementPreset.TFC_ORE_TYPE -> replaceTFCOre(originalState);
             default -> throw new RuntimeException("Type " + replacementType + " is not supported");
         };
     }

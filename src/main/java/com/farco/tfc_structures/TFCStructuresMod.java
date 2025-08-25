@@ -45,7 +45,7 @@ public class TFCStructuresMod {
     private static final JsonConfigProvider CONFIG_PROVIDER;
     private static final DatapackGenerator DATAPACK_GENERATOR;
 
-    public static ReplacementConfig replacementConfig;
+    public final static PresetContainer presetContainer;
     public static StructureConfig structureConfig;
     public static WorldgenConfig worldgenConfig;
 
@@ -54,6 +54,7 @@ public class TFCStructuresMod {
         CONFIG_FOLDER_PATH = FMLPaths.CONFIGDIR.get().resolve(TFCStructuresMod.MODID);
         CONFIG_PROVIDER = new JsonConfigProvider(CONFIG_FOLDER_PATH);
         DATAPACK_GENERATOR = new DatapackGenerator(FMLPaths.GAMEDIR.get().resolve(MODID + "_datapacks"));
+        presetContainer = new PresetContainer(CONFIG_FOLDER_PATH);
 
         @SuppressWarnings("unused") Class<?> unused = SurfaceBuilderContextAccessorMixin.class;
     }
@@ -71,7 +72,7 @@ public class TFCStructuresMod {
         LOGGER.info("Common setup of {}", MODID);
         structureConfig = CONFIG_PROVIDER.load(StructureConfig.CONFIG_NAME, StructureConfig.CODEC, StructureConfig::getDefaultConfig);
         worldgenConfig = CONFIG_PROVIDER.load(WorldgenConfig.CONFIG_NAME, WorldgenConfig.CODEC, WorldgenConfig::getDefaultConfig);
-        replacementConfig = CONFIG_PROVIDER.load(ReplacementConfig.CONFIG_NAME, ReplacementConfig.CODEC, ReplacementConfig::getDefaultConfig);
+        presetContainer.loadPresets();
     }
 
     private void addPackFinder(AddPackFindersEvent event) {

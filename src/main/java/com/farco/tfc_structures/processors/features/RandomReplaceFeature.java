@@ -1,6 +1,6 @@
 package com.farco.tfc_structures.processors.features;
 
-import com.farco.tfc_structures.config.ReplacementConfig;
+import com.farco.tfc_structures.config.ReplacementPreset;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -18,11 +18,11 @@ import java.util.List;
 import java.util.Map;
 
 public class RandomReplaceFeature implements ReplaceFeature {
-    private final Map<ResourceLocation, ReplacementConfig.Random.Replacement> replacementMap;
+    private final Map<ResourceLocation, ReplacementPreset.Random.Replacement> replacementMap;
     private Map<ResourceLocation, ResourceLocation> predefinedReplacementMap;
     private RandomSource localRandom;
 
-    public RandomReplaceFeature(Map<ResourceLocation, ReplacementConfig.Random.Replacement> replacementMap) {
+    public RandomReplaceFeature(Map<ResourceLocation, ReplacementPreset.Random.Replacement> replacementMap) {
         this.replacementMap = replacementMap;
     }
 
