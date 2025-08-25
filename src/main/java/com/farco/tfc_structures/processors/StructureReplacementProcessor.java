@@ -45,6 +45,8 @@ import java.util.List;
 public class StructureReplacementProcessor {
     public static final ThreadLocal<StructureReplacementProcessor> THREAD_LOCAL = new ThreadLocal<>();
     private static final String LOOT_TABLE_NAME = "LootTable";
+    private static final String LOOT_TABLE_SEED_NAME = "LootTableSeed";
+    private static final String ITEMS_NAME = "Items";
     private static final TagKey<Block> TFC_SHELVES = TagKey.create(Registries.BLOCK, ResourceLocation.parse("tfc:bookshelves"));
     private static final List<Direction> HORIZONTAL_DIRECTIONS = List.of(Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
 
@@ -102,7 +104,7 @@ public class StructureReplacementProcessor {
             chunkAccess.setBlockState(pos, newState, false);
 
             if (originalEntity != null) {
-                replaceBlockEntity(pos, originalState, originalEntity, newState, chunkAccess, level);
+                replaceBlockEntity(pos, originalState, originalEntity, newState, chunkAccess, level, random);
             } else {
                 createBlockEntity(pos, newState, chunkAccess);
             }
@@ -133,7 +135,7 @@ public class StructureReplacementProcessor {
         return newState;
     }
 
-    private void replaceBlockEntity(BlockPos pos, BlockState originalState, BlockEntity originalEntity, BlockState newState, ChunkAccess chunkAccess, WorldGenLevel level) {
+    private void replaceBlockEntity(BlockPos pos, BlockState originalState, BlockEntity originalEntity, BlockState newState, ChunkAccess chunkAccess, WorldGenLevel level, RandomSource random) {
         BlockEntity newEntity = null;
         if (newState.getBlock() instanceof EntityBlock entityBlock) {
             newEntity = entityBlock.newBlockEntity(pos, newState);
@@ -148,34 +150,45 @@ public class StructureReplacementProcessor {
 
         CompoundTag originalTag = originalEntity.saveWithFullMetadata();
         //noinspection DataFlowIssue due WorldGenLevel always has Server
-        replaceLootTable(originalTag, level.getServer().getLootData());
+        replaceLootTable(originalTag, level.getServer().getLootData(), random);
         newEntity.load(originalTag);
         chunkAccess.setBlockEntity(newEntity);
     }
 
-    private void replaceLootTable(CompoundTag originalTag, LootDataManager lootData) {
-        if (!originalTag.contains(LOOT_TABLE_NAME)) {
-            return;
+    private void replaceLootTable(CompoundTag originalTag, LootDataManager lootData, RandomSource random) {
+        String newLootTable = null;
+
+        if (originalTag.contains(LOOT_TABLE_NAME)) {
+            String originalLootTable = originalTag.getString(LOOT_TABLE_NAME);
+            TFCStructuresMod.LOGGER.debug("Detected LootTable = {}", originalLootTable);
+
+            newLootTable = structureData != null && structureData.lootTablesOverrideMap() != null
+                    ? structureData.lootTablesOverrideMap().get(originalLootTable)
+                    : null;
+
+            if (newLootTable == null) {
+                newLootTable = originalLootTable.replace("minecraft", TFCStructuresMod.MODID);
+            }
+        } else if (originalTag.contains(ITEMS_NAME) && structureData != null && !structureData.emptyChestLootTable().isEmpty()) {
+            originalTag.remove(ITEMS_NAME);
+            newLootTable = structureData.emptyChestLootTable();
         }
 
-        String originalLootTable = originalTag.getString(LOOT_TABLE_NAME);
-        TFCStructuresMod.LOGGER.debug("Detected LootTable = {}", originalLootTable);
-
-        String newLootTable = structureData != null && structureData.lootTablesMap() != null
-                ? structureData.lootTablesMap().get(originalLootTable)
-                : null;
-
-        if (newLootTable == null) {
-            newLootTable = originalLootTable.replace("minecraft", TFCStructuresMod.MODID);
+        if (newLootTable == null || newLootTable.isEmpty()) {
+            return;
         }
 
         var lootTableLocation = ResourceLocation.parse(newLootTable);
         if (lootData.getLootTable(lootTableLocation) == LootTable.EMPTY) {
-            TFCStructuresMod.LOGGER.warn("Can't replace {} with {} due it's not valid", originalLootTable, newLootTable);
+            TFCStructuresMod.LOGGER.warn("Can't use lootTable {} due it's not valid", newLootTable);
             return;
         }
 
         originalTag.putString(LOOT_TABLE_NAME, newLootTable);
+
+        if (!originalTag.contains(LOOT_TABLE_SEED_NAME)) {
+            originalTag.putLong(LOOT_TABLE_SEED_NAME, random.nextLong());
+        }
     }
 
     private void createBlockEntity(BlockPos pos, BlockState newState, ChunkAccess chunkAccess) {
