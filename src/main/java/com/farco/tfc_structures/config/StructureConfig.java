@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class StructureConfig {
+public final class StructureConfig implements JsonConfigProvider.HasFieldsToSort {
     public static final Codec<StructureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.unboundedMap(ResourceLocation.CODEC, Data.CODEC).fieldOf("structures").forGetter(cfg -> cfg.structures)
     ).apply(instance, StructureConfig::new));
@@ -34,6 +34,11 @@ public final class StructureConfig {
 
     public StructureConfig(Map<ResourceLocation, Data> structures) {
         this.structures = new HashMap<>(structures);
+    }
+
+    @Override
+    public boolean needSort(String fieldName) {
+        return fieldName.equals("structures");
     }
 
     public static StructureConfig getDefaultConfig() {

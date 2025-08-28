@@ -1,9 +1,6 @@
 package com.farco.tfc_structures.config;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 
@@ -11,9 +8,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.function.Supplier;
 
 public class JsonConfigProvider {
+    public interface HasFieldsToSort {
+        boolean needSort(String fieldName);
+    }
+
     private final Path configFolderPath;
     private final Gson gson;
 
@@ -54,11 +56,39 @@ public class JsonConfigProvider {
             Files.createDirectories(configFolderPath);
 
             JsonElement jsonElement = codec.encodeStart(JsonOps.INSTANCE, config).result().orElseThrow();
+            jsonElement = sortIfNeed(config, jsonElement);
             String jsonString = gson.toJson(jsonElement);
             Path configPath = getConfigPath(configName);
             Files.writeString(configPath, jsonString);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static <T> JsonElement sortIfNeed(T config, JsonElement jsonElement) {
+        if (config instanceof HasFieldsToSort hasFieldsToSort && jsonElement.isJsonObject()) {
+            var sortedCopy = new JsonObject();
+
+            for (var entry : jsonElement.getAsJsonObject().entrySet()) {
+                var fieldName = entry.getKey();
+                var value = entry.getValue();
+                if (hasFieldsToSort.needSort(fieldName) && value.isJsonObject()) {
+                    var sortedValue = new JsonObject();
+
+                    value.getAsJsonObject()
+                            .entrySet().stream()
+                            .sorted(Map.Entry.comparingByKey())
+                            .forEach(e -> sortedValue.add(e.getKey(), e.getValue()));
+
+                    sortedCopy.add(fieldName, sortedValue);
+                } else {
+                    sortedCopy.add(fieldName, value);
+                }
+            }
+
+            return sortedCopy;
+        } else {
+            return jsonElement;
         }
     }
 }
