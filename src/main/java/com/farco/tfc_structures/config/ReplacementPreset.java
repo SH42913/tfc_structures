@@ -101,6 +101,10 @@ public final class ReplacementPreset {
                 continue;
             }
 
+            if (entry.original.equals(entry.replacement)) {
+                TFCStructuresMod.LOGGER.warn("Duplicated replacement with ID {}", entry.original);
+            }
+
             directMap.put(entry.original, entry.replacement);
         }
     }
