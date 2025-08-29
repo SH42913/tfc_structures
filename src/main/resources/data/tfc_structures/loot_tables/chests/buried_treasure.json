@@ -59,7 +59,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:tnt",
+          "name": "minecraft:gunpowder",
           "weight": 5
         }
       ],

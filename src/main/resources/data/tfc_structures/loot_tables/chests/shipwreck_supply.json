@@ -253,7 +253,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:tnt"
+          "name": "minecraft:gunpowder"
         },
         {
           "type": "minecraft:item",
