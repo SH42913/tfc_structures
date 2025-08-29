@@ -230,7 +230,7 @@ public final class PresetContainer {
         var sandNames = List.of("sand", "gravel");
         var oreNames = List.of("ore");
         var woodNames = WoodType.values().map(WoodType::name).toList();
-        var woodBlocksSet = Set.of(Blocks.CRAFTING_TABLE, Blocks.CHEST, Blocks.TRAPPED_CHEST, Blocks.LECTERN, Blocks.BOOKSHELF);
+        var woodBlocksSet = Set.of(Blocks.CRAFTING_TABLE, Blocks.CHEST, Blocks.TRAPPED_CHEST, Blocks.BOOKSHELF);
         var soilBlockSet = Set.of(Blocks.GRASS_BLOCK, Blocks.DIRT_PATH, Blocks.DIRT, Blocks.FARMLAND, Blocks.COARSE_DIRT, Blocks.PODZOL, Blocks.ROOTED_DIRT, Blocks.MUD, Blocks.MUDDY_MANGROVE_ROOTS);
 
         var list = new ArrayList<ReplacementPreset.TFCWorld>();
