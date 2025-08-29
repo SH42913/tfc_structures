@@ -100,6 +100,7 @@ public class StructureReplacementProcessor {
                 continue;
             }
 
+            TFCStructuresMod.LOGGER.debug("{} at {} replaced with {}", originalState.getBlock(), pos, newBlock);
             BlockState newState = replaceBlock(newBlock, originalState);
             chunkAccess.setBlockState(pos, newState, false);
 
@@ -169,6 +170,8 @@ public class StructureReplacementProcessor {
             if (newLootTable == null) {
                 newLootTable = originalLootTable.replace("minecraft", TFCStructuresMod.MODID);
             }
+
+            TFCStructuresMod.LOGGER.debug("LootTable {} will be replaced with {}", originalLootTable, newLootTable);
         } else if (originalTag.contains(ITEMS_NAME) && structureData != null && !structureData.emptyChestLootTable().isEmpty()) {
             originalTag.remove(ITEMS_NAME);
             newLootTable = structureData.emptyChestLootTable();
