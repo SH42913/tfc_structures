@@ -158,6 +158,8 @@ public final class PresetContainer {
         list.add(new ReplacementPreset.Direct("minecraft:mud_brick_stairs", "tfc:mud_bricks/sandy_loam_stairs"));
         list.add(new ReplacementPreset.Direct("minecraft:mud_brick_slab", "tfc:mud_bricks/sandy_loam_slab"));
         list.add(new ReplacementPreset.Direct("minecraft:mud_brick_wall", "tfc:mud_bricks/sandy_loam_wall"));
+        list.add(new ReplacementPreset.Direct("minecraft:sugar_cane", "tfc:crop/sugarcane"));
+        list.add(new ReplacementPreset.Direct("minecraft:copper_block", "tfc:metal/block/copper"));
         return list;
     }
 
