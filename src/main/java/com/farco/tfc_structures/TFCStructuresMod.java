@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddPackFindersEvent;
-import net.minecraftforge.event.server.ServerStartedEvent;
+import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -65,7 +65,7 @@ public class TFCStructuresMod {
         modEventBus.addListener(this::addPackFinder);
         modLoadingContext.registerConfig(ModConfig.Type.COMMON, CommonConfig.SPEC, MODID + "/common-config.toml");
 
-        MinecraftForge.EVENT_BUS.addListener(this::onServerStarted);
+        MinecraftForge.EVENT_BUS.addListener(this::onServerAboutToStart);
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
@@ -83,7 +83,7 @@ public class TFCStructuresMod {
         }
     }
 
-    private void onServerStarted(ServerStartedEvent event) {
+    private void onServerAboutToStart(ServerAboutToStartEvent event) {
         RegistryAccess.Frozen registryAccess = event.getServer().registryAccess();
 
         Registry<Structure> structureRegistry = registryAccess.registryOrThrow(Registries.STRUCTURE);
