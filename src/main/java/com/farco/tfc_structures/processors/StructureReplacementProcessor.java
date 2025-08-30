@@ -35,7 +35,6 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.storage.loot.LootDataManager;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -143,9 +142,7 @@ public class StructureReplacementProcessor {
         }
 
         if (newEntity == null) {
-            var originalLocation = ForgeRegistries.BLOCKS.getKey(originalState.getBlock());
-            var newLocation = ForgeRegistries.BLOCKS.getKey(newState.getBlock());
-            TFCStructuresMod.LOGGER.error("Replacement block {} can't fully replace {} due first one is not EntityBlock", newLocation, originalLocation);
+            TFCStructuresMod.LOGGER.error("Replacement block {} can't fully replace {} due first one is not EntityBlock", originalState.getBlock(), newState.getBlock());
             return;
         }
 
