@@ -220,6 +220,15 @@ public final class PresetContainer {
                         "tfc:crop/tomato",
                         "tfc:crop/yellow_bell_pepper",
                         "tfc:crop/red_bell_pepper"
+                )),
+                new ReplacementPreset.Random("minecraft:magma_block", true, List.of(
+                        "tfc:rock/magma/granite",
+                        "tfc:rock/magma/diorite",
+                        "tfc:rock/magma/gabbro",
+                        "tfc:rock/magma/rhyolite",
+                        "tfc:rock/magma/basalt",
+                        "tfc:rock/magma/andesite",
+                        "tfc:rock/magma/dacite"
                 ))
         );
     }
