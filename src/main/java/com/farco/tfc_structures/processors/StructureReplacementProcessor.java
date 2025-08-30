@@ -87,13 +87,13 @@ public class StructureReplacementProcessor {
                 continue;
             }
 
-            BlockState originalState = chunkAccess.getBlockState(pos);
+            BlockState originalState = level.getBlockState(pos);
             if (originalState.isAir()) {
                 TFCStructuresMod.LOGGER.warn("Registered block at {} was moved or removed", pos);
                 continue;
             }
 
-            BlockEntity originalEntity = chunkAccess.getBlockEntity(pos);
+            BlockEntity originalEntity = level.getBlockEntity(pos);
 
             Block newBlock = getReplacementBlock(level, pos, originalState);
             if (newBlock == null) {
@@ -102,7 +102,7 @@ public class StructureReplacementProcessor {
 
             TFCStructuresMod.LOGGER.debug("{} at {} replaced with {}", originalState.getBlock(), pos, newBlock);
             BlockState newState = replaceBlock(newBlock, originalState);
-            chunkAccess.setBlockState(pos, newState, false);
+            level.setBlock(pos, newState, Block.UPDATE_NONE);
 
             if (originalEntity != null) {
                 replaceBlockEntity(pos, originalState, originalEntity, newState, chunkAccess, level, random);
@@ -110,7 +110,7 @@ public class StructureReplacementProcessor {
                 createBlockEntity(pos, newState, chunkAccess);
             }
 
-            postProcessNewBlock(pos, newBlock, newState, chunkAccess);
+            postProcessNewBlock(pos, newBlock, newState, level);
         }
     }
 
@@ -205,10 +205,10 @@ public class StructureReplacementProcessor {
         }
     }
 
-    private void postProcessNewBlock(BlockPos pos, Block newBlock, BlockState newState, ChunkAccess chunkAccess) {
-        postProcessDoubleBlocks(pos, newBlock, newState, chunkAccess);
+    private void postProcessNewBlock(BlockPos pos, Block newBlock, BlockState newState, WorldGenLevel level) {
+        postProcessDoubleBlocks(pos, newBlock, newState, level);
 
-        var blockEntity = chunkAccess.getBlockEntity(pos);
+        var blockEntity = level.getBlockEntity(pos);
         if (blockEntity instanceof DecayingBlockEntity decaying) {
             Item item = newBlock.asItem();
             ItemStack itemStack = new ItemStack(item, 1);
@@ -225,17 +225,17 @@ public class StructureReplacementProcessor {
         if (newState.is(TFC_SHELVES)) {
             for (Direction direction : HORIZONTAL_DIRECTIONS) {
                 var neighbourPos = pos.relative(direction);
-                var neighbourState = chunkAccess.getBlockState(neighbourPos);
-                if (neighbourState.getCollisionShape(chunkAccess, neighbourPos).isEmpty()) {
+                var neighbourState = level.getBlockState(neighbourPos);
+                if (neighbourState.getCollisionShape(level, neighbourPos).isEmpty()) {
                     newState = newState.setValue(BlockStateProperties.HORIZONTAL_FACING, direction);
-                    chunkAccess.setBlockState(pos, newState, false);
+                    level.setBlock(pos, newState, Block.UPDATE_NONE);
                     break;
                 }
             }
         }
     }
 
-    private void postProcessDoubleBlocks(BlockPos pos, Block newBlock, BlockState newState, ChunkAccess chunkAccess) {
+    private void postProcessDoubleBlocks(BlockPos pos, Block newBlock, BlockState newState, WorldGenLevel level) {
         var bedPartProperty = BlockStateProperties.BED_PART;
         var doubleBlockHalfProperty = BlockStateProperties.DOUBLE_BLOCK_HALF;
         var tallPlantPartProperty = TFCBlockStateProperties.TALL_PLANT_PART;
@@ -270,7 +270,7 @@ public class StructureReplacementProcessor {
         }
 
         if (secondPartPos != null) {
-            chunkAccess.setBlockState(secondPartPos, secondPartState, false);
+            level.setBlock(secondPartPos, secondPartState, Block.UPDATE_NONE);
             blocksToSkip.add(secondPartPos);
         }
     }

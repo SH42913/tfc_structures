@@ -67,7 +67,7 @@ public abstract class StructureStartMixin {
         TFCStructuresMod.LOGGER.debug("Start structure replacement for {} at {}", location, getChunkPos());
     }
 
-    @Inject(method = "placeInChunk", at = @At("TAIL"))
+    @Inject(method = "placeInChunk", at = @At("RETURN"))
     private void onPlaceInChunkTail(WorldGenLevel level, StructureManager manager, ChunkGenerator generator,
                                     RandomSource random, BoundingBox box, ChunkPos chunkPos,
                                     CallbackInfo ci) {
