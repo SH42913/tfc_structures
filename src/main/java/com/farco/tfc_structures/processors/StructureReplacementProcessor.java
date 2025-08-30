@@ -27,6 +27,7 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BedPart;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -43,8 +44,8 @@ import java.util.List;
 
 public class StructureReplacementProcessor {
     public static final ThreadLocal<StructureReplacementProcessor> THREAD_LOCAL = new ThreadLocal<>();
-    private static final String LOOT_TABLE_NAME = "LootTable";
-    private static final String LOOT_TABLE_SEED_NAME = "LootTableSeed";
+    private static final String LOOT_TABLE_NAME = RandomizableContainerBlockEntity.LOOT_TABLE_TAG;
+    private static final String LOOT_TABLE_SEED_NAME = RandomizableContainerBlockEntity.LOOT_TABLE_SEED_TAG;
     private static final String ITEMS_NAME = "Items";
     private static final TagKey<Block> TFC_SHELVES = TagKey.create(Registries.BLOCK, ResourceLocation.parse("tfc:bookshelves"));
     private static final List<Direction> HORIZONTAL_DIRECTIONS = List.of(Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
@@ -93,7 +94,6 @@ public class StructureReplacementProcessor {
             }
 
             BlockEntity originalEntity = level.getBlockEntity(pos);
-
             Block newBlock = getReplacementBlock(level, pos, originalState);
             if (newBlock == null) {
                 continue;
@@ -142,52 +142,69 @@ public class StructureReplacementProcessor {
         }
 
         if (newEntity == null) {
-            TFCStructuresMod.LOGGER.error("Replacement block {} can't fully replace {} due first one is not EntityBlock", originalState.getBlock(), newState.getBlock());
+            TFCStructuresMod.LOGGER.error("Replacement block {} can't fully replace {} due first one is not EntityBlock", newState.getBlock(), originalState.getBlock());
             return;
         }
 
-        CompoundTag originalTag = originalEntity.saveWithFullMetadata();
         //noinspection DataFlowIssue due WorldGenLevel always has Server
-        replaceLootTable(originalTag, level.getServer().getLootData(), random);
+        LootDataManager lootDataManager = level.getServer().getLootData();
+
+        CompoundTag originalTag = originalEntity.saveWithFullMetadata();
+        overrideLootTableInTag(originalTag, lootDataManager);
+        initEmptyChestLootTable(originalTag, lootDataManager, random);
         newEntity.load(originalTag);
+        newEntity.setChanged();
+
         chunkAccess.setBlockEntity(newEntity);
     }
 
-    private void replaceLootTable(CompoundTag originalTag, LootDataManager lootData, RandomSource random) {
-        String newLootTable = null;
-
-        if (originalTag.contains(LOOT_TABLE_NAME)) {
-            String originalLootTable = originalTag.getString(LOOT_TABLE_NAME);
-            TFCStructuresMod.LOGGER.debug("Detected LootTable = {}", originalLootTable);
-
-            newLootTable = structureData != null && structureData.lootTablesOverrideMap() != null
-                    ? structureData.lootTablesOverrideMap().get(originalLootTable)
-                    : null;
-
-            if (newLootTable == null) {
-                newLootTable = originalLootTable.replace("minecraft", TFCStructuresMod.MODID);
-            }
-
-            TFCStructuresMod.LOGGER.debug("LootTable {} will be replaced with {}", originalLootTable, newLootTable);
-        } else if (originalTag.contains(ITEMS_NAME) && structureData != null && !structureData.emptyChestLootTable().isEmpty()) {
-            originalTag.remove(ITEMS_NAME);
-            newLootTable = structureData.emptyChestLootTable();
+    private void overrideLootTableInTag(CompoundTag originalTag, LootDataManager lootDataManager) {
+        if (!originalTag.contains(LOOT_TABLE_NAME)) {
+            return;
         }
 
+        String originalLootTable = originalTag.getString(LOOT_TABLE_NAME);
+        TFCStructuresMod.LOGGER.debug("Detected LootTable = {}", originalLootTable);
+
+        String newLootTable = structureData != null && structureData.lootTablesOverrideMap() != null
+                ? structureData.lootTablesOverrideMap().get(originalLootTable)
+                : null;
+
+        if (newLootTable == null) {
+            newLootTable = originalLootTable.replace("minecraft", TFCStructuresMod.MODID);
+        }
+
+        TFCStructuresMod.LOGGER.debug("LootTable {} will be replaced with {}", originalLootTable, newLootTable);
+        setLootTableToTag(originalTag, lootDataManager, newLootTable);
+    }
+
+    private void initEmptyChestLootTable(CompoundTag originalTag, LootDataManager lootDataManager, RandomSource random) {
+        if (originalTag.contains(LOOT_TABLE_NAME)) {
+            return;
+        }
+
+        if (structureData == null || structureData.emptyChestLootTable().isEmpty()) {
+            return;
+        }
+
+        if (originalTag.contains(ITEMS_NAME)) {
+            originalTag.remove(ITEMS_NAME);
+        }
+
+        setLootTableToTag(originalTag, lootDataManager, structureData.emptyChestLootTable());
+        originalTag.putLong(LOOT_TABLE_SEED_NAME, random.nextLong());
+    }
+
+    private static void setLootTableToTag(CompoundTag originalTag, LootDataManager lootDataManager, String newLootTable) {
         if (newLootTable == null || newLootTable.isEmpty()) {
             return;
         }
 
         var lootTableLocation = ResourceLocation.parse(newLootTable);
-        if (lootData.getLootTable(lootTableLocation) == LootTable.EMPTY) {
+        if (lootDataManager.getLootTable(lootTableLocation) != LootTable.EMPTY) {
+            originalTag.putString(LOOT_TABLE_NAME, newLootTable);
+        } else {
             TFCStructuresMod.LOGGER.warn("Can't use lootTable {} due it's not valid", newLootTable);
-            return;
-        }
-
-        originalTag.putString(LOOT_TABLE_NAME, newLootTable);
-
-        if (!originalTag.contains(LOOT_TABLE_SEED_NAME)) {
-            originalTag.putLong(LOOT_TABLE_SEED_NAME, random.nextLong());
         }
     }
 
