@@ -19,8 +19,10 @@ Be aware that Dynamic TFC Structures is currently in **BETA**, so it **contains 
 Dynamic TFC Structures has 3 main configuration files:
 
 * **common-config.toml**\
-  _allowedDimensions_ - list of dimensions where structure block will be replaced with TFC blocks  
-  _biomesTagsStructuresToLogs_ - debug-toggle to output biomes, biome-tags and structures to logs  
+  _allowedDimensions_ - list of dimensions where structure block will be replaced with TFC blocks
+  _biomesTagsStructuresToLogs_ - debug-toggle to output biomes, biome-tags and structures to logs
+  _fallbackToTfcStructuresLoot_ - toggle to enable tfc_structures loot tables in case there's no lootTablesOverrideMap
+  in structure
   _mossyBlocks_/_strippedLogs_/_strippedWood_/_crackedBricks_ - special tags for replacements. All of them will be
   generated to special block-tags.
 * **worldgen\_config.json**\

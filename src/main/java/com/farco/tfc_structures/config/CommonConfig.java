@@ -24,6 +24,12 @@ public class CommonConfig {
             .comment("You'll able to find it with [BIOME], [BIOME_TAG] and [STRUCTURE] tags")
             .define("biomesTagsStructuresToLogs", false);
 
+    public static final ForgeConfigSpec.BooleanValue FALLBACK_TO_TFC_STRUCTURES_LOOT = BUILDER
+            .comment("Should Dynamic TFC Structures fallback to mod built-in loot tables or not")
+            .comment("It will be happen if mod can't get overridden loot table from lootTablesOverrideMap of Structure")
+            .comment("(eg, it will use tfc_structures:chests/desert_pyramid instead of minecraft:chests/desert_pyramid)")
+            .define("fallbackToTfcStructuresLoot", true);
+
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ALLOWED_DIMENSIONS = BUILDER
             .comment("Dimensions where structure blocks will be replaced")
             .defineList("allowedDimensions", List.of(Level.OVERWORLD.location().toString()), str -> str instanceof String);

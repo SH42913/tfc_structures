@@ -1,6 +1,7 @@
 package com.farco.tfc_structures.processors;
 
 import com.farco.tfc_structures.TFCStructuresMod;
+import com.farco.tfc_structures.config.CommonConfig;
 import com.farco.tfc_structures.config.ReplacementPreset;
 import com.farco.tfc_structures.config.StructureConfig;
 import com.farco.tfc_structures.processors.features.DirectReplaceFeature;
@@ -170,12 +171,14 @@ public class StructureReplacementProcessor {
                 ? structureData.lootTablesOverrideMap().get(originalLootTable)
                 : null;
 
-        if (newLootTable == null) {
+        if (newLootTable == null && CommonConfig.FALLBACK_TO_TFC_STRUCTURES_LOOT.get()) {
             newLootTable = originalLootTable.replace("minecraft", TFCStructuresMod.MODID);
         }
 
-        TFCStructuresMod.LOGGER.debug("LootTable {} will be replaced with {}", originalLootTable, newLootTable);
-        setLootTableToTag(originalTag, lootDataManager, newLootTable);
+        if (newLootTable != null) {
+            TFCStructuresMod.LOGGER.debug("LootTable {} will be replaced with {}", originalLootTable, newLootTable);
+            setLootTableToTag(originalTag, lootDataManager, newLootTable);
+        }
     }
 
     private void initEmptyChestLootTable(CompoundTag originalTag, LootDataManager lootDataManager, RandomSource random) {
