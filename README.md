@@ -47,6 +47,10 @@ Every preset has 3 properties:
 By default, there are two presets: `no-replace`(empty preset) and `overworld-common`, but you can create another presets
 by your own(don't forget to assign preset to structure in `structures_config.json`).
 
+If you are annoyed by a lot of structures in one place,
+you may be interested to install
+also [Sparse Structures](https://www.curseforge.com/minecraft/mc-mods/sparse-structures) mod.
+
 ## TFC Structures Datapacks folder
 
 Dynamic TFC Structures generates its own data-pack using configuration files, so it has its own directory for datapacks
@@ -55,8 +59,17 @@ Dynamic TFC Structures generates its own data-pack using configuration files, so
 But you may place YOUR datapacks or KubeJS-like datapack folder(use `tfc_structures_main` datapack as an example)
 directly to **_tfc\_structures\_datapacks_** folder, and it will load upon world creation.
 
+_Don't put your files to `tfc_structures_main`, because it will be deleted and re-created for every resource pack
+generation_
+
+## Built-in data changes
+
+You should be aware that Dynamic TFC structures override vanilla loot tables to TFC items in `gameplay` folder,
+like Cat morning gift, Hero of the Village reward, Piglin bartering and Sniffer digging.
+
 ## Known issues
 
-* Some structures may be lost(Treasures and Portals)
 * Currently, _tfcWorldReplacement_ is not compatible with non-default TFC blocks
   (eg, [ArborFirmaCraft](https://www.curseforge.com/minecraft/mc-mods/arborfirmacraft))
+* There are some issues with tall plant replacement
+* Structures can't spawn on water(including salt and spring water)
