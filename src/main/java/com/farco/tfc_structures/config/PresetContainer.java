@@ -234,9 +234,9 @@ public final class PresetContainer {
     }
 
     private static @NotNull List<ReplacementPreset.TFCWorld> getDefaultTFCWorld() {
-        var ignoreNames = List.of("nether", "prismarine", "end", "infested", "redstone", "blackstone", "dripstone", "soul", "suspicious");
+        var ignoreNames = List.of("nether", "prismarine", "end", "infested", "blackstone", "dripstone", "soul", "suspicious");
         var stoneNames = List.of("stone");
-        var stoneFunctional = Set.of(Blocks.STONECUTTER, Blocks.GRINDSTONE, Blocks.LODESTONE, Blocks.GLOWSTONE);
+        var stoneIgnore = List.of("stonecutter", "grindstone", "lodestone", "glowstone", "redstone");
         var brickNames = List.of("brick");
         var sandNames = List.of("sand", "gravel");
         var oreNames = List.of("ore");
@@ -269,7 +269,7 @@ public final class PresetContainer {
                 conversionType = ReplacementPreset.TFC_SAND_TYPE;
             } else if (oreNames.stream().anyMatch(predicate)) {
                 conversionType = ReplacementPreset.TFC_ORE_TYPE;
-            } else if (!stoneFunctional.contains(block) && stoneNames.stream().anyMatch(predicate)) {
+            } else if (stoneIgnore.stream().noneMatch(predicate) && stoneNames.stream().anyMatch(predicate)) {
                 conversionType = ReplacementPreset.TFC_STONE_TYPE;
             } else {
                 continue;
