@@ -61,7 +61,7 @@ public final class WorldgenConfig {
             }
         }
 
-        defaultWorldgenStructures = structures.stream().sorted().toList();
+        defaultWorldgenStructures = structures.stream().sorted(ResourceLocation::compareNamespaced).toList();
     }
 
     public static WorldgenConfig getDefaultConfig() {
