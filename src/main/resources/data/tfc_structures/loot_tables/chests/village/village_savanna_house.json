@@ -58,7 +58,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "tfc:seeds/maize_seeds",
+          "name": "tfc:seeds/maize",
           "weight": 10
         },
         {

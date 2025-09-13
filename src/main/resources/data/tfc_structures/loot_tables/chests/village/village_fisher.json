@@ -71,7 +71,7 @@
               "function": "minecraft:set_count"
             }
           ],
-          "name": "tfc:seeds/wheat_seeds",
+          "name": "tfc:seeds/wheat",
           "weight": 3
         },
         {
