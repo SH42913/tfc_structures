@@ -81,6 +81,10 @@ public class CommonConfig {
                     "minecraft:cracked_deepslate_tiles"
             ), CommonConfig::validateBlockIds);
 
+    public static final ForgeConfigSpec.ConfigValue<String> DEFAULT_EMPTY_CHEST_LOOT_TABLE = BUILDER
+            .comment("Loot table that will be used as emptyChestLootTable field for every new Structure in StructureConfig")
+            .define("defaultEmptyChestLootTable", "");
+
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 
     public static Set<ResourceLocation> allowedDimensionsSet;

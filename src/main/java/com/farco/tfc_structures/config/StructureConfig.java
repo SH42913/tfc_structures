@@ -24,8 +24,6 @@ public final class StructureConfig implements JsonConfigProvider.HasFieldsToSort
                 Codec.STRING.fieldOf("emptyChestLootTable").forGetter(Data::emptyChestLootTable),
                 Codec.unboundedMap(Codec.STRING, Codec.STRING).fieldOf("lootTablesOverrideMap").forGetter(Data::lootTablesOverrideMap)
         ).apply(instance, Data::new));
-
-        public static final Data DEFAULT = new Data(PresetContainer.DEFAULT_OVERWORLD_PRESET_NAME, "", Collections.emptyMap());
     }
 
     public static final String CONFIG_NAME = "structures_config.json";
@@ -50,9 +48,13 @@ public final class StructureConfig implements JsonConfigProvider.HasFieldsToSort
     }
 
     public void refreshUnused(Registry<Structure> structuresRegistry) {
+        String defaultPreset = PresetContainer.DEFAULT_OVERWORLD_PRESET_NAME;
+        String defaultEmptyChest = CommonConfig.DEFAULT_EMPTY_CHEST_LOOT_TABLE.get();
+        Map<String, String> defaultLootOverrideMAp = Collections.emptyMap();
+        Data defaultData = new Data(defaultPreset, defaultEmptyChest, defaultLootOverrideMAp);
         for (ResourceLocation location : structuresRegistry.keySet()) {
             if (!structures.containsKey(location)) {
-                structures.put(location, Data.DEFAULT);
+                structures.put(location, defaultData);
             }
         }
     }
