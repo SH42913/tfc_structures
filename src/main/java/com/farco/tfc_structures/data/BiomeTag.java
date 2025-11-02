@@ -41,99 +41,110 @@ public record BiomeTag(ResourceLocation id,
         return TagKey.create(Registries.BIOME, id);
     }
 
-    public static final BiomeTag ALL_TFC_BIOMES = new BiomeTag(TFCStructuresMod.MODID + ":all_tfc_biomes", TFCBiomes.getAllKeys());
+    public static BiomeTag ALL_TFC_BIOMES;
+    public static BiomeTag BEACH;
+    public static BiomeTag OCEANIC_MOUNTAIN_LAKE;
+    public static BiomeTag MOUNTAIN_LAKE;
+    public static BiomeTag COMMON_LAKE;
+    public static BiomeTag ANY_LAKE;
+    public static BiomeTag RIVER;
+    public static BiomeTag HIGHLANDS;
+    public static BiomeTag ANY_BADLANDS;
+    public static BiomeTag HILL;
+    public static BiomeTag CANYONS;
+    public static BiomeTag COMMON_MOUNTAINS;
+    public static BiomeTag VOLCANIC_MOUNTAINS;
+    public static BiomeTag ANY_MOUNTAINS;
+    public static BiomeTag DEEP_OCEAN;
+    public static BiomeTag COMMON_OCEAN;
+    public static BiomeTag ANY_OCEAN;
+    public static BiomeTag SWAMP;
+    public static BiomeTag PLAINS;
 
-    public static final BiomeTag BEACH = new BiomeTag(TFCStructuresMod.MODID + ":is_beach", List.of(
-            TFCBiomes.TIDAL_FLATS.key(),
-            TFCBiomes.SHORE.key()
-    ));
+    static {
+        if (TFCStructuresMod.TFC_IS_LOADED) {
+            ALL_TFC_BIOMES = new BiomeTag(TFCStructuresMod.MODID + ":all_tfc_biomes", TFCBiomes.getAllKeys());
 
-    public static final BiomeTag OCEANIC_MOUNTAIN_LAKE = new BiomeTag(TFCStructuresMod.MODID + ":is_oceanic_mountain_lake", List.of(
-            TFCBiomes.OCEANIC_MOUNTAIN_LAKE.key(),
-            TFCBiomes.VOLCANIC_OCEANIC_MOUNTAIN_LAKE.key()
-    ));
+            BEACH = new BiomeTag(TFCStructuresMod.MODID + ":is_beach", List.of(
+                    TFCBiomes.TIDAL_FLATS.key(),
+                    TFCBiomes.SHORE.key()
+            ));
 
-    public static final BiomeTag MOUNTAIN_LAKE = new BiomeTag(TFCStructuresMod.MODID + ":is_mountain_lake", List.of(
-            TFCBiomes.MOUNTAIN_LAKE.key(),
-            TFCBiomes.OLD_MOUNTAIN_LAKE.key(),
-            TFCBiomes.VOLCANIC_MOUNTAIN_LAKE.key()
-    ));
+            OCEANIC_MOUNTAIN_LAKE = new BiomeTag(TFCStructuresMod.MODID + ":is_oceanic_mountain_lake", List.of(
+                    TFCBiomes.OCEANIC_MOUNTAIN_LAKE.key(),
+                    TFCBiomes.VOLCANIC_OCEANIC_MOUNTAIN_LAKE.key()
+            ));
+            MOUNTAIN_LAKE = new BiomeTag(TFCStructuresMod.MODID + ":is_mountain_lake", List.of(
+                    TFCBiomes.MOUNTAIN_LAKE.key(),
+                    TFCBiomes.OLD_MOUNTAIN_LAKE.key(),
+                    TFCBiomes.VOLCANIC_MOUNTAIN_LAKE.key()
+            ));
+            COMMON_LAKE = new BiomeTag(TFCStructuresMod.MODID + ":is_common_lake", List.of(
+                    TFCBiomes.LAKE.key(),
+                    TFCBiomes.PLATEAU_LAKE.key()
+            ));
+            ANY_LAKE = new BiomeTag(TFCStructuresMod.MODID + ":is_any_lake", List.of(
+                    COMMON_LAKE,
+                    MOUNTAIN_LAKE,
+                    OCEANIC_MOUNTAIN_LAKE
+            ));
 
-    public static final BiomeTag COMMON_LAKE = new BiomeTag(TFCStructuresMod.MODID + ":is_common_lake", List.of(
-            TFCBiomes.LAKE.key(),
-            TFCBiomes.PLATEAU_LAKE.key()
-    ));
+            RIVER = new BiomeTag(TFCStructuresMod.MODID + ":is_river", List.of(
+                    TFCBiomes.RIVER.key()
+            ));
+            HIGHLANDS = new BiomeTag(TFCStructuresMod.MODID + ":is_highlands", List.of(
+                    TFCBiomes.HIGHLANDS.key()
+            ));
+            ANY_BADLANDS = new BiomeTag(TFCStructuresMod.MODID + ":is_any_badlands", List.of(
+                    TFCBiomes.BADLANDS.key(),
+                    TFCBiomes.INVERTED_BADLANDS.key()
+            ));
+            HILL = new BiomeTag(TFCStructuresMod.MODID + ":is_hill", List.of(
+                    TFCBiomes.ROLLING_HILLS.key(),
+                    TFCBiomes.HILLS.key()
+            ));
+            CANYONS = new BiomeTag(TFCStructuresMod.MODID + ":is_canyons", List.of(
+                    TFCBiomes.LOW_CANYONS.key(),
+                    TFCBiomes.CANYONS.key()
+            ));
+            SWAMP = new BiomeTag(TFCStructuresMod.MODID + ":is_swamp", List.of(
+                    TFCBiomes.LOWLANDS.key(),
+                    TFCBiomes.SALT_MARSH.key()
+            ));
+            PLAINS = new BiomeTag(TFCStructuresMod.MODID + ":is_plains", List.of(
+                    TFCBiomes.PLAINS.key(),
+                    TFCBiomes.PLATEAU.key()
+            ));
 
-    public static final BiomeTag ANY_LAKE = new BiomeTag(TFCStructuresMod.MODID + ":is_any_lake", List.of(
-            COMMON_LAKE,
-            MOUNTAIN_LAKE,
-            OCEANIC_MOUNTAIN_LAKE
-    ));
+            COMMON_MOUNTAINS = new BiomeTag(TFCStructuresMod.MODID + ":is_common_mountains", List.of(
+                    TFCBiomes.MOUNTAINS.key(),
+                    TFCBiomes.OLD_MOUNTAINS.key()
+            ));
+            VOLCANIC_MOUNTAINS = new BiomeTag(TFCStructuresMod.MODID + ":is_volcanic_mountains", List.of(
+                    TFCBiomes.VOLCANIC_MOUNTAINS.key(),
+                    TFCBiomes.VOLCANIC_OCEANIC_MOUNTAINS.key()
+            ));
+            ANY_MOUNTAINS = new BiomeTag(TFCStructuresMod.MODID + ":is_any_mountains", List.of(
+                    COMMON_MOUNTAINS,
+                    VOLCANIC_MOUNTAINS
+            ));
 
-    public static final BiomeTag RIVER = new BiomeTag(TFCStructuresMod.MODID + ":is_river", List.of(
-            TFCBiomes.RIVER.key()
-    ));
+            DEEP_OCEAN = new BiomeTag(TFCStructuresMod.MODID + ":is_deep_ocean", List.of(
+                    TFCBiomes.DEEP_OCEAN.key(),
+                    TFCBiomes.DEEP_OCEAN_TRENCH.key()
+            ));
+            COMMON_OCEAN = new BiomeTag(TFCStructuresMod.MODID + ":is_common_ocean", List.of(
+                    TFCBiomes.OCEAN.key(),
+                    TFCBiomes.OCEAN_REEF.key()
+            ));
+            ANY_OCEAN = new BiomeTag(TFCStructuresMod.MODID + ":is_any_ocean", List.of(
+                    DEEP_OCEAN,
+                    COMMON_OCEAN
+            ));
+        }
+    }
 
-    public static final BiomeTag HIGHLANDS = new BiomeTag(TFCStructuresMod.MODID + ":is_highlands", List.of(
-            TFCBiomes.HIGHLANDS.key()
-    ));
-
-    public static final BiomeTag ANY_BADLANDS = new BiomeTag(TFCStructuresMod.MODID + ":is_any_badlands", List.of(
-            TFCBiomes.BADLANDS.key(),
-            TFCBiomes.INVERTED_BADLANDS.key()
-    ));
-
-    public static final BiomeTag HILL = new BiomeTag(TFCStructuresMod.MODID + ":is_hill", List.of(
-            TFCBiomes.ROLLING_HILLS.key(),
-            TFCBiomes.HILLS.key()
-    ));
-
-    public static final BiomeTag CANYONS = new BiomeTag(TFCStructuresMod.MODID + ":is_canyons", List.of(
-            TFCBiomes.LOW_CANYONS.key(),
-            TFCBiomes.CANYONS.key()
-    ));
-
-    public static final BiomeTag COMMON_MOUNTAINS = new BiomeTag(TFCStructuresMod.MODID + ":is_common_mountains", List.of(
-            TFCBiomes.MOUNTAINS.key(),
-            TFCBiomes.OLD_MOUNTAINS.key()
-    ));
-
-    public static final BiomeTag VOLCANIC_MOUNTAINS = new BiomeTag(TFCStructuresMod.MODID + ":is_volcanic_mountains", List.of(
-            TFCBiomes.VOLCANIC_MOUNTAINS.key(),
-            TFCBiomes.VOLCANIC_OCEANIC_MOUNTAINS.key()
-    ));
-
-    public static final BiomeTag ANY_MOUNTAINS = new BiomeTag(TFCStructuresMod.MODID + ":is_any_mountains", List.of(
-            COMMON_MOUNTAINS,
-            VOLCANIC_MOUNTAINS
-    ));
-
-    public static final BiomeTag DEEP_OCEAN = new BiomeTag(TFCStructuresMod.MODID + ":is_deep_ocean", List.of(
-            TFCBiomes.DEEP_OCEAN.key(),
-            TFCBiomes.DEEP_OCEAN_TRENCH.key()
-    ));
-
-    public static final BiomeTag COMMON_OCEAN = new BiomeTag(TFCStructuresMod.MODID + ":is_common_ocean", List.of(
-            TFCBiomes.OCEAN.key(),
-            TFCBiomes.OCEAN_REEF.key()
-    ));
-
-    public static final BiomeTag ANY_OCEAN = new BiomeTag(TFCStructuresMod.MODID + ":is_any_ocean", List.of(
-            DEEP_OCEAN,
-            COMMON_OCEAN
-    ));
-
-    public static final BiomeTag SWAMP = new BiomeTag(TFCStructuresMod.MODID + ":is_swamp", List.of(
-            TFCBiomes.LOWLANDS.key(),
-            TFCBiomes.SALT_MARSH.key()
-    ));
-
-    public static final BiomeTag PLAINS = new BiomeTag(TFCStructuresMod.MODID + ":is_plains", List.of(
-            TFCBiomes.PLAINS.key(),
-            TFCBiomes.PLATEAU.key()
-    ));
-
-    public static List<BiomeTag> getBuiltinBiomeTags() {
+    public static List<BiomeTag> getBuiltinTFCBiomeTags() {
         var list = new ArrayList<BiomeTag>();
         list.add(ALL_TFC_BIOMES);
         list.add(BEACH);

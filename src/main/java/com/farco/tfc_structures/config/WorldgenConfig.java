@@ -72,7 +72,11 @@ public final class WorldgenConfig {
     }
 
     private static List<BiomeTag> getDefaultBiomeTags() {
-        var list = new ArrayList<>(BiomeTag.getBuiltinBiomeTags());
+        if (!TFCStructuresMod.TFC_IS_LOADED) {
+            return List.of();
+        }
+
+        var list = new ArrayList<>(BiomeTag.getBuiltinTFCBiomeTags());
         list.add(buildBiomeTag(BuiltinStructures.BURIED_TREASURE, BiomeTag.BEACH.getTagId(), BiomeTag.OCEANIC_MOUNTAIN_LAKE.getTagId()));
         list.add(buildBiomeTag(BuiltinStructures.DESERT_PYRAMID, BiomeTag.ANY_BADLANDS.getTagId(), BiomeTag.HILL.getTagId(), getBiomeId(TFCBiomes.SHORE)));
         list.add(buildBiomeTag(BuiltinStructures.PILLAGER_OUTPOST, BiomeTag.CANYONS.getTagId(), BiomeTag.ANY_BADLANDS.getTagId(), BiomeTag.ANY_MOUNTAINS.getTagId(), BiomeTag.HIGHLANDS.getTagId()));

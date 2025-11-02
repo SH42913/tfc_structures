@@ -13,7 +13,6 @@ import net.dries007.tfc.common.blocks.TFCBlockStateProperties;
 import net.dries007.tfc.common.blocks.plant.ITallPlant;
 import net.dries007.tfc.common.capabilities.food.FoodCapability;
 import net.dries007.tfc.common.capabilities.food.IFood;
-import net.dries007.tfc.util.Helpers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
@@ -33,6 +32,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BedPart;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.storage.loot.LootDataManager;
@@ -40,6 +40,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -59,11 +60,13 @@ public class StructureReplacementProcessor {
     public StructureReplacementProcessor(@Nullable StructureConfig.Data structureData, ReplacementPreset replacementPreset) {
         this.structureData = structureData;
 
-        replaceFeatures = List.of(
-                new DirectReplaceFeature(replacementPreset.getDirectReplacementMap()),
-                new RandomReplaceFeature(replacementPreset.getRandomReplacementMap()),
-                new TFCReplaceFeature(replacementPreset.getTfcWorldReplacementMap())
-        );
+        replaceFeatures = new ArrayList<>();
+        replaceFeatures.add(new DirectReplaceFeature(replacementPreset.getDirectReplacementMap()));
+        replaceFeatures.add(new RandomReplaceFeature(replacementPreset.getRandomReplacementMap()));
+
+        if (TFCStructuresMod.TFC_IS_LOADED) {
+            replaceFeatures.add(new TFCReplaceFeature(replacementPreset.getTfcWorldReplacementMap()));
+        }
 
         registeredBlocks = new HashSet<>();
         blocksToSkip = new HashSet<>();
@@ -110,8 +113,82 @@ public class StructureReplacementProcessor {
                 createBlockEntity(pos, newState, chunkAccess);
             }
 
-            postProcessNewBlock(pos, newBlock, newState, level);
+            postProcessVanilla(pos, newBlock, newState, level);
+            if (TFCStructuresMod.TFC_IS_LOADED) {
+                postProcessTFC(pos, newBlock, newState, level);
+            }
         }
+    }
+
+    private void postProcessVanilla(BlockPos pos, Block newBlock, BlockState newState, WorldGenLevel level) {
+        var bedPartProperty = BlockStateProperties.BED_PART;
+        var doubleBlockHalfProperty = BlockStateProperties.DOUBLE_BLOCK_HALF;
+        BlockState secondPartState = copyProperties(newBlock.defaultBlockState(), newState);
+        if (newState.hasProperty(bedPartProperty)) {
+            BedPart value = newState.getValue(bedPartProperty);
+            secondPartState = value == BedPart.FOOT
+                    ? secondPartState.setValue(bedPartProperty, BedPart.HEAD)
+                    : secondPartState.setValue(bedPartProperty, BedPart.FOOT);
+
+            Direction direction = newState.getValue(BlockStateProperties.HORIZONTAL_FACING);
+            setPostProcessBlock(level, pos.relative(direction), secondPartState);
+        } else if (newState.hasProperty(doubleBlockHalfProperty)) {
+            DoubleBlockHalf value = newState.getValue(doubleBlockHalfProperty);
+            if (value == DoubleBlockHalf.LOWER) {
+                secondPartState = secondPartState.setValue(doubleBlockHalfProperty, DoubleBlockHalf.UPPER);
+                setPostProcessBlock(level, pos.above(), secondPartState);
+            } else {
+                secondPartState = secondPartState.setValue(doubleBlockHalfProperty, DoubleBlockHalf.LOWER);
+                setPostProcessBlock(level, pos.below(), secondPartState);
+            }
+        }
+    }
+
+    private void postProcessTFC(BlockPos pos, Block newBlock, BlockState newState, WorldGenLevel level) {
+        var tallPlantPartProperty = TFCBlockStateProperties.TALL_PLANT_PART;
+
+        BlockState secondPartState = copyProperties(newBlock.defaultBlockState(), newState);
+        if (newState.hasProperty(tallPlantPartProperty)) {
+            ITallPlant.Part value = newState.getValue(tallPlantPartProperty);
+            if (value == ITallPlant.Part.LOWER) {
+                secondPartState = secondPartState.setValue(tallPlantPartProperty, ITallPlant.Part.UPPER);
+                setPostProcessBlock(level, pos.above(), secondPartState);
+            } else {
+                secondPartState = secondPartState.setValue(tallPlantPartProperty, ITallPlant.Part.LOWER);
+                setPostProcessBlock(level, pos.below(), secondPartState);
+            }
+        }
+
+        var blockEntity = level.getBlockEntity(pos);
+        if (blockEntity instanceof DecayingBlockEntity decaying) {
+            Item item = newBlock.asItem();
+            ItemStack itemStack = new ItemStack(item, 1);
+            FoodCapability.get(itemStack);
+
+            IFood food = FoodCapability.get(itemStack);
+            if (food != null) {
+                food.setCreationDate(FoodCapability.getRoundedCreationDate());
+                decaying.setStack(itemStack);
+                blockEntity.setChanged();
+            }
+        }
+
+        if (newState.is(TFC_SHELVES)) {
+            for (Direction direction : HORIZONTAL_DIRECTIONS) {
+                var neighbourPos = pos.relative(direction);
+                var neighbourState = level.getBlockState(neighbourPos);
+                if (neighbourState.getCollisionShape(level, neighbourPos).isEmpty()) {
+                    newState = newState.setValue(BlockStateProperties.HORIZONTAL_FACING, direction);
+                    level.setBlock(pos, newState, Block.UPDATE_NONE);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void setPostProcessBlock(WorldGenLevel level, BlockPos pos, BlockState state) {
+        level.setBlock(pos, state, Block.UPDATE_NONE);
+        blocksToSkip.add(pos);
     }
 
     private Block getReplacementBlock(WorldGenLevel level, BlockPos pos, BlockState original) {
@@ -132,7 +209,7 @@ public class StructureReplacementProcessor {
 
     private static @NotNull BlockState replaceBlock(Block newBlock, BlockState originalState) {
         BlockState newState = newBlock.defaultBlockState();
-        newState = Helpers.copyProperties(newState, originalState);
+        newState = copyProperties(newState, originalState);
         return newState;
     }
 
@@ -222,73 +299,15 @@ public class StructureReplacementProcessor {
         }
     }
 
-    private void postProcessNewBlock(BlockPos pos, Block newBlock, BlockState newState, WorldGenLevel level) {
-        postProcessDoubleBlocks(pos, newBlock, newState, level);
-
-        var blockEntity = level.getBlockEntity(pos);
-        if (blockEntity instanceof DecayingBlockEntity decaying) {
-            Item item = newBlock.asItem();
-            ItemStack itemStack = new ItemStack(item, 1);
-            FoodCapability.get(itemStack);
-
-            IFood food = FoodCapability.get(itemStack);
-            if (food != null) {
-                food.setCreationDate(FoodCapability.getRoundedCreationDate());
-                decaying.setStack(itemStack);
-                blockEntity.setChanged();
-            }
+    public static BlockState copyProperties(BlockState copyTo, BlockState copyFrom) {
+        for (Property<?> property : copyFrom.getProperties()) {
+            copyTo = copyProperty(copyTo, copyFrom, property);
         }
 
-        if (newState.is(TFC_SHELVES)) {
-            for (Direction direction : HORIZONTAL_DIRECTIONS) {
-                var neighbourPos = pos.relative(direction);
-                var neighbourState = level.getBlockState(neighbourPos);
-                if (neighbourState.getCollisionShape(level, neighbourPos).isEmpty()) {
-                    newState = newState.setValue(BlockStateProperties.HORIZONTAL_FACING, direction);
-                    level.setBlock(pos, newState, Block.UPDATE_NONE);
-                    break;
-                }
-            }
-        }
+        return copyTo;
     }
 
-    private void postProcessDoubleBlocks(BlockPos pos, Block newBlock, BlockState newState, WorldGenLevel level) {
-        var bedPartProperty = BlockStateProperties.BED_PART;
-        var doubleBlockHalfProperty = BlockStateProperties.DOUBLE_BLOCK_HALF;
-        var tallPlantPartProperty = TFCBlockStateProperties.TALL_PLANT_PART;
-
-        BlockPos secondPartPos = null;
-        BlockState secondPartState = Helpers.copyProperties(newBlock.defaultBlockState(), newState);
-        if (newState.hasProperty(bedPartProperty)) {
-            BedPart value = newState.getValue(bedPartProperty);
-            Direction direction = newState.getValue(BlockStateProperties.HORIZONTAL_FACING);
-            secondPartPos = pos.relative(direction);
-            secondPartState = value == BedPart.FOOT
-                    ? secondPartState.setValue(bedPartProperty, BedPart.HEAD)
-                    : secondPartState.setValue(bedPartProperty, BedPart.FOOT);
-        } else if (newState.hasProperty(doubleBlockHalfProperty)) {
-            DoubleBlockHalf value = newState.getValue(doubleBlockHalfProperty);
-            if (value == DoubleBlockHalf.LOWER) {
-                secondPartPos = pos.above();
-                secondPartState = secondPartState.setValue(doubleBlockHalfProperty, DoubleBlockHalf.UPPER);
-            } else {
-                secondPartPos = pos.below();
-                secondPartState = secondPartState.setValue(doubleBlockHalfProperty, DoubleBlockHalf.LOWER);
-            }
-        } else if (newState.hasProperty(tallPlantPartProperty)) {
-            ITallPlant.Part value = newState.getValue(tallPlantPartProperty);
-            if (value == ITallPlant.Part.LOWER) {
-                secondPartPos = pos.above();
-                secondPartState = secondPartState.setValue(tallPlantPartProperty, ITallPlant.Part.UPPER);
-            } else {
-                secondPartPos = pos.below();
-                secondPartState = secondPartState.setValue(tallPlantPartProperty, ITallPlant.Part.LOWER);
-            }
-        }
-
-        if (secondPartPos != null) {
-            level.setBlock(secondPartPos, secondPartState, Block.UPDATE_NONE);
-            blocksToSkip.add(secondPartPos);
-        }
+    public static <T extends Comparable<T>> BlockState copyProperty(BlockState copyTo, BlockState copyFrom, Property<T> property) {
+        return copyTo.hasProperty(property) ? copyTo.setValue(property, copyFrom.getValue(property)) : copyTo;
     }
 }

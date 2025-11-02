@@ -2,7 +2,7 @@ package com.farco.tfc_structures;
 
 import com.farco.tfc_structures.config.*;
 import com.farco.tfc_structures.data.DatapackGenerator;
-import com.farco.tfc_structures.mixin.tfc.SurfaceBuilderContextAccessorMixin;
+import com.farco.tfc_structures.data.TFCOnlyDatapack;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -58,11 +58,7 @@ public class TFCStructuresMod {
         DATAPACK_GENERATOR = new DatapackGenerator(FMLPaths.GAMEDIR.get().resolve(MODID + "_datapacks"));
         presetContainer = new PresetContainer(CONFIG_FOLDER_PATH);
 
-        ModList modList = ModList.get();
-        TFC_IS_LOADED = modList.isLoaded("tfc");
-        if (TFC_IS_LOADED) {
-            @SuppressWarnings("unused") Class<?> unused = SurfaceBuilderContextAccessorMixin.class;
-        }
+        TFC_IS_LOADED = ModList.get().isLoaded("tfc");
     }
 
     public TFCStructuresMod(FMLJavaModLoadingContext modLoadingContext) {
@@ -82,11 +78,18 @@ public class TFCStructuresMod {
     }
 
     private void addPackFinder(AddPackFindersEvent event) {
-        if (event.getPackType() == PackType.SERVER_DATA) {
-            DATAPACK_GENERATOR.refreshDatapack(worldgenConfig);
-            event.addRepositorySource(DATAPACK_GENERATOR.getDatapackSource());
-            LOGGER.info("Added generated datapack for {}", MODID);
+        if (event.getPackType() != PackType.SERVER_DATA) {
+            return;
         }
+
+        if (TFC_IS_LOADED) {
+            event.addRepositorySource(TFCOnlyDatapack.getSource());
+            LOGGER.info("Added TFC only datapack for {}", MODID);
+        }
+
+        DATAPACK_GENERATOR.refreshDatapack(worldgenConfig);
+        event.addRepositorySource(DATAPACK_GENERATOR.getDatapackSource());
+        LOGGER.info("Added generated datapack for {}", MODID);
     }
 
     private void onServerAboutToStart(ServerAboutToStartEvent event) {
