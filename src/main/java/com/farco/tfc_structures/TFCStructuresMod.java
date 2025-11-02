@@ -3,6 +3,7 @@ package com.farco.tfc_structures;
 import com.farco.tfc_structures.config.*;
 import com.farco.tfc_structures.data.DatapackGenerator;
 import com.farco.tfc_structures.data.TFCOnlyDatapack;
+import com.farco.tfc_structures.utils.ClassLoadChecker;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -18,7 +19,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -58,7 +58,7 @@ public class TFCStructuresMod {
         DATAPACK_GENERATOR = new DatapackGenerator(FMLPaths.GAMEDIR.get().resolve(MODID + "_datapacks"));
         presetContainer = new PresetContainer(CONFIG_FOLDER_PATH);
 
-        TFC_IS_LOADED = ModList.get().isLoaded("tfc");
+        TFC_IS_LOADED = ClassLoadChecker.TFC_IS_LOADED;
     }
 
     public TFCStructuresMod(FMLJavaModLoadingContext modLoadingContext) {

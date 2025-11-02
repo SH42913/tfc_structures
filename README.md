@@ -10,6 +10,10 @@ it was built specially for TFC.\
 The mod is also fully configurable, you may find configuration files in **config/tfc\_structures** folder. By default,
 only vanilla structures are activated, but you can activate any other modded structure.
 
+Despite mod name, Dynamic TFC Structures may work and without TerraFirmaCraft, so feel free to use it in non-TFC
+modpacks :)
+_But you'll need to build configuration files by yourself in case you don't have TFC._
+
 ## Disclaimer
 
 Be aware that Dynamic TFC Structures is currently in **BETA**, so it **contains bugs** and **there are things to do**.

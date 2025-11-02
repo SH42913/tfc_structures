@@ -72,6 +72,3 @@ side = "BOTH"
 
 [[mixins]]
 config = "tfc_structures.mixins.json"
-
-[[mixins]]
-config = "tfc_structures.mixins.tfc.json"
