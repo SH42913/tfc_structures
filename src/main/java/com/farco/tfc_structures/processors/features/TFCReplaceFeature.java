@@ -2,7 +2,7 @@ package com.farco.tfc_structures.processors.features;
 
 import com.farco.tfc_structures.TFCStructuresMod;
 import com.farco.tfc_structures.config.ReplacementPreset;
-import com.farco.tfc_structures.mixin.ForestFeatureAccessorMixin;
+import com.farco.tfc_structures.mixin.tfc.ForestFeatureAccessorMixin;
 import com.farco.tfc_structures.processors.DummySurfaceBuilderContext;
 import com.farco.tfc_structures.utils.Pair;
 import net.dries007.tfc.common.blocks.SandstoneBlockType;

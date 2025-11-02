@@ -2,7 +2,7 @@ package com.farco.tfc_structures;
 
 import com.farco.tfc_structures.config.*;
 import com.farco.tfc_structures.data.DatapackGenerator;
-import com.farco.tfc_structures.mixin.SurfaceBuilderContextAccessorMixin;
+import com.farco.tfc_structures.mixin.tfc.SurfaceBuilderContextAccessorMixin;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -18,6 +18,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -41,6 +42,7 @@ public class TFCStructuresMod {
     public static final TagKey<Block> CRACKED_BRICKS_TAG = TagKey.create(Registries.BLOCK, ResourceLocation.fromNamespaceAndPath(MODID, CRACKED_BRICKS_TAG_NAME));
 
     public static final Logger LOGGER;
+    public static final boolean TFC_IS_LOADED;
     private static final Path CONFIG_FOLDER_PATH;
     private static final JsonConfigProvider CONFIG_PROVIDER;
     private static final DatapackGenerator DATAPACK_GENERATOR;
@@ -56,7 +58,11 @@ public class TFCStructuresMod {
         DATAPACK_GENERATOR = new DatapackGenerator(FMLPaths.GAMEDIR.get().resolve(MODID + "_datapacks"));
         presetContainer = new PresetContainer(CONFIG_FOLDER_PATH);
 
-        @SuppressWarnings("unused") Class<?> unused = SurfaceBuilderContextAccessorMixin.class;
+        ModList modList = ModList.get();
+        TFC_IS_LOADED = modList.isLoaded("tfc");
+        if (TFC_IS_LOADED) {
+            @SuppressWarnings("unused") Class<?> unused = SurfaceBuilderContextAccessorMixin.class;
+        }
     }
 
     public TFCStructuresMod(FMLJavaModLoadingContext modLoadingContext) {

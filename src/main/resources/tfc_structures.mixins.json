@@ -5,13 +5,9 @@
   "compatibilityLevel": "JAVA_16",
   "refmap": "tfc_structures.refmap.json",
   "mixins": [
-    "BuriedTreasurePieceMixin",
-    "ForestFeatureAccessorMixin",
     "ProtoChunkMixin",
-    "RuinedPortalStructureMixin",
     "StructureMixin",
-    "StructureStartMixin",
-    "SurfaceBuilderContextAccessorMixin"
+    "StructureStartMixin"
   ],
   "client": [
   ],

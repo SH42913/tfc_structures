@@ -1,4 +1,4 @@
-package com.farco.tfc_structures.mixin;
+package com.farco.tfc_structures.mixin.tfc;
 
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;

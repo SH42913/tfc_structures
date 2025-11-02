@@ -1,4 +1,4 @@
-package com.farco.tfc_structures.mixin;
+package com.farco.tfc_structures.mixin.tfc;
 
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;

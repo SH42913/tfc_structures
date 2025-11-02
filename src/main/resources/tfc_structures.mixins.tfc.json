@@ -1,0 +1,15 @@
+{
+  "required": false,
+  "package": "com.farco.tfc_structures.mixin.tfc",
+  "plugin": "com.farco.tfc_structures.mixin.TFCStructuresMixinPlugin",
+  "refmap": "tfc_structures.refmap.json",
+  "mixins": [
+    "BuriedTreasurePieceMixin",
+    "ForestFeatureAccessorMixin",
+    "RuinedPortalStructureMixin",
+    "SurfaceBuilderContextAccessorMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

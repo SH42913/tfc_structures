@@ -1,6 +1,6 @@
 package com.farco.tfc_structures.processors;
 
-import com.farco.tfc_structures.mixin.SurfaceBuilderContextAccessorMixin;
+import com.farco.tfc_structures.mixin.tfc.SurfaceBuilderContextAccessorMixin;
 import net.dries007.tfc.world.chunkdata.ChunkData;
 import net.dries007.tfc.world.settings.RockLayerSettings;
 import net.dries007.tfc.world.settings.RockSettings;

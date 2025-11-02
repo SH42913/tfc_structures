@@ -1,4 +1,4 @@
-package com.farco.tfc_structures.mixin;
+package com.farco.tfc_structures.mixin.tfc;
 
 import net.dries007.tfc.world.chunkdata.ChunkData;
 import net.dries007.tfc.world.feature.tree.ForestConfig;
