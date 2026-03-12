@@ -17,6 +17,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
@@ -229,7 +230,7 @@ public class StructureReplacementProcessor {
 
         CompoundTag originalTag = originalEntity.saveWithFullMetadata();
         overrideLootTableInTag(originalTag, lootDataManager);
-        initEmptyChestLootTable(originalTag, lootDataManager, random);
+        initNonLootTableChest(originalTag, lootDataManager, random);
         newEntity.load(originalTag);
         newEntity.setChanged();
 
@@ -258,7 +259,7 @@ public class StructureReplacementProcessor {
         }
     }
 
-    private void initEmptyChestLootTable(CompoundTag originalTag, LootDataManager lootDataManager, RandomSource random) {
+    private void initNonLootTableChest(CompoundTag originalTag, LootDataManager lootDataManager, RandomSource random) {
         if (originalTag.contains(LOOT_TABLE_NAME)) {
             return;
         }
@@ -267,12 +268,16 @@ public class StructureReplacementProcessor {
             return;
         }
 
+        boolean isEmptyChest = true;
         if (originalTag.contains(ITEMS_NAME)) {
-            originalTag.remove(ITEMS_NAME);
+            isEmptyChest = originalTag.getList(ITEMS_NAME, Tag.TAG_COMPOUND).isEmpty();
         }
 
-        setLootTableToTag(originalTag, lootDataManager, structureData.emptyChestLootTable());
-        originalTag.putLong(LOOT_TABLE_SEED_NAME, random.nextLong());
+        if (!isEmptyChest) {
+            originalTag.remove(ITEMS_NAME);
+            setLootTableToTag(originalTag, lootDataManager, structureData.emptyChestLootTable());
+            originalTag.putLong(LOOT_TABLE_SEED_NAME, random.nextLong());
+        }
     }
 
     private static void setLootTableToTag(CompoundTag originalTag, LootDataManager lootDataManager, String newLootTable) {

@@ -17,7 +17,7 @@ public final class StructureConfig implements JsonConfigProvider.HasFieldsToSort
     ).apply(instance, StructureConfig::new));
 
     public record Data(String replacementPreset,
-                       String emptyChestLootTable,
+                       String emptyChestLootTable, //TODO: Rename to lootTableForManualItemsChests in 0.4.0
                        Map<String, String> lootTablesOverrideMap) {
         public static final Codec<Data> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 Codec.STRING.fieldOf("replacementPreset").forGetter(Data::replacementPreset),
