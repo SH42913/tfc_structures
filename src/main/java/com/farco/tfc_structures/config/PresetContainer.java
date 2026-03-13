@@ -13,7 +13,6 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.function.Predicate;
 
 public final class PresetContainer {
     public static final String NO_REPLACE_PRESET_NAME = "no-replace";
@@ -241,13 +240,14 @@ public final class PresetContainer {
     }
 
     private static @NotNull List<ReplacementPreset.TFCWorld> getDefaultTFCWorld() {
-        var ignoreNames = List.of("nether", "prismarine", "end", "infested", "blackstone", "dripstone", "soul", "suspicious");
+        var ignoreNames = List.of("nether", "prismarine", "end", "infested", "blackstone", "dripstone", "soul", "suspicious", "potted");
         var stoneNames = List.of("stone");
         var stoneIgnore = List.of("stonecutter", "grindstone", "lodestone", "glowstone", "redstone");
         var brickNames = List.of("brick");
         var sandNames = List.of("sand", "gravel");
         var oreNames = List.of("ore");
         var woodNames = WoodType.values().map(WoodType::name).toList();
+        var woodIgnore = List.of("bamboo_sapling");
         var woodBlocksSet = Set.of(Blocks.CRAFTING_TABLE, Blocks.CHEST, Blocks.TRAPPED_CHEST, Blocks.BOOKSHELF);
         var soilBlockSet = Set.of(Blocks.GRASS_BLOCK, Blocks.DIRT_PATH, Blocks.DIRT, Blocks.FARMLAND, Blocks.COARSE_DIRT, Blocks.PODZOL, Blocks.ROOTED_DIRT, Blocks.MUD, Blocks.MUDDY_MANGROVE_ROOTS);
 
@@ -259,24 +259,23 @@ public final class PresetContainer {
             }
 
             String name = location.getPath();
-            Predicate<String> predicate = name::contains;
-            if (ignoreNames.stream().anyMatch(predicate)) {
+            if (containsAny(name, ignoreNames)) {
                 continue;
             }
 
             String conversionType;
             Block block = entry.getValue();
-            if (woodBlocksSet.contains(block) || woodNames.stream().anyMatch(predicate)) {
+            if (woodBlocksSet.contains(block) || (containsAny(name, woodNames, woodIgnore) && block != Blocks.BAMBOO)) {
                 conversionType = ReplacementPreset.TFC_WOOD_TYPE;
             } else if (soilBlockSet.contains(block)) {
                 conversionType = ReplacementPreset.TFC_SOIL_TYPE;
-            } else if (brickNames.stream().anyMatch(predicate)) {
+            } else if (containsAny(name, brickNames)) {
                 conversionType = ReplacementPreset.TFC_BRICK_TYPE;
-            } else if (sandNames.stream().anyMatch(predicate)) {
+            } else if (containsAny(name, sandNames)) {
                 conversionType = ReplacementPreset.TFC_SAND_TYPE;
-            } else if (oreNames.stream().anyMatch(predicate)) {
+            } else if (containsAny(name, oreNames)) {
                 conversionType = ReplacementPreset.TFC_ORE_TYPE;
-            } else if (stoneIgnore.stream().noneMatch(predicate) && stoneNames.stream().anyMatch(predicate)) {
+            } else if (containsAny(name, stoneNames, stoneIgnore)) {
                 conversionType = ReplacementPreset.TFC_STONE_TYPE;
             } else {
                 continue;
@@ -287,5 +286,24 @@ public final class PresetContainer {
 
         list.sort(Comparator.comparing(ReplacementPreset.TFCWorld::original));
         return list;
+    }
+
+    private static boolean containsAny(String name, List<String> allowedValues) {
+        return containsAny(name, allowedValues, null);
+    }
+
+    private static boolean containsAny(String name, List<String> allowedValues, List<String> ignoredValues) {
+        if (ignoredValues != null) {
+            if (containsAny(name, ignoredValues)) {
+                return false;
+            }
+        }
+
+        for (String keyword : allowedValues) {
+            if (name.contains(keyword)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
