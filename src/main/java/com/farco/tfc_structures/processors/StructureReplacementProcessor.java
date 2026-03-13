@@ -127,11 +127,14 @@ public class StructureReplacementProcessor {
         BlockState secondPartState = copyProperties(newBlock.defaultBlockState(), newState);
         if (newState.hasProperty(bedPartProperty)) {
             BedPart value = newState.getValue(bedPartProperty);
-            secondPartState = value == BedPart.FOOT
-                    ? secondPartState.setValue(bedPartProperty, BedPart.HEAD)
-                    : secondPartState.setValue(bedPartProperty, BedPart.FOOT);
-
             Direction direction = newState.getValue(BlockStateProperties.HORIZONTAL_FACING);
+            if (value == BedPart.FOOT) {
+                secondPartState = secondPartState.setValue(bedPartProperty, BedPart.HEAD);
+            } else {
+                secondPartState = secondPartState.setValue(bedPartProperty, BedPart.FOOT);
+                direction = direction.getOpposite();
+            }
+
             setPostProcessBlock(level, pos.relative(direction), secondPartState);
         } else if (newState.hasProperty(doubleBlockHalfProperty)) {
             DoubleBlockHalf value = newState.getValue(doubleBlockHalfProperty);
