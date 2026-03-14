@@ -102,7 +102,8 @@ public class TFCReplaceFeature implements ReplaceFeature {
                 new Pair<>(Tags.Blocks.BOOKSHELVES, Wood.BlockType.BOOKSHELF),
                 new Pair<>(TFCStructuresMod.STRIPPED_LOG_TAG, Wood.BlockType.STRIPPED_LOG),
                 new Pair<>(TFCStructuresMod.STRIPPED_WOOD_TAG, Wood.BlockType.STRIPPED_WOOD),
-                new Pair<>(BlockTags.LOGS, Wood.BlockType.LOG)
+                new Pair<>(BlockTags.LOGS, Wood.BlockType.LOG),
+                new Pair<>(BlockTags.SAPLINGS, Wood.BlockType.SAPLING)
         );
 
         blockToSoilBlockTypeMappings = List.of(
