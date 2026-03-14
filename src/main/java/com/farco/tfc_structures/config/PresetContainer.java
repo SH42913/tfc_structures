@@ -247,7 +247,7 @@ public final class PresetContainer {
         var sandNames = List.of("sand", "gravel");
         var oreNames = List.of("ore");
         var woodNames = WoodType.values().map(WoodType::name).toList();
-        var woodIgnore = List.of("bamboo_sapling");
+        var woodIgnore = List.of("bamboo");
         var woodBlocksSet = Set.of(Blocks.CRAFTING_TABLE, Blocks.CHEST, Blocks.TRAPPED_CHEST, Blocks.BOOKSHELF);
         var soilBlockSet = Set.of(Blocks.GRASS_BLOCK, Blocks.DIRT_PATH, Blocks.DIRT, Blocks.FARMLAND, Blocks.COARSE_DIRT, Blocks.PODZOL, Blocks.ROOTED_DIRT, Blocks.MUD, Blocks.MUDDY_MANGROVE_ROOTS);
 
@@ -265,7 +265,7 @@ public final class PresetContainer {
 
             String conversionType;
             Block block = entry.getValue();
-            if (woodBlocksSet.contains(block) || (containsAny(name, woodNames, woodIgnore) && block != Blocks.BAMBOO)) {
+            if (woodBlocksSet.contains(block) || containsAny(name, woodNames, woodIgnore)) {
                 conversionType = ReplacementPreset.TFC_WOOD_TYPE;
             } else if (soilBlockSet.contains(block)) {
                 conversionType = ReplacementPreset.TFC_SOIL_TYPE;
