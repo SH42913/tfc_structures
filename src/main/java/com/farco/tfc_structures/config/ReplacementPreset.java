@@ -102,7 +102,8 @@ public final class ReplacementPreset {
             }
 
             if (entry.original.equals(entry.replacement)) {
-                TFCStructuresMod.LOGGER.warn("Duplicated replacement with ID {}", entry.original);
+                TFCStructuresMod.LOGGER.warn("Replacement of ID {} will be skipped", entry.original);
+                continue;
             }
 
             directMap.put(entry.original, entry.replacement);
@@ -132,7 +133,7 @@ public final class ReplacementPreset {
             }
 
             if (replacements.isEmpty()) {
-                TFCStructuresMod.LOGGER.error("There's no random replacements for {}", entry.original);
+                TFCStructuresMod.LOGGER.warn("No random replacements for ID {}, it will be skipped", entry.original);
                 continue;
             }
 
@@ -149,6 +150,11 @@ public final class ReplacementPreset {
         for (TFCWorld entry : tfcWorldReplacements) {
             if (!blockRegistry.containsKey(entry.original)) {
                 TFCStructuresMod.LOGGER.error("Original for TFC replacement with ID {} not found", entry.original);
+                continue;
+            }
+
+            if (entry.type == null || entry.type.isBlank()) {
+                TFCStructuresMod.LOGGER.warn("No TFC type replacement for ID {}, it will be skipped", entry.original);
                 continue;
             }
 
