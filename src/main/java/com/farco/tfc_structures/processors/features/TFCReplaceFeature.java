@@ -12,6 +12,7 @@ import net.dries007.tfc.common.blocks.rock.Rock;
 import net.dries007.tfc.common.blocks.soil.SandBlockType;
 import net.dries007.tfc.common.blocks.soil.SoilBlockType;
 import net.dries007.tfc.common.blocks.wood.Wood;
+import net.dries007.tfc.util.Metal;
 import net.dries007.tfc.util.climate.OverworldClimateModel;
 import net.dries007.tfc.world.TFCChunkGenerator;
 import net.dries007.tfc.world.biome.BiomeExtension;
@@ -38,6 +39,8 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CeilingHangingSignBlock;
+import net.minecraft.world.level.block.SignBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
@@ -46,6 +49,7 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -221,8 +225,31 @@ public class TFCReplaceFeature implements ReplaceFeature {
     }
 
     private Block replaceTFCWood(BlockState original) {
-        Wood.BlockType blockType = null;
         Block originalBlock = original.getBlock();
+        if (original.is(BlockTags.ALL_HANGING_SIGNS)) {
+            return getHangingSignBlock(originalBlock);
+        } else {
+            Wood.BlockType blockType = getWoodBlockType(original, originalBlock);
+            return cachedWood.getBlock(blockType).get();
+        }
+    }
+
+    private @Nullable SignBlock getHangingSignBlock(Block originalBlock) {
+        var woodMap = originalBlock instanceof CeilingHangingSignBlock
+                ? TFCBlocks.CEILING_HANGING_SIGNS
+                : TFCBlocks.WALL_HANGING_SIGNS;
+
+        var metalMap = woodMap.getOrDefault(cachedWood, null);
+        if (metalMap != null) {
+            return metalMap.get(Metal.Default.COPPER).get();
+        } else {
+            TFCStructuresMod.LOGGER.error("Can't get hanging sign block for {} wood", cachedWood);
+            return null;
+        }
+    }
+
+    private Wood.@NotNull BlockType getWoodBlockType(BlockState original, Block originalBlock) {
+        Wood.BlockType blockType = null;
         var possibleReplacement = blockToWoodBlockTypeMap.get(originalBlock);
         if (possibleReplacement != null) {
             blockType = possibleReplacement;
@@ -241,7 +268,7 @@ public class TFCReplaceFeature implements ReplaceFeature {
             blockType = Wood.BlockType.WOOD;
         }
 
-        return cachedWood.getBlock(blockType).get();
+        return blockType;
     }
 
     private Block replaceTFCSoil(WorldGenLevel level, BlockPos pos, BlockState original) {
