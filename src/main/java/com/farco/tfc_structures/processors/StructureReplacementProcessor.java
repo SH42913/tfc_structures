@@ -30,10 +30,7 @@ import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BedPart;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
-import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.block.state.properties.*;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.storage.loot.LootDataManager;
@@ -149,20 +146,40 @@ public class StructureReplacementProcessor {
     }
 
     private void postProcessTFC(BlockPos pos, Block newBlock, BlockState newState, WorldGenLevel level) {
-        var tallPlantPartProperty = TFCBlockStateProperties.TALL_PLANT_PART;
+        postProcessTallPlants(pos, newBlock, newState, level);
+        postProcessDecayingBlock(pos, newBlock, level);
+        postProcessShelves(pos, newState, level);
+    }
 
-        BlockState secondPartState = copyProperties(newBlock.defaultBlockState(), newState);
-        if (newState.hasProperty(tallPlantPartProperty)) {
-            ITallPlant.Part value = newState.getValue(tallPlantPartProperty);
-            if (value == ITallPlant.Part.LOWER) {
-                secondPartState = secondPartState.setValue(tallPlantPartProperty, ITallPlant.Part.UPPER);
-                setPostProcessBlock(level, pos.above(), secondPartState);
-            } else {
-                secondPartState = secondPartState.setValue(tallPlantPartProperty, ITallPlant.Part.LOWER);
-                setPostProcessBlock(level, pos.below(), secondPartState);
-            }
+    private void postProcessTallPlants(BlockPos pos, Block newBlock, BlockState newState, WorldGenLevel level) {
+        var tallPlantPartProperty = TFCBlockStateProperties.TALL_PLANT_PART;
+        if (!newState.hasProperty(tallPlantPartProperty)) {
+            return;
         }
 
+        BlockPos bottomPos = pos;
+        while (blockHasTallPlant(level, bottomPos.below(), tallPlantPartProperty)) {
+            bottomPos = bottomPos.below();
+        }
+
+        var lastPos = bottomPos;
+        BlockState secondPartState = copyProperties(newBlock.defaultBlockState(), newState);
+        while (blockHasTallPlant(level, lastPos, tallPlantPartProperty)) {
+            secondPartState = secondPartState.setValue(tallPlantPartProperty, ITallPlant.Part.LOWER);
+            setPostProcessBlock(level, lastPos, secondPartState);
+
+            lastPos = lastPos.above();
+        }
+
+        secondPartState = secondPartState.setValue(tallPlantPartProperty, ITallPlant.Part.UPPER);
+        setPostProcessBlock(level, lastPos.below(), secondPartState);
+    }
+
+    private static boolean blockHasTallPlant(WorldGenLevel level, BlockPos bottomPos, EnumProperty<ITallPlant.Part> tallPlantPartProperty) {
+        return level.getBlockState(bottomPos).hasProperty(tallPlantPartProperty);
+    }
+
+    private static void postProcessDecayingBlock(BlockPos pos, Block newBlock, WorldGenLevel level) {
         var blockEntity = level.getBlockEntity(pos);
         if (blockEntity instanceof DecayingBlockEntity decaying) {
             Item item = newBlock.asItem();
@@ -176,16 +193,20 @@ public class StructureReplacementProcessor {
                 blockEntity.setChanged();
             }
         }
+    }
 
-        if (newState.is(TFC_SHELVES)) {
-            for (Direction direction : HORIZONTAL_DIRECTIONS) {
-                var neighbourPos = pos.relative(direction);
-                var neighbourState = level.getBlockState(neighbourPos);
-                if (neighbourState.getCollisionShape(level, neighbourPos).isEmpty()) {
-                    newState = newState.setValue(BlockStateProperties.HORIZONTAL_FACING, direction);
-                    level.setBlock(pos, newState, Block.UPDATE_NONE);
-                    break;
-                }
+    private static void postProcessShelves(BlockPos pos, BlockState newState, WorldGenLevel level) {
+        if (!newState.is(TFC_SHELVES)) {
+            return;
+        }
+
+        for (Direction direction : HORIZONTAL_DIRECTIONS) {
+            var neighbourPos = pos.relative(direction);
+            var neighbourState = level.getBlockState(neighbourPos);
+            if (neighbourState.getCollisionShape(level, neighbourPos).isEmpty()) {
+                newState = newState.setValue(BlockStateProperties.HORIZONTAL_FACING, direction);
+                level.setBlock(pos, newState, Block.UPDATE_NONE);
+                break;
             }
         }
     }
