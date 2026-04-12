@@ -8,21 +8,13 @@ import com.farco.tfc_structures.processors.features.DirectReplaceFeature;
 import com.farco.tfc_structures.processors.features.RandomReplaceFeature;
 import com.farco.tfc_structures.processors.features.ReplaceFeature;
 import com.farco.tfc_structures.processors.features.TFCReplaceFeature;
-import net.dries007.tfc.common.blockentities.DecayingBlockEntity;
-import net.dries007.tfc.common.blocks.TFCBlockStateProperties;
-import net.dries007.tfc.common.blocks.plant.ITallPlant;
-import net.dries007.tfc.common.capabilities.food.FoodCapability;
-import net.dries007.tfc.common.capabilities.food.IFood;
+import com.farco.tfc_structures.utils.BlockStateHelper;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
@@ -30,12 +22,10 @@ import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.*;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.storage.loot.LootDataManager;
 import net.minecraft.world.level.storage.loot.LootTable;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -47,8 +37,6 @@ public class StructureReplacementProcessor {
     private static final String LOOT_TABLE_NAME = RandomizableContainerBlockEntity.LOOT_TABLE_TAG;
     private static final String LOOT_TABLE_SEED_NAME = RandomizableContainerBlockEntity.LOOT_TABLE_SEED_TAG;
     private static final String ITEMS_NAME = "Items";
-    private static final TagKey<Block> TFC_SHELVES = TagKey.create(Registries.BLOCK, ResourceLocation.parse("tfc:bookshelves"));
-    private static final List<Direction> HORIZONTAL_DIRECTIONS = List.of(Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
 
     private final @Nullable StructureConfig.Data structureData;
     private final List<ReplaceFeature> replaceFeatures;
@@ -84,6 +72,7 @@ public class StructureReplacementProcessor {
         }
 
         var chunkAccess = level.getChunk(chunkPos.x, chunkPos.z);
+        var postProcessHelper = new PostProcessHelper(level, blocksToSkip);
         for (BlockPos pos : registeredBlocks) {
             if (blocksToSkip.contains(pos)) {
                 continue;
@@ -102,7 +91,7 @@ public class StructureReplacementProcessor {
             }
 
             TFCStructuresMod.LOGGER.debug("{} at {} replaced with {}", originalState.getBlock(), pos, newBlock);
-            BlockState newState = replaceBlock(newBlock, originalState);
+            BlockState newState = BlockStateHelper.replaceBlock(newBlock, originalState);
             level.setBlock(pos, newState, Block.UPDATE_NONE);
 
             if (originalEntity != null) {
@@ -111,109 +100,13 @@ public class StructureReplacementProcessor {
                 createBlockEntity(pos, newState, chunkAccess);
             }
 
-            postProcessVanilla(pos, newBlock, newState, level);
-            if (TFCStructuresMod.TFC_IS_LOADED) {
-                postProcessTFC(pos, newBlock, newState, level);
+            for (ReplaceFeature feature : replaceFeatures) {
+                feature.postProcessBlock(pos, newBlock, newState, postProcessHelper);
             }
         }
-    }
 
-    private void postProcessVanilla(BlockPos pos, Block newBlock, BlockState newState, WorldGenLevel level) {
-        var bedPartProperty = BlockStateProperties.BED_PART;
-        var doubleBlockHalfProperty = BlockStateProperties.DOUBLE_BLOCK_HALF;
-        BlockState secondPartState = copyProperties(newBlock.defaultBlockState(), newState);
-        if (newState.hasProperty(bedPartProperty)) {
-            BedPart value = newState.getValue(bedPartProperty);
-            Direction direction = newState.getValue(BlockStateProperties.HORIZONTAL_FACING);
-            if (value == BedPart.FOOT) {
-                secondPartState = secondPartState.setValue(bedPartProperty, BedPart.HEAD);
-            } else {
-                secondPartState = secondPartState.setValue(bedPartProperty, BedPart.FOOT);
-                direction = direction.getOpposite();
-            }
-
-            setPostProcessBlock(level, pos.relative(direction), secondPartState);
-        } else if (newState.hasProperty(doubleBlockHalfProperty)) {
-            DoubleBlockHalf value = newState.getValue(doubleBlockHalfProperty);
-            if (value == DoubleBlockHalf.LOWER) {
-                secondPartState = secondPartState.setValue(doubleBlockHalfProperty, DoubleBlockHalf.UPPER);
-                setPostProcessBlock(level, pos.above(), secondPartState);
-            } else {
-                secondPartState = secondPartState.setValue(doubleBlockHalfProperty, DoubleBlockHalf.LOWER);
-                setPostProcessBlock(level, pos.below(), secondPartState);
-            }
-        }
-    }
-
-    private void postProcessTFC(BlockPos pos, Block newBlock, BlockState newState, WorldGenLevel level) {
-        postProcessTallPlants(pos, newBlock, newState, level);
-        postProcessDecayingBlock(pos, newBlock, level);
-        postProcessShelves(pos, newState, level);
-    }
-
-    private void postProcessTallPlants(BlockPos pos, Block newBlock, BlockState newState, WorldGenLevel level) {
-        var tallPlantPartProperty = TFCBlockStateProperties.TALL_PLANT_PART;
-        if (!newState.hasProperty(tallPlantPartProperty)) {
-            return;
-        }
-
-        BlockPos bottomPos = pos;
-        while (blockHasTallPlant(level, bottomPos.below(), tallPlantPartProperty)) {
-            bottomPos = bottomPos.below();
-        }
-
-        var lastPos = bottomPos;
-        BlockState secondPartState = copyProperties(newBlock.defaultBlockState(), newState);
-        while (blockHasTallPlant(level, lastPos, tallPlantPartProperty)) {
-            secondPartState = secondPartState.setValue(tallPlantPartProperty, ITallPlant.Part.LOWER);
-            setPostProcessBlock(level, lastPos, secondPartState);
-
-            lastPos = lastPos.above();
-        }
-
-        secondPartState = secondPartState.setValue(tallPlantPartProperty, ITallPlant.Part.UPPER);
-        setPostProcessBlock(level, lastPos.below(), secondPartState);
-    }
-
-    private static boolean blockHasTallPlant(WorldGenLevel level, BlockPos bottomPos, EnumProperty<ITallPlant.Part> tallPlantPartProperty) {
-        return level.getBlockState(bottomPos).hasProperty(tallPlantPartProperty);
-    }
-
-    private static void postProcessDecayingBlock(BlockPos pos, Block newBlock, WorldGenLevel level) {
-        var blockEntity = level.getBlockEntity(pos);
-        if (blockEntity instanceof DecayingBlockEntity decaying) {
-            Item item = newBlock.asItem();
-            ItemStack itemStack = new ItemStack(item, 1);
-            FoodCapability.get(itemStack);
-
-            IFood food = FoodCapability.get(itemStack);
-            if (food != null) {
-                food.setCreationDate(FoodCapability.getRoundedCreationDate());
-                decaying.setStack(itemStack);
-                blockEntity.setChanged();
-            }
-        }
-    }
-
-    private static void postProcessShelves(BlockPos pos, BlockState newState, WorldGenLevel level) {
-        if (!newState.is(TFC_SHELVES)) {
-            return;
-        }
-
-        for (Direction direction : HORIZONTAL_DIRECTIONS) {
-            var neighbourPos = pos.relative(direction);
-            var neighbourState = level.getBlockState(neighbourPos);
-            if (neighbourState.getCollisionShape(level, neighbourPos).isEmpty()) {
-                newState = newState.setValue(BlockStateProperties.HORIZONTAL_FACING, direction);
-                level.setBlock(pos, newState, Block.UPDATE_NONE);
-                break;
-            }
-        }
-    }
-
-    private void setPostProcessBlock(WorldGenLevel level, BlockPos pos, BlockState state) {
-        level.setBlock(pos, state, Block.UPDATE_NONE);
-        blocksToSkip.add(pos);
+        registeredBlocks.clear();
+        blocksToSkip.clear();
     }
 
     private Block getReplacementBlock(WorldGenLevel level, BlockPos pos, BlockState original) {
@@ -230,12 +123,6 @@ public class StructureReplacementProcessor {
         }
 
         return null;
-    }
-
-    private static @NotNull BlockState replaceBlock(Block newBlock, BlockState originalState) {
-        BlockState newState = newBlock.defaultBlockState();
-        newState = copyProperties(newState, originalState);
-        return newState;
     }
 
     private void replaceBlockEntity(BlockPos pos, BlockState originalState, BlockEntity originalEntity, BlockState newState, ChunkAccess chunkAccess, WorldGenLevel level, RandomSource random) {
@@ -326,17 +213,5 @@ public class StructureReplacementProcessor {
         if (newEntity != null) {
             chunkAccess.setBlockEntity(newEntity);
         }
-    }
-
-    public static BlockState copyProperties(BlockState copyTo, BlockState copyFrom) {
-        for (Property<?> property : copyFrom.getProperties()) {
-            copyTo = copyProperty(copyTo, copyFrom, property);
-        }
-
-        return copyTo;
-    }
-
-    public static <T extends Comparable<T>> BlockState copyProperty(BlockState copyTo, BlockState copyFrom, Property<T> property) {
-        return copyTo.hasProperty(property) ? copyTo.setValue(property, copyFrom.getValue(property)) : copyTo;
     }
 }

@@ -1,6 +1,7 @@
 package com.farco.tfc_structures.processors.features;
 
 import com.farco.tfc_structures.config.ReplacementPreset;
+import com.farco.tfc_structures.processors.PostProcessHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -62,5 +63,9 @@ public class RandomReplaceFeature implements ReplaceFeature {
         var replacementLocation = variants.get(randomIndex);
         return blockRegistry.get(replacementLocation);
 
+    }
+
+    @Override
+    public void postProcessBlock(BlockPos pos, Block newBlock, BlockState newState, PostProcessHelper postProcessHelper) {
     }
 }

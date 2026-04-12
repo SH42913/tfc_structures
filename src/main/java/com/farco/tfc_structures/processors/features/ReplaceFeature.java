@@ -1,5 +1,6 @@
 package com.farco.tfc_structures.processors.features;
 
+import com.farco.tfc_structures.processors.PostProcessHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
@@ -14,4 +15,6 @@ public interface ReplaceFeature {
     void prepareData(WorldGenLevel level, RandomSource random, ChunkPos rootChunkPos, BoundingBox box, ChunkPos chunkPos);
 
     @Nullable Block replaceBlock(WorldGenLevel level, BlockPos pos, BlockState originalState, ResourceLocation originalLocation);
+
+    void postProcessBlock(BlockPos pos, Block newBlock, BlockState newState, PostProcessHelper postProcessHelper);
 }
