@@ -161,7 +161,7 @@ public class StructureReplacementProcessor {
                 : null;
 
         if (newLootTable == null && CommonConfig.FALLBACK_TO_TFC_STRUCTURES_LOOT.get()) {
-            newLootTable = originalLootTable.replace("minecraft", TFCStructuresMod.MODID);
+            newLootTable = originalLootTable.replaceFirst("minecraft", TFCStructuresMod.MODID);
         }
 
         if (newLootTable != null) {

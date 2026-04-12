@@ -99,6 +99,11 @@ public class CommonConfig {
     }
 
     public static boolean isAvailableToReplace(@NotNull WorldGenLevel worldGenLevel) {
-        return allowedDimensionsSet.contains(worldGenLevel.getLevel().dimension().location());
+        if (allowedDimensionsSet == null || allowedDimensionsSet.isEmpty()) {
+            TFCStructuresMod.LOGGER.warn("allowedDimensions set is empty, so any dimension will use block replacements");
+            return true;
+        } else {
+            return allowedDimensionsSet.contains(worldGenLevel.getLevel().dimension().location());
+        }
     }
 }

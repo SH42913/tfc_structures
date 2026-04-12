@@ -58,6 +58,10 @@ public abstract class StructureStartMixin {
 
         String name = structureData.replacementPreset();
         ReplacementPreset replacementPreset = TFCStructuresMod.presetContainer.getPresetByName(name);
+        if (replacementPreset == null) {
+            TFCStructuresMod.LOGGER.error("Replacement Preset {} was not found, so {} will use default blocks", name, location);
+            return;
+        }
 
         Registry<Block> blockRegistry = level.registryAccess().registryOrThrow(Registries.BLOCK);
         replacementPreset.createMapsIfNeed(blockRegistry);

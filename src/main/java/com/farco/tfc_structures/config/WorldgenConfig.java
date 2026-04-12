@@ -48,16 +48,18 @@ public final class WorldgenConfig {
 
         var structures = new HashSet<>(allStructures);
         for (ResourceLocation structure : activeStructures) {
-            if (!allStructures.contains(structure)) {
-                TFCStructuresMod.LOGGER.warn("Structure {} is not valid", structure);
-            } else {
+            if (allStructures.contains(structure)) {
                 structures.remove(structure);
+            } else {
+                TFCStructuresMod.LOGGER.warn("Structure {} is not valid", structure);
             }
         }
 
         for (var structure : disabledStructures) {
             if (allStructures.contains(structure)) {
                 structures.remove(structure);
+            } else {
+                TFCStructuresMod.LOGGER.warn("Disabled structure {} is not valid", structure);
             }
         }
 

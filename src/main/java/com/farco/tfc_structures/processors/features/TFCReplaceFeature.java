@@ -366,6 +366,7 @@ public class TFCReplaceFeature implements ReplaceFeature {
         for (Pair<TagKey<Block>, Ore> mapping : tagToOreMappings) {
             if (originalState.is(mapping.first())) {
                 ore = mapping.second();
+                break;
             }
         }
 
@@ -541,8 +542,6 @@ public class TFCReplaceFeature implements ReplaceFeature {
         if (blockEntity instanceof DecayingBlockEntity decaying) {
             Item item = newBlock.asItem();
             ItemStack itemStack = new ItemStack(item, 1);
-            FoodCapability.get(itemStack);
-
             IFood food = FoodCapability.get(itemStack);
             if (food != null) {
                 food.setCreationDate(FoodCapability.getRoundedCreationDate());
