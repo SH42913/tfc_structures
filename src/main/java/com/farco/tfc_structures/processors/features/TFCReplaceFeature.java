@@ -2,6 +2,7 @@ package com.farco.tfc_structures.processors.features;
 
 import com.farco.tfc_structures.TFCStructuresMod;
 import com.farco.tfc_structures.config.ReplacementPreset;
+import com.farco.tfc_structures.mixin.tfc.ConnectedGrassBlockAccessorMixin;
 import com.farco.tfc_structures.mixin.tfc.ForestFeatureAccessorMixin;
 import com.farco.tfc_structures.processors.DummySurfaceBuilderContext;
 import com.farco.tfc_structures.processors.PostProcessHelper;
@@ -10,6 +11,9 @@ import net.dries007.tfc.common.blockentities.DecayingBlockEntity;
 import net.dries007.tfc.common.blocks.SandstoneBlockType;
 import net.dries007.tfc.common.blocks.TFCBlockStateProperties;
 import net.dries007.tfc.common.blocks.TFCBlocks;
+import net.dries007.tfc.common.blocks.crop.CropBlock;
+import net.dries007.tfc.common.blocks.crop.DoubleCropBlock;
+import net.dries007.tfc.common.blocks.crop.WildCropBlock;
 import net.dries007.tfc.common.blocks.plant.ITallPlant;
 import net.dries007.tfc.common.blocks.rock.Ore;
 import net.dries007.tfc.common.blocks.rock.Rock;
@@ -52,7 +56,6 @@ import net.minecraft.world.level.block.CeilingHangingSignBlock;
 import net.minecraft.world.level.block.SignBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
@@ -503,38 +506,49 @@ public class TFCReplaceFeature implements ReplaceFeature {
     }
 
     @Override
-    public void postProcessBlock(BlockPos pos, Block newBlock, BlockState newState, PostProcessHelper postProcessHelper) {
-        postProcessTallPlants(pos, newBlock, newState, postProcessHelper);
+    public void postProcessBlock(BlockPos pos, Block originalBlock, Block newBlock, BlockState newState, PostProcessHelper postProcessHelper) {
+        postProcessTallPlants(pos, originalBlock, newBlock, newState, postProcessHelper);
+
         postProcessDecayingBlock(pos, newBlock, postProcessHelper);
         postProcessShelves(pos, newState, postProcessHelper);
     }
 
-    private static void postProcessTallPlants(BlockPos pos, Block newBlock, BlockState newState, PostProcessHelper helper) {
-        var tallPlantPartProperty = TFCBlockStateProperties.TALL_PLANT_PART;
-        if (!newState.hasProperty(tallPlantPartProperty)) {
+    private void postProcessTallPlants(BlockPos pos, Block originalBlock, Block newBlock, BlockState newState, PostProcessHelper helper) {
+        var tallPlantProperty = TFCBlockStateProperties.TALL_PLANT_PART;
+        var isTallPlant = newState.hasProperty(tallPlantProperty);
+
+        var doubleCropProperty = TFCBlockStateProperties.DOUBLE_CROP_PART;
+        var isDoubleCrop = newState.hasProperty(doubleCropProperty);
+        if (!isTallPlant && !isDoubleCrop) {
             return;
         }
 
-        BlockPos bottomPos = pos;
-        while (blockHasTallPlant(helper.level, bottomPos.below(), tallPlantPartProperty)) {
-            bottomPos = bottomPos.below();
+        BlockPos bottomPos = detectBottomBlock(helper.level, pos, originalBlock);
+        postProcessGroundUnderPlant(bottomPos, newBlock, helper);
+
+        BlockPos currentPos = bottomPos;
+        BlockPos topPos = detectTopBlock(helper.level, pos, originalBlock);
+        BlockState baseState = helper.copyProperties(newBlock.defaultBlockState(), newState);
+        while (currentPos.getY() < topPos.getY()) {
+            var state = baseState;
+            if (isTallPlant) {
+                state = state.setValue(tallPlantProperty, ITallPlant.Part.LOWER);
+            } else {
+                state = state.setValue(doubleCropProperty, DoubleCropBlock.Part.BOTTOM);
+            }
+
+            helper.setPostProcessBlock(currentPos, state);
+            currentPos = currentPos.above();
         }
 
-        var lastPos = bottomPos;
-        BlockState secondPartState = helper.copyProperties(newBlock.defaultBlockState(), newState);
-        while (blockHasTallPlant(helper.level, lastPos, tallPlantPartProperty)) {
-            secondPartState = secondPartState.setValue(tallPlantPartProperty, ITallPlant.Part.LOWER);
-            helper.setPostProcessBlock(lastPos, secondPartState);
-
-            lastPos = lastPos.above();
+        var topState = baseState;
+        if (isTallPlant) {
+            topState = topState.setValue(tallPlantProperty, ITallPlant.Part.UPPER);
+        } else {
+            topState = topState.setValue(doubleCropProperty, DoubleCropBlock.Part.TOP);
         }
 
-        secondPartState = secondPartState.setValue(tallPlantPartProperty, ITallPlant.Part.UPPER);
-        helper.setPostProcessBlock(lastPos.below(), secondPartState);
-    }
-
-    private static boolean blockHasTallPlant(WorldGenLevel level, BlockPos bottomPos, EnumProperty<ITallPlant.Part> tallPlantPartProperty) {
-        return level.getBlockState(bottomPos).hasProperty(tallPlantPartProperty);
+        helper.setPostProcessBlock(topPos, topState);
     }
 
     private static void postProcessDecayingBlock(BlockPos pos, Block newBlock, PostProcessHelper helper) {
@@ -564,6 +578,47 @@ public class TFCReplaceFeature implements ReplaceFeature {
                 helper.level.setBlock(pos, newState, Block.UPDATE_NONE);
                 break;
             }
+        }
+    }
+
+    private static @NotNull BlockPos detectBottomBlock(WorldGenLevel level, BlockPos pos, Block originalBlock) {
+        BlockPos bottomPos = pos;
+        while (true) {
+            BlockState stateBelow = level.getBlockState(bottomPos.below());
+            if (stateBelow.is(originalBlock)) {
+                bottomPos = bottomPos.below();
+            } else {
+                break;
+            }
+        }
+
+        return bottomPos;
+    }
+
+    private static @NotNull BlockPos detectTopBlock(WorldGenLevel level, BlockPos pos, Block originalBlock) {
+        BlockPos topPos = pos;
+        while (true) {
+            BlockState stateAbove = level.getBlockState(topPos.above());
+            if (stateAbove.is(originalBlock)) {
+                topPos = topPos.above();
+            } else {
+                break;
+            }
+        }
+
+        return topPos;
+    }
+
+    private void postProcessGroundUnderPlant(BlockPos blockPos, Block newBlock, PostProcessHelper helper) {
+        BlockPos groundPos = blockPos.below();
+        var soilContext = buildSoilContext(helper.level, groundPos);
+        var grassState = SurfaceStates.GRASS.getState(soilContext);
+        if (newBlock instanceof CropBlock) {
+            var connectedGrassAccessor = (ConnectedGrassBlockAccessorMixin) grassState.getBlock();
+            var farmlandState = connectedGrassAccessor.getFarmlandSupplier().get().defaultBlockState();
+            helper.setPostProcessBlock(groundPos, farmlandState);
+        } else if (newBlock instanceof WildCropBlock) {
+            helper.setPostProcessBlock(groundPos, grassState);
         }
     }
 }

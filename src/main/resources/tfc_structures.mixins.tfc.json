@@ -5,6 +5,7 @@
   "refmap": "tfc_structures.refmap.json",
   "mixins": [
     "BuriedTreasurePieceMixin",
+    "ConnectedGrassBlockAccessorMixin",
     "ForestFeatureAccessorMixin",
     "RuinedPortalStructureMixin",
     "SurfaceBuilderContextAccessorMixin"
