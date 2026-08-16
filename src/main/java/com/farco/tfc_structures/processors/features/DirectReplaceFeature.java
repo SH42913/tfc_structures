@@ -36,7 +36,7 @@ public class DirectReplaceFeature implements ReplaceFeature {
     }
 
     @Override
-    public void postProcessBlock(BlockPos pos, Block newBlock, BlockState newState, PostProcessHelper postProcessHelper) {
+    public void postProcessBlock(BlockPos pos, Block originalBlock, Block newBlock, BlockState newState, PostProcessHelper postProcessHelper) {
         BlockState secondPartState = postProcessHelper.copyProperties(newBlock.defaultBlockState(), newState);
 
         var bedPartProperty = BlockStateProperties.BED_PART;

@@ -90,7 +90,8 @@ public class StructureReplacementProcessor {
                 continue;
             }
 
-            TFCStructuresMod.LOGGER.debug("{} at {} replaced with {}", originalState.getBlock(), pos, newBlock);
+            Block originalBlock = originalState.getBlock();
+            TFCStructuresMod.LOGGER.debug("{} at {} replaced with {}", originalBlock, pos, newBlock);
             BlockState newState = BlockStateHelper.replaceBlock(newBlock, originalState);
             level.setBlock(pos, newState, Block.UPDATE_NONE);
 
@@ -101,7 +102,7 @@ public class StructureReplacementProcessor {
             }
 
             for (ReplaceFeature feature : replaceFeatures) {
-                feature.postProcessBlock(pos, newBlock, newState, postProcessHelper);
+                feature.postProcessBlock(pos, originalBlock, newBlock, newState, postProcessHelper);
             }
         }
 

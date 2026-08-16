@@ -66,6 +66,6 @@ public class RandomReplaceFeature implements ReplaceFeature {
     }
 
     @Override
-    public void postProcessBlock(BlockPos pos, Block newBlock, BlockState newState, PostProcessHelper postProcessHelper) {
+    public void postProcessBlock(BlockPos pos, Block originalBlock, Block newBlock, BlockState newState, PostProcessHelper postProcessHelper) {
     }
 }

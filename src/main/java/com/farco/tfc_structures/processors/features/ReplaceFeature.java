@@ -16,5 +16,5 @@ public interface ReplaceFeature {
 
     @Nullable Block replaceBlock(WorldGenLevel level, BlockPos pos, BlockState originalState, ResourceLocation originalLocation);
 
-    void postProcessBlock(BlockPos pos, Block newBlock, BlockState newState, PostProcessHelper postProcessHelper);
+    void postProcessBlock(BlockPos pos, Block originalBlock, Block newBlock, BlockState newState, PostProcessHelper postProcessHelper);
 }
