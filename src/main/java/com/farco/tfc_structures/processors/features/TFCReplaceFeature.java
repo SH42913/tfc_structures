@@ -78,7 +78,8 @@ public class TFCReplaceFeature implements ReplaceFeature {
     );
 
     private static final TagKey<Block> TFC_SHELVES = TagKey.create(Registries.BLOCK, ResourceLocation.parse("tfc:bookshelves"));
-    private static final List<Direction> HORIZONTAL_DIRECTIONS = List.of(Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
+    private static final Direction[] HORIZONTAL_DIRECTIONS = new Direction[]{Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
+    private static final Direction[] SEARCH_DIRECTIONS = new Direction[]{Direction.UP, Direction.DOWN, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST};
 
     private final Map<ResourceLocation, String> replacementMap;
 
@@ -98,7 +99,8 @@ public class TFCReplaceFeature implements ReplaceFeature {
 
         blockToWoodBlockTypeMap = Map.of(
                 Blocks.CRAFTING_TABLE, Wood.BlockType.WORKBENCH,
-                Blocks.LECTERN, Wood.BlockType.LECTERN
+                Blocks.LECTERN, Wood.BlockType.LECTERN,
+                Blocks.CHISELED_BOOKSHELF, Wood.BlockType.BOOKSHELF
         );
 
         tagToWoodBlockTypeMappings = List.of(
@@ -570,14 +572,48 @@ public class TFCReplaceFeature implements ReplaceFeature {
             return;
         }
 
-        for (Direction direction : HORIZONTAL_DIRECTIONS) {
-            var neighbourPos = pos.relative(direction);
-            var neighbourState = helper.level.getBlockState(neighbourPos);
-            if (neighbourState.getCollisionShape(helper.level, neighbourPos).isEmpty()) {
-                newState = newState.setValue(BlockStateProperties.HORIZONTAL_FACING, direction);
-                helper.level.setBlock(pos, newState, Block.UPDATE_NONE);
+        Direction chosenDirection = null;
+
+        for (Direction dir : SEARCH_DIRECTIONS) {
+            BlockState neighborState = helper.level.getBlockState(pos.relative(dir));
+            if (neighborState.is(TFC_SHELVES) && neighborState.hasProperty(BlockStateProperties.HORIZONTAL_FACING)) {
+                chosenDirection = neighborState.getValue(BlockStateProperties.HORIZONTAL_FACING);
                 break;
             }
+        }
+
+        if (chosenDirection == null) {
+            int openCount = 0;
+            Direction firstOpen = null;
+            Direction singleOccupiedDirection = null;
+
+            for (Direction direction : HORIZONTAL_DIRECTIONS) {
+                var neighbourPos = pos.relative(direction);
+                var neighbourState = helper.level.getBlockState(neighbourPos);
+
+                if (neighbourState.isAir()) {
+                    openCount++;
+                    if (firstOpen == null) {
+                        firstOpen = direction;
+                    }
+                } else {
+                    singleOccupiedDirection = direction;
+                }
+            }
+
+            if (openCount == 1) {
+                chosenDirection = firstOpen;
+            } else if (openCount == 3 && singleOccupiedDirection != null) {
+                chosenDirection = singleOccupiedDirection.getOpposite();
+            } else if (openCount > 0) {
+                chosenDirection = firstOpen;
+            }
+
+        }
+
+        if (chosenDirection != null && newState.getValue(BlockStateProperties.HORIZONTAL_FACING) != chosenDirection) {
+            newState = newState.setValue(BlockStateProperties.HORIZONTAL_FACING, chosenDirection);
+            helper.level.setBlock(pos, newState, Block.UPDATE_NONE);
         }
     }
 
