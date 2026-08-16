@@ -137,10 +137,10 @@ public final class PresetContainer {
         list.add(new ReplacementPreset.Direct("minecraft:polished_andesite_stairs", "tfc:rock/smooth/andesite_stairs"));
         list.add(new ReplacementPreset.Direct("minecraft:polished_andesite_slab", "tfc:rock/smooth/andesite_slab"));
         list.add(new ReplacementPreset.Direct("minecraft:deepslate", "tfc:rock/hardened/basalt"));
-        list.add(new ReplacementPreset.Direct("minecraft:cobbled_deepslate", "tfc:rock/cobble/basalt"));
-        list.add(new ReplacementPreset.Direct("minecraft:cobbled_deepslate_stairs", "tfc:rock/cobble/basalt_stairs"));
-        list.add(new ReplacementPreset.Direct("minecraft:cobbled_deepslate_slab", "tfc:rock/cobble/basalt_slab"));
-        list.add(new ReplacementPreset.Direct("minecraft:cobbled_deepslate_wall", "tfc:rock/cobble/basalt_wall"));
+        list.add(new ReplacementPreset.Direct("minecraft:cobbled_deepslate", "tfc:rock/hardened/basalt"));
+        list.add(new ReplacementPreset.Direct("minecraft:cobbled_deepslate_stairs", "tfc:rock/raw/basalt_stairs"));
+        list.add(new ReplacementPreset.Direct("minecraft:cobbled_deepslate_slab", "tfc:rock/raw/basalt_slab"));
+        list.add(new ReplacementPreset.Direct("minecraft:cobbled_deepslate_wall", "tfc:rock/raw/basalt_wall"));
         list.add(new ReplacementPreset.Direct("minecraft:polished_deepslate", "tfc:rock/smooth/basalt"));
         list.add(new ReplacementPreset.Direct("minecraft:polished_deepslate_stairs", "tfc:rock/smooth/basalt_stairs"));
         list.add(new ReplacementPreset.Direct("minecraft:polished_deepslate_slab", "tfc:rock/smooth/basalt_slab"));
@@ -166,6 +166,9 @@ public final class PresetContainer {
         list.add(new ReplacementPreset.Direct("minecraft:mud_brick_wall", "tfc:mud_bricks/sandy_loam_wall"));
         list.add(new ReplacementPreset.Direct("minecraft:sugar_cane", "tfc:wild_crop/sugarcane"));
         list.add(new ReplacementPreset.Direct("minecraft:copper_block", "tfc:metal/block/copper"));
+        list.add(new ReplacementPreset.Direct("minecraft:cocoa", "minecraft:air"));
+        list.add(new ReplacementPreset.Direct("minecraft:calcite", "tfc:rock/smooth/chalk"));
+        list.add(new ReplacementPreset.Direct("minecraft:smooth_basalt", "tfc:rock/smooth/basalt"));
         return list;
     }
 
@@ -235,6 +238,24 @@ public final class PresetContainer {
                         "tfc:rock/magma/basalt",
                         "tfc:rock/magma/andesite",
                         "tfc:rock/magma/dacite"
+                )),
+                new ReplacementPreset.Random("minecraft:white_bed", true, List.of(
+                        "minecraft:white_bed",
+                        "minecraft:light_gray_bed",
+                        "minecraft:gray_bed",
+                        "minecraft:black_bed",
+                        "minecraft:brown_bed",
+                        "minecraft:red_bed",
+                        "minecraft:orange_bed",
+                        "minecraft:yellow_bed",
+                        "minecraft:lime_bed",
+                        "minecraft:green_bed",
+                        "minecraft:cyan_bed",
+                        "minecraft:light_blue_bed",
+                        "minecraft:blue_bed",
+                        "minecraft:purple_bed",
+                        "minecraft:magenta_bed",
+                        "minecraft:pink_bed"
                 ))
         );
     }
