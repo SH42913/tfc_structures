@@ -22,7 +22,6 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.slf4j.Logger;
@@ -64,19 +63,11 @@ public class TFCStructuresMod {
 
     public TFCStructuresMod(FMLJavaModLoadingContext modLoadingContext) {
         IEventBus modEventBus = modLoadingContext.getModEventBus();
-        modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::addPackFinder);
         modEventBus.addListener(this::onConfigLoading);
         modLoadingContext.registerConfig(ModConfig.Type.COMMON, CommonConfig.SPEC, MODID + "/common-config.toml");
 
         MinecraftForge.EVENT_BUS.addListener(this::onServerAboutToStart);
-    }
-
-    private void commonSetup(FMLCommonSetupEvent event) {
-        LOGGER.info("Common setup of {}", MODID);
-        structureConfig = CONFIG_PROVIDER.load(StructureConfig.CONFIG_NAME, StructureConfig.CODEC, StructureConfig::getDefaultConfig);
-        worldgenConfig = CONFIG_PROVIDER.load(WorldgenConfig.CONFIG_NAME, WorldgenConfig.CODEC, WorldgenConfig::getDefaultConfig);
-        presetContainer.loadPresets();
     }
 
     private void onConfigLoading(ModConfigEvent event) {
@@ -85,7 +76,12 @@ public class TFCStructuresMod {
             Path datapacksFolderPath = FMLPaths.GAMEDIR.get().resolve(datapacksFolderName);
             DATAPACK_GENERATOR = new DatapackGenerator(datapacksFolderPath);
             LOGGER.info("{} will use \"{}\" as datapacks folder", MODID, datapacksFolderName);
-            LOGGER.info("{} config loaded", MODID);
+
+            structureConfig = CONFIG_PROVIDER.load(StructureConfig.CONFIG_NAME, StructureConfig.CODEC, StructureConfig::getDefaultConfig);
+            worldgenConfig = CONFIG_PROVIDER.load(WorldgenConfig.CONFIG_NAME, WorldgenConfig.CODEC, WorldgenConfig::getDefaultConfig);
+            presetContainer.loadPresets();
+
+            LOGGER.info("{} configs loaded", MODID);
         }
     }
 
