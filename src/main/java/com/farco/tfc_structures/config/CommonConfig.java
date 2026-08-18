@@ -19,6 +19,12 @@ import java.util.stream.Collectors;
 public class CommonConfig {
     private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 
+    public static final ForgeConfigSpec.ConfigValue<String> DATAPACKS_FOLDER = BUILDER
+            .comment("Folder relative to game folder where datapacks(incl. generated one) will be placed")
+            .comment("Eg, you can use \"datapacks\" name to load all datapacks from that folder")
+            .comment("Be cautious, all datapacks in this folder will always be loaded")
+            .define("datapacksFolder", TFCStructuresMod.MODID + "_datapacks");
+
     public static final ForgeConfigSpec.BooleanValue BIOMES_TAGS_STRUCTURES_TO_LOGS = BUILDER
             .comment("Print all biomes, biome tags and structures to logs upon world loading")
             .comment("You'll able to find it with [BIOME], [BIOME_TAG] and [STRUCTURE] tags")

@@ -21,6 +21,7 @@ import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -45,17 +46,17 @@ public class TFCStructuresMod {
     public static final boolean TFC_IS_LOADED;
     private static final Path CONFIG_FOLDER_PATH;
     private static final JsonConfigProvider CONFIG_PROVIDER;
-    private static final DatapackGenerator DATAPACK_GENERATOR;
 
     public final static PresetContainer presetContainer;
     public static StructureConfig structureConfig;
     public static WorldgenConfig worldgenConfig;
 
+    private DatapackGenerator DATAPACK_GENERATOR;
+
     static {
         LOGGER = LogUtils.getLogger();
         CONFIG_FOLDER_PATH = FMLPaths.CONFIGDIR.get().resolve(TFCStructuresMod.MODID);
         CONFIG_PROVIDER = new JsonConfigProvider(CONFIG_FOLDER_PATH);
-        DATAPACK_GENERATOR = new DatapackGenerator(FMLPaths.GAMEDIR.get().resolve(MODID + "_datapacks"));
         presetContainer = new PresetContainer(CONFIG_FOLDER_PATH);
 
         TFC_IS_LOADED = ClassLoadChecker.TFC_IS_LOADED;
@@ -65,6 +66,7 @@ public class TFCStructuresMod {
         IEventBus modEventBus = modLoadingContext.getModEventBus();
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::addPackFinder);
+        modEventBus.addListener(this::onConfigLoading);
         modLoadingContext.registerConfig(ModConfig.Type.COMMON, CommonConfig.SPEC, MODID + "/common-config.toml");
 
         MinecraftForge.EVENT_BUS.addListener(this::onServerAboutToStart);
@@ -75,6 +77,16 @@ public class TFCStructuresMod {
         structureConfig = CONFIG_PROVIDER.load(StructureConfig.CONFIG_NAME, StructureConfig.CODEC, StructureConfig::getDefaultConfig);
         worldgenConfig = CONFIG_PROVIDER.load(WorldgenConfig.CONFIG_NAME, WorldgenConfig.CODEC, WorldgenConfig::getDefaultConfig);
         presetContainer.loadPresets();
+    }
+
+    private void onConfigLoading(ModConfigEvent event) {
+        if (event.getConfig().getModId().equals(MODID)) {
+            String datapacksFolderName = CommonConfig.DATAPACKS_FOLDER.get();
+            Path datapacksFolderPath = FMLPaths.GAMEDIR.get().resolve(datapacksFolderName);
+            DATAPACK_GENERATOR = new DatapackGenerator(datapacksFolderPath);
+            LOGGER.info("{} will use \"{}\" as datapacks folder", MODID, datapacksFolderName);
+            LOGGER.info("{} config loaded", MODID);
+        }
     }
 
     private void addPackFinder(AddPackFindersEvent event) {
