@@ -14,7 +14,6 @@ import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
@@ -66,9 +65,11 @@ public abstract class StructureStartMixin {
         Registry<Block> blockRegistry = level.registryAccess().registryOrThrow(Registries.BLOCK);
         replacementPreset.createMapsIfNeed(blockRegistry);
 
-        StructureReplacementProcessor processor = new StructureReplacementProcessor(structureData, replacementPreset);
+        long worldSeed = level.getSeed();
+        ChunkPos rootChunkPos = getChunkPos();
+        StructureReplacementProcessor processor = new StructureReplacementProcessor(worldSeed, rootChunkPos, structureData, replacementPreset);
         StructureReplacementProcessor.THREAD_LOCAL.set(processor);
-        TFCStructuresMod.LOGGER.debug("Start structure replacement for {} at {}", location, getChunkPos());
+        TFCStructuresMod.LOGGER.debug("Start structure replacement for {} at {}", location, rootChunkPos);
     }
 
     @Inject(method = "placeInChunk", at = @At("RETURN"))
@@ -78,12 +79,7 @@ public abstract class StructureStartMixin {
         var processor = StructureReplacementProcessor.THREAD_LOCAL.get();
         if (processor != null) {
             StructureReplacementProcessor.THREAD_LOCAL.remove();
-            long worldSeed = level.getSeed();
-            var rootChunkPos = getChunkPos();
-            var worldGenRandom = new WorldgenRandom(WorldgenRandom.Algorithm.XOROSHIRO.newInstance(worldSeed));
-            worldGenRandom.setLargeFeatureSeed(worldSeed, rootChunkPos.x, rootChunkPos.z);
-            TFCStructuresMod.LOGGER.debug("Applying replacements for structure at {}, randomCheck={}", getChunkPos(), worldGenRandom.nextLong());
-            processor.applyReplacements(level, worldGenRandom, rootChunkPos, box, chunkPos);
+            processor.applyReplacements(level, box, chunkPos);
         }
     }
 }

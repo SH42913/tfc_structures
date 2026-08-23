@@ -28,7 +28,7 @@ public class RandomReplaceFeature implements ReplaceFeature {
     }
 
     @Override
-    public void prepareData(WorldGenLevel level, RandomSource random, ChunkPos rootChunkPos, BoundingBox box, ChunkPos chunkPos) {
+    public void prepareData(WorldGenLevel level, RandomSource random, ChunkPos rootChunkPos, BoundingBox box) {
         localRandom = random;
 
         predefinedReplacementMap = new HashMap<>();

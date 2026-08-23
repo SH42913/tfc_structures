@@ -23,6 +23,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.storage.loot.LootDataManager;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -38,12 +39,18 @@ public class StructureReplacementProcessor {
     private static final String LOOT_TABLE_SEED_NAME = RandomizableContainerBlockEntity.LOOT_TABLE_SEED_TAG;
     private static final String ITEMS_NAME = "Items";
 
+    private final RandomSource randomSource;
+    private final ChunkPos rootChunkPos;
     private final @Nullable StructureConfig.Data structureData;
     private final List<ReplaceFeature> replaceFeatures;
     private final HashSet<BlockPos> registeredBlocks;
     private final HashSet<BlockPos> blocksToSkip;
 
-    public StructureReplacementProcessor(@Nullable StructureConfig.Data structureData, ReplacementPreset replacementPreset) {
+    public StructureReplacementProcessor(long worldSeed, ChunkPos rootChunkPos, @Nullable StructureConfig.Data structureData, ReplacementPreset replacementPreset) {
+        var worldGenRandom = new WorldgenRandom(WorldgenRandom.Algorithm.XOROSHIRO.newInstance(worldSeed));
+        worldGenRandom.setLargeFeatureSeed(worldSeed, rootChunkPos.x, rootChunkPos.z);
+        this.randomSource = worldGenRandom;
+        this.rootChunkPos = rootChunkPos;
         this.structureData = structureData;
 
         replaceFeatures = new ArrayList<>();
@@ -66,11 +73,13 @@ public class StructureReplacementProcessor {
         }
     }
 
-    public void applyReplacements(WorldGenLevel level, RandomSource random, ChunkPos rootChunkPos, BoundingBox box, ChunkPos chunkPos) {
+    public void applyReplacements(WorldGenLevel level, BoundingBox box, ChunkPos chunkPos) {
+        TFCStructuresMod.LOGGER.debug("Applying replacements at {} for structure(root={})", chunkPos, rootChunkPos);
         for (ReplaceFeature feature : replaceFeatures) {
-            feature.prepareData(level, random.fork(), rootChunkPos, box, chunkPos);
+            feature.prepareData(level, randomSource.fork(), rootChunkPos, box);
         }
 
+        var blockRandom = randomSource.fork();
         var chunkAccess = level.getChunk(chunkPos.x, chunkPos.z);
         var postProcessHelper = new PostProcessHelper(level, blocksToSkip);
         for (BlockPos pos : registeredBlocks) {
@@ -96,7 +105,7 @@ public class StructureReplacementProcessor {
             level.setBlock(pos, newState, Block.UPDATE_NONE);
 
             if (originalEntity != null) {
-                replaceBlockEntity(pos, originalState, originalEntity, newState, chunkAccess, level, random);
+                replaceBlockEntity(pos, originalState, originalEntity, newState, chunkAccess, level, blockRandom);
             } else {
                 createBlockEntity(pos, newState, chunkAccess);
             }

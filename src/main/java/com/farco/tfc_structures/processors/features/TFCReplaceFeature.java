@@ -151,7 +151,7 @@ public class TFCReplaceFeature implements ReplaceFeature {
     }
 
     @Override
-    public void prepareData(WorldGenLevel level, RandomSource random, ChunkPos rootChunkPos, BoundingBox box, ChunkPos chunkPos) {
+    public void prepareData(WorldGenLevel level, RandomSource random, ChunkPos rootChunkPos, BoundingBox box) {
         var chunkGenerator = level.getLevel().getChunkSource().getGenerator();
         tfcGeneratorAvailable = chunkGenerator instanceof TFCChunkGenerator;
         if (!tfcGeneratorAvailable) {

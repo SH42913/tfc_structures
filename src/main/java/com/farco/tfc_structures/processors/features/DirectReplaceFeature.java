@@ -26,7 +26,7 @@ public class DirectReplaceFeature implements ReplaceFeature {
     }
 
     @Override
-    public void prepareData(WorldGenLevel level, RandomSource random, ChunkPos rootChunkPos, BoundingBox box, ChunkPos chunkPos) {
+    public void prepareData(WorldGenLevel level, RandomSource random, ChunkPos rootChunkPos, BoundingBox box) {
     }
 
     @Override
