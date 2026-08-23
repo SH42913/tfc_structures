@@ -42,6 +42,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
@@ -56,6 +57,7 @@ import net.minecraft.world.level.block.CeilingHangingSignBlock;
 import net.minecraft.world.level.block.SignBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
@@ -152,7 +154,8 @@ public class TFCReplaceFeature implements ReplaceFeature {
 
     @Override
     public void prepareData(WorldGenLevel level, RandomSource random, ChunkPos rootChunkPos, BoundingBox box) {
-        var chunkGenerator = level.getLevel().getChunkSource().getGenerator();
+        ServerChunkCache chunkSource = level.getLevel().getChunkSource();
+        ChunkGenerator chunkGenerator = chunkSource.getGenerator();
         tfcGeneratorAvailable = chunkGenerator instanceof TFCChunkGenerator;
         if (!tfcGeneratorAvailable) {
             TFCStructuresMod.LOGGER.warn("Cannot use TFCReplaceFeature due TFCChunkGenerator is not in use");
@@ -163,8 +166,13 @@ public class TFCReplaceFeature implements ReplaceFeature {
 
         int x = rootChunkPos.getMiddleBlockX();
         int z = rootChunkPos.getMiddleBlockZ();
-        int y = level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, x, z);
-        BlockPos rootChunkSurface = new BlockPos(x, y, z);
+        int y = chunkGenerator.getBaseHeight(
+                x,
+                z,
+                Heightmap.Types.WORLD_SURFACE_WG,
+                level,
+                chunkSource.randomState()
+        );
 
         ChunkDataProvider provider = ChunkDataProvider.get(level);
         ChunkData chunkData = provider.get(level, rootChunkPos);
@@ -173,6 +181,7 @@ public class TFCReplaceFeature implements ReplaceFeature {
 
         Wood wood = null;
         int woodIndex = random.nextInt(Integer.MAX_VALUE);
+        BlockPos rootChunkSurface = new BlockPos(x, y, z);
         var forestEntries = getForestEntry(level, chunkData, rootChunkSurface, random);
         if (forestEntries == null || forestEntries.isEmpty()) {
             TFCStructuresMod.LOGGER.warn("Can't detect ForestEntry");
