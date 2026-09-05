@@ -6,7 +6,10 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.dries007.tfc.world.biome.BiomeExtension;
 import net.dries007.tfc.world.biome.TFCBiomes;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -14,6 +17,7 @@ import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.structure.BuiltinStructures;
 import net.minecraft.world.level.levelgen.structure.Structure;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -32,6 +36,7 @@ public final class WorldgenConfig {
     public List<ResourceLocation> defaultWorldgenStructures;
 
     private Map<String, TagKey<Biome>> structureToTagMap = new HashMap<>();
+    private Map<Structure, HolderSet<Biome>> structureToBiomesMap = new HashMap<>();
 
     public WorldgenConfig(List<BiomeTag> biomeTags, List<ResourceLocation> disabledStructures, List<ResourceLocation> defaultWorldgenStructures) {
         this.biomeTags = biomeTags;
@@ -141,7 +146,29 @@ public final class WorldgenConfig {
         structureToTagMap = map;
     }
 
+    public void rebuildStructureToBiomesMap(RegistryAccess registryAccess) {
+        var biomesMap = new HashMap<Structure, HolderSet<Biome>>();
+        var structureRegistry = registryAccess.registryOrThrow(Registries.STRUCTURE);
+        var biomeLookup = registryAccess.lookupOrThrow(Registries.BIOME);
+        for (var entry : structureToTagMap.entrySet()) {
+            ResourceKey<Structure> structureKey = ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse(entry.getKey()));
+            Structure structure = structureRegistry.get(structureKey);
+            if (structure == null) {
+                continue;
+            }
+
+            biomeLookup.get(entry.getValue()).ifPresent(biomes -> biomesMap.put(structure, biomes));
+        }
+
+        structureToBiomesMap = biomesMap;
+    }
+
     public TagKey<Biome> getStructureTag(ResourceKey<Structure> structureKey) {
         return structureToTagMap.get(structureKey.location().toString());
+    }
+
+    @Nullable
+    public HolderSet<Biome> getStructureBiomes(Structure structure) {
+        return structureToBiomesMap.get(structure);
     }
 }
