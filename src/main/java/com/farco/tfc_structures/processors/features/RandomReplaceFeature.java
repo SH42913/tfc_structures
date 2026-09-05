@@ -39,6 +39,10 @@ public class RandomReplaceFeature implements ReplaceFeature {
             }
 
             List<ResourceLocation> variants = value.variants();
+            if (variants.isEmpty()) {
+                continue;
+            }
+
             int randomIndex = localRandom.nextInt(variants.size());
             ResourceLocation replacement = value.variants().get(randomIndex);
             predefinedReplacementMap.put(entry.getKey(), replacement);
@@ -59,6 +63,10 @@ public class RandomReplaceFeature implements ReplaceFeature {
         }
 
         List<ResourceLocation> variants = pair.variants();
+        if (variants.isEmpty()) {
+            return null;
+        }
+
         int randomIndex = localRandom.nextInt(variants.size());
         var replacementLocation = variants.get(randomIndex);
         return blockRegistry.get(replacementLocation);
