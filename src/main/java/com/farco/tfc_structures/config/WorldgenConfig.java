@@ -12,7 +12,6 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.structure.BuiltinStructures;
@@ -31,11 +30,12 @@ public final class WorldgenConfig {
 
     public static final String CONFIG_NAME = "worldgen_config.json";
 
+    private static final HolderSet<Biome> NO_BIOMES = HolderSet.direct(List.of());
+
     public List<BiomeTag> biomeTags;
     public List<ResourceLocation> disabledStructures;
     public List<ResourceLocation> defaultWorldgenStructures;
 
-    private Map<String, TagKey<Biome>> structureToTagMap = new HashMap<>();
     private Map<Structure, HolderSet<Biome>> structureToBiomesMap = new HashMap<>();
 
     public WorldgenConfig(List<BiomeTag> biomeTags, List<ResourceLocation> disabledStructures, List<ResourceLocation> defaultWorldgenStructures) {
@@ -134,37 +134,55 @@ public final class WorldgenConfig {
         );
     }
 
-    public void rebuildStructureToTagMap() {
-        var map = new HashMap<String, TagKey<Biome>>();
+    public void rebuildStructureToBiomesMap(RegistryAccess registryAccess) {
+        int structureCount = disabledStructures.size();
         for (BiomeTag biomeTag : biomeTags) {
-            var tagKey = biomeTag.getTagKey();
-            for (ResourceLocation structureId : biomeTag.structures()) {
-                map.put(structureId.toString(), tagKey);
-            }
+            structureCount += biomeTag.structures().size();
         }
 
-        structureToTagMap = map;
-    }
+        if (structureCount == 0) {
+            structureToBiomesMap = Map.of();
+            return;
+        }
 
-    public void rebuildStructureToBiomesMap(RegistryAccess registryAccess) {
-        var biomesMap = new HashMap<Structure, HolderSet<Biome>>();
+        var biomesMap = new HashMap<Structure, HolderSet<Biome>>(structureCount);
         var structureRegistry = registryAccess.registryOrThrow(Registries.STRUCTURE);
         var biomeLookup = registryAccess.lookupOrThrow(Registries.BIOME);
-        for (var entry : structureToTagMap.entrySet()) {
-            ResourceKey<Structure> structureKey = ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse(entry.getKey()));
-            Structure structure = structureRegistry.get(structureKey);
-            if (structure == null) {
+        var tagBiomes = new HashMap<ResourceLocation, HolderSet<Biome>>();
+
+        for (BiomeTag biomeTag : biomeTags) {
+            var structures = biomeTag.structures();
+            if (structures.isEmpty()) {
                 continue;
             }
 
-            biomeLookup.get(entry.getValue()).ifPresent(biomes -> biomesMap.put(structure, biomes));
+            HolderSet<Biome> biomes = tagBiomes.get(biomeTag.id());
+            if (biomes == null) {
+                var resolved = biomeLookup.get(biomeTag.getTagKey());
+                if (resolved.isEmpty()) {
+                    continue;
+                }
+
+                biomes = resolved.get();
+                tagBiomes.put(biomeTag.id(), biomes);
+            }
+
+            for (ResourceLocation structureId : structures) {
+                Structure structure = structureRegistry.get(structureId);
+                if (structure != null) {
+                    biomesMap.put(structure, biomes);
+                }
+            }
+        }
+
+        for (ResourceLocation structureId : disabledStructures) {
+            Structure structure = structureRegistry.get(structureId);
+            if (structure != null) {
+                biomesMap.put(structure, NO_BIOMES);
+            }
         }
 
         structureToBiomesMap = biomesMap;
-    }
-
-    public TagKey<Biome> getStructureTag(ResourceKey<Structure> structureKey) {
-        return structureToTagMap.get(structureKey.location().toString());
     }
 
     @Nullable
