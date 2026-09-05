@@ -12,6 +12,9 @@ The mod is also fully configurable; you may find configuration files in the **co
 default,
 only vanilla structures are activated, but you can activate any other modded structure.
 
+**Primarily aimed at TerraFirmaCraft modpack authors** — this mod helps you bring vanilla and modded structures into
+TFC worlds with configurable block replacements and worldgen rules.
+
 Despite the mod's name, Dynamic TFC Structures may work without TerraFirmaCraft, so feel free to use it in non-TFC
 modpacks :)
 _But you'll need to build configuration files yourself if you don't have TFC._
@@ -77,6 +80,50 @@ generation._
 
 You should be aware that Dynamic TFC Structures overrides vanilla loot tables to TFC items in the `gameplay` folder,
 such as the Cat's morning gift, Hero of the Village reward, Piglin bartering, and Sniffer digging.
+
+## FAQ
+
+### How do I add new structures?
+
+Just start a new world with your structure mods installed. After the first server load, you will find new structures in
+`config/tfc_structures/worldgen_config.json` (in the `defaultWorldgenStructures` section) and in
+`config/tfc_structures/structures_config.json` (in the `structures` section). Both files are created or updated
+automatically when the server is about to start.
+
+<details>
+<summary>What happens under the hood</summary>
+
+- `worldgen_config.json` — the mod scans the structure registry and puts every structure that is not listed in
+  `biomeTags` or `disabledStructures` into `defaultWorldgenStructures`. Structures in that list keep the biome rules
+  from the original mod. To make a structure spawn in TFC biomes, move its ID from `defaultWorldgenStructures` into a
+  `biomeTags` entry (create a new one or add it to an existing tag). See the vanilla entries in
+  `WorldgenConfig.getDefaultConfig()` for examples.
+- `structures_config.json` — every registered structure that is missing from `structures` gets a default entry:
+  `replacementPreset: "overworld-common"`, the default empty-chest loot table from `common-config.toml`, and an empty
+  `lootTablesOverrideMap`. Adjust the preset, loot overrides, or assign a custom preset from the `presets` folder as
+  needed.
+
+</details>
+
+**After editing**
+
+Restart the server (or create a new world) so the generated datapack in `_tfc_structures_datapacks/tfc_structures_main`
+is rebuilt with your `biomeTags` changes. Block replacement settings from `structures_config.json` are picked up on the
+next structure spawn.
+
+**Tip:** enable `biomesTagsStructuresToLogs` in `common-config.toml` to print every structure ID to the log — useful
+when you are unsure of the exact resource location.
+
+### How to customize loot tables on structures?
+
+There are three ways:
+
+- Override loot tables of structures directly using a custom datapack (or KubeJS data folder).
+- Create your own loot tables using a custom datapack and override vanilla tables with yours for desired structures
+  using `lootTablesOverrideMap` in `config/tfc_structures/structures_config.json`.
+- Replace items in loot tables using KubeJS + LootJS (you may take a look at how I did that in my modpack TFC: Lost
+  Light, in file `kubejs/server_scripts/modpack_loot_replacement.js`). This one is the easier way, as it will be fully
+  automatic for all structure loot tables.
 
 ## Known issues
 
