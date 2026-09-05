@@ -79,6 +79,7 @@ public class TFCStructuresMod {
 
             structureConfig = CONFIG_PROVIDER.load(StructureConfig.CONFIG_NAME, StructureConfig.CODEC, StructureConfig::getDefaultConfig);
             worldgenConfig = CONFIG_PROVIDER.load(WorldgenConfig.CONFIG_NAME, WorldgenConfig.CODEC, WorldgenConfig::getDefaultConfig);
+            worldgenConfig.rebuildStructureToTagMap();
             presetContainer.loadPresets();
 
             LOGGER.info("{} configs loaded", MODID);
@@ -105,6 +106,7 @@ public class TFCStructuresMod {
 
         Registry<Structure> structureRegistry = registryAccess.registryOrThrow(Registries.STRUCTURE);
         worldgenConfig.refreshUnused(structureRegistry);
+        worldgenConfig.rebuildStructureToTagMap();
         CONFIG_PROVIDER.save(WorldgenConfig.CONFIG_NAME, worldgenConfig, WorldgenConfig.CODEC);
 
         structureConfig.refreshUnused(structureRegistry);

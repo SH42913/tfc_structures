@@ -31,7 +31,7 @@ public final class WorldgenConfig {
     public List<ResourceLocation> disabledStructures;
     public List<ResourceLocation> defaultWorldgenStructures;
 
-    private Map<String, TagKey<Biome>> structureToTagMap;
+    private Map<String, TagKey<Biome>> structureToTagMap = new HashMap<>();
 
     public WorldgenConfig(List<BiomeTag> biomeTags, List<ResourceLocation> disabledStructures, List<ResourceLocation> defaultWorldgenStructures) {
         this.biomeTags = biomeTags;
@@ -129,18 +129,19 @@ public final class WorldgenConfig {
         );
     }
 
-    public TagKey<Biome> getStructureTag(ResourceKey<Structure> structureKey) {
-        if (structureToTagMap == null) {
-            structureToTagMap = new HashMap<>();
-            for (BiomeTag biomeTag : biomeTags) {
-                var tagKey = biomeTag.getTagKey();
-                for (ResourceLocation structureId : biomeTag.structures()) {
-                    structureToTagMap.put(structureId.toString(), tagKey);
-                }
+    public void rebuildStructureToTagMap() {
+        var map = new HashMap<String, TagKey<Biome>>();
+        for (BiomeTag biomeTag : biomeTags) {
+            var tagKey = biomeTag.getTagKey();
+            for (ResourceLocation structureId : biomeTag.structures()) {
+                map.put(structureId.toString(), tagKey);
             }
         }
 
-        String structureId = structureKey.location().toString();
-        return structureToTagMap.get(structureId);
+        structureToTagMap = map;
+    }
+
+    public TagKey<Biome> getStructureTag(ResourceKey<Structure> structureKey) {
+        return structureToTagMap.get(structureKey.location().toString());
     }
 }
