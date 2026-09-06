@@ -50,11 +50,9 @@ public final class StructureConfig implements JsonConfigProvider.HasFieldsToSort
     public void refreshUnused(Registry<Structure> structuresRegistry) {
         String defaultPreset = PresetContainer.DEFAULT_OVERWORLD_PRESET_NAME;
         String defaultEmptyChest = CommonConfig.DEFAULT_EMPTY_CHEST_LOOT_TABLE.get();
-        Map<String, String> defaultLootOverrideMAp = Collections.emptyMap();
-        Data defaultData = new Data(defaultPreset, defaultEmptyChest, defaultLootOverrideMAp);
         for (ResourceLocation location : structuresRegistry.keySet()) {
             if (!structures.containsKey(location)) {
-                structures.put(location, defaultData);
+                structures.put(location, new Data(defaultPreset, defaultEmptyChest, Collections.emptyMap()));
             }
         }
     }

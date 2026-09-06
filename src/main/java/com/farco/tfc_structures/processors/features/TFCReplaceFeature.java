@@ -93,6 +93,8 @@ public class TFCReplaceFeature implements ReplaceFeature {
     private boolean tfcGeneratorAvailable;
     private Registry<Block> blockRegistry;
     private DummySurfaceBuilderContext surfaceBuilderContext;
+    private Biome cachedBiome;
+    private BiomeExtension cachedBiomeExtension;
     private RockSettings cachedSurfaceRock;
     private Wood cachedWood;
 
@@ -180,9 +182,12 @@ public class TFCReplaceFeature implements ReplaceFeature {
         RockData cachedRockData = chunkData.getRockData();
         cachedSurfaceRock = cachedRockData.getSurfaceRock(x, z);
 
+        BlockPos rootChunkSurface = new BlockPos(x, y, z);
+        cachedBiome = level.getBiome(rootChunkSurface).get();
+        cachedBiomeExtension = TFCBiomes.getExtensionOrThrow(level, cachedBiome);
+
         Wood wood = null;
         int woodIndex = random.nextInt(Integer.MAX_VALUE);
-        BlockPos rootChunkSurface = new BlockPos(x, y, z);
         var forestEntries = getForestEntry(level, chunkData, rootChunkSurface, random);
         if (forestEntries == null || forestEntries.isEmpty()) {
             TFCStructuresMod.LOGGER.warn("Can't detect ForestEntry");
@@ -330,10 +335,11 @@ public class TFCReplaceFeature implements ReplaceFeature {
         boolean isCommonSandstone = isSandstoneBlock || isStair || isSlab || isWall;
 
         var context = buildSoilContext(level, pos);
-        Block sandBlock = SurfaceStates.SHORE_SAND.getState(context).getBlock();
+        boolean isShore = cachedBiomeExtension.isShore();
+        Block sandBlock = isShore ? SurfaceStates.SHORE_SAND.getState(context).getBlock() : cachedSurfaceRock.sand();
         if (!isCommonSandstone) {
             if (original.is(Tags.Blocks.GRAVEL)) {
-                return SurfaceStates.GRAVEL.getState(context).getBlock();
+                return isShore ? context.getBottomRock().gravel() : cachedSurfaceRock.gravel();
             } else {
                 return sandBlock;
             }
@@ -410,10 +416,8 @@ public class TFCReplaceFeature implements ReplaceFeature {
         return null;
     }
 
-    private static List<ForestConfig.Entry> getForestEntry(WorldGenLevel level, ChunkData chunkData, BlockPos pos, RandomSource random) {
-        Biome biome = level.getBiome(pos).get();
-        BiomeExtension biomeExtension = TFCBiomes.getExtensionOrThrow(level, biome);
-        Set<PlacedFeature> featureSet = biomeExtension.getFlattenedFeatureSet(biome);
+    private List<ForestConfig.Entry> getForestEntry(WorldGenLevel level, ChunkData chunkData, BlockPos pos, RandomSource random) {
+        Set<PlacedFeature> featureSet = cachedBiomeExtension.getFlattenedFeatureSet(cachedBiome);
 
         for (PlacedFeature placedFeature : featureSet) {
             var configuredFeature = placedFeature.feature().value();
