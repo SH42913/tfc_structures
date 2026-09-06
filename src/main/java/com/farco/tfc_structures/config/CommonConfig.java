@@ -12,6 +12,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -38,7 +39,8 @@ public class CommonConfig {
 
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ALLOWED_DIMENSIONS = BUILDER
             .comment("Dimensions where structure blocks will be replaced")
-            .defineList("allowedDimensions", List.of(Level.OVERWORLD.location().toString()), str -> str instanceof String);
+            .comment("Empty list disables block replacements in all dimensions")
+            .defineListAllowEmpty("allowedDimensions", List.of(Level.OVERWORLD.location().toString()), CommonConfig::validateDimensionId);
 
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> MOSSY_BLOCKS = BUILDER
             .comment("List to separate mossy blocks from others (it will generate #mossy_stones tag)")
@@ -95,21 +97,43 @@ public class CommonConfig {
 
     public static Set<ResourceLocation> allowedDimensionsSet;
 
+    private static boolean validateDimensionId(Object dimensionId) {
+        return dimensionId instanceof String && ResourceLocation.tryParse((String) dimensionId) != null;
+    }
+
     private static boolean validateBlockIds(Object blockId) {
-        return blockId instanceof String && ForgeRegistries.BLOCKS.containsKey(ResourceLocation.parse((String) blockId));
+        if (blockId instanceof String blockIdString) {
+            ResourceLocation location = ResourceLocation.tryParse(blockIdString);
+            return location != null && ForgeRegistries.BLOCKS.containsKey(location);
+        } else {
+            return false;
+        }
     }
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {
-        allowedDimensionsSet = ALLOWED_DIMENSIONS.get().stream().map(ResourceLocation::parse).collect(Collectors.toSet());
+        if (!event.getConfig().getModId().equals(TFCStructuresMod.MODID)) {
+            return;
+        }
+
+        if (event instanceof ModConfigEvent.Loading || event instanceof ModConfigEvent.Reloading) {
+            allowedDimensionsSet = ALLOWED_DIMENSIONS.get().stream()
+                    .map(ResourceLocation::tryParse)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
+        }
     }
 
     public static boolean isAvailableToReplace(@NotNull WorldGenLevel worldGenLevel) {
-        if (allowedDimensionsSet == null || allowedDimensionsSet.isEmpty()) {
-            TFCStructuresMod.LOGGER.warn("allowedDimensions set is empty, so any dimension will use block replacements");
-            return true;
-        } else {
-            return allowedDimensionsSet.contains(worldGenLevel.getLevel().dimension().location());
+        if (allowedDimensionsSet == null) {
+            TFCStructuresMod.LOGGER.warn("allowedDimensions has not been loaded yet, skipping block replacements");
+            return false;
         }
+
+        if (allowedDimensionsSet.isEmpty()) {
+            return false;
+        }
+
+        return allowedDimensionsSet.contains(worldGenLevel.getLevel().dimension().location());
     }
 }
