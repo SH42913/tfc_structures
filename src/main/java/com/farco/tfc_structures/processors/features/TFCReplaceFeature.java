@@ -137,7 +137,8 @@ public class TFCReplaceFeature implements ReplaceFeature {
                 new Pair<>(Blocks.MUD, SoilBlockType.MUD),
                 new Pair<>(Blocks.MUD_BRICKS, SoilBlockType.MUD_BRICKS),
                 new Pair<>(Blocks.MUDDY_MANGROVE_ROOTS, SoilBlockType.MUDDY_ROOTS),
-                new Pair<>(Blocks.PODZOL, SoilBlockType.ROOTED_DIRT)
+                new Pair<>(Blocks.PODZOL, SoilBlockType.ROOTED_DIRT),
+                new Pair<>(Blocks.MYCELIUM, SoilBlockType.ROOTED_DIRT)
         );
 
         tagToOreMappings = List.of(
